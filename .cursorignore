@@ -1,0 +1,22 @@
+﻿# Cursor indexing - exclude heavy/missing paths
+backups/
+can/
+tmp/
+tmp_*/
+node_modules/
+vendor/
+.codex_tmp/
+.terraform/
+
+*.log
+bootstrap/cache/
+storage/logs/
+storage/framework/
+public/build/
+.env
+.env.*
+*.pem
+*credentials*.json
+*.zip
+*.sql
+*.db
