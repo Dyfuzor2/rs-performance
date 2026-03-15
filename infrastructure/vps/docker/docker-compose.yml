@@ -1,0 +1,83 @@
+﻿services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - /srv/ops-stack/postgres:/var/lib/postgresql/data
+      - /srv/ops-stack/compose/init.sql:/docker-entrypoint-initdb.d/00-init.sql:ro
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  uptime-kuma:
+    image: louislam/uptime-kuma:1
+    restart: unless-stopped
+    volumes:
+      - /srv/ops-stack/kuma:/app/data
+    ports:
+      - 127.0.0.1:3001:3001
+
+  n8n:
+    image: n8nio/n8n:latest
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_TYPE: postgresdb
+      DB_POSTGRESDB_HOST: postgres
+      DB_POSTGRESDB_PORT: 5432
+      DB_POSTGRESDB_DATABASE: ${N8N_DB_NAME}
+      DB_POSTGRESDB_USER: ${N8N_DB_USER}
+      DB_POSTGRESDB_PASSWORD: ${N8N_DB_PASSWORD}
+      N8N_HOST: ${N8N_HOST}
+      N8N_PORT: ${N8N_PORT}
+      N8N_PROTOCOL: ${N8N_PROTOCOL}
+      N8N_EDITOR_BASE_URL: ${N8N_EDITOR_BASE_URL}
+      WEBHOOK_URL: ${WEBHOOK_URL}
+      N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY}
+      N8N_SECURE_COOKIE: true
+      N8N_PROXY_HOPS: ${N8N_PROXY_HOPS}
+      N8N_BASIC_AUTH_ACTIVE: ${N8N_BASIC_AUTH_ACTIVE}
+      N8N_BASIC_AUTH_USER: ${N8N_BASIC_AUTH_USER}
+      N8N_BASIC_AUTH_PASSWORD: ${N8N_BASIC_AUTH_PASSWORD}
+      GENERIC_TIMEZONE: Europe/Warsaw
+      N8N_RUNNERS_ENABLED: true
+      BLOG_TELEGRAM_BOT_TOKEN: 
+      BLOG_TELEGRAM_CHAT_ID: 
+      REPAIR_REPORTS_AUTOMATION_WEBHOOK_KEY: 
+      N8N_BLOCK_ENV_ACCESS_IN_NODE: false
+    volumes:
+      - /srv/ops-stack/n8n:/home/node/.n8n
+    ports:
+      - 127.0.0.1:5678:5678
+
+  umami:
+    image: ghcr.io/umami-software/umami:postgresql-latest
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://${UMAMI_DB_USER}:${UMAMI_DB_PASSWORD}@postgres:5432/${UMAMI_DB_NAME}
+      APP_SECRET: ${UMAMI_APP_SECRET}
+    ports:
+      - 127.0.0.1:3002:3000
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    restart: unless-stopped
+    volumes:
+      - /srv/ops-stack/qdrant:/qdrant/storage
+    ports:
+      - 127.0.0.1:6333:6333
+      - 127.0.0.1:6334:6334
+

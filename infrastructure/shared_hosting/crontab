@@ -1,0 +1,3 @@
+﻿* * * * * cd /home/tyurjydtpw/domains/rsperformance.online/laravel && /usr/local/bin/php85 artisan schedule:run >> /dev/null 2>&1
+* * * * * domains/rsperformance.online/laravel/heartbeat.sh >> domains/rsperformance.online/laravel/storage/logs/cron_daemon.log 2>&1
+MAILTO=""

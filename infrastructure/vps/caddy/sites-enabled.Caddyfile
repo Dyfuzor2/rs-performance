@@ -1,0 +1,63 @@
+﻿analytics.rs3d.pl {
+    encode zstd gzip
+    reverse_proxy 127.0.0.1:3002
+}
+auto.rs3d.pl {
+    encode zstd gzip
+
+    handle_path /support-plane/* {
+        reverse_proxy 127.0.0.1:8091
+    }
+
+    reverse_proxy 127.0.0.1:5678
+}
+cp.rs3d.pl {
+    encode gzip zstd
+
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "no-referrer"
+    }
+
+    @health path /healthz
+    handle @health {
+        respond "ok" 200
+    }
+
+    @aiBeacon path /.well-known/rs-ai-beacon.json /hello-agents.txt
+    handle @aiBeacon {
+        root * /srv/diagnosta/beacon
+        file_server
+    }
+
+    reverse_proxy 127.0.0.1:8001
+}
+mcp.rs3d.pl {
+    encode gzip zstd
+
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "no-referrer"
+    }
+
+    @health path /healthz
+    handle @health {
+        respond "ok" 200
+    }
+
+    @aiBeacon path /.well-known/rs-ai-beacon.json /hello-agents.txt
+    handle @aiBeacon {
+        root * /srv/diagnosta/beacon
+        file_server
+    }
+
+    reverse_proxy 127.0.0.1:8001
+}
+status.rs3d.pl {
+    encode zstd gzip
+    reverse_proxy 127.0.0.1:3001
+}

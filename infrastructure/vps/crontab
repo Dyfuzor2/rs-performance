@@ -1,0 +1,1 @@
+﻿0 3 * * * /srv/ops-stack/backups/restic-backup.sh
