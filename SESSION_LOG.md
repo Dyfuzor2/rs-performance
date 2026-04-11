@@ -4,6 +4,16 @@ Format relay: jeden blok na sesję, bez kasowania cudzych wpisów. Starsze wpisy
 
 ---
 
+## [2026-04-12] Cursor — WOW digest: n8n fleet + Telegram (skills rs-n8n-wow-2026 + telegram-bot-skills)
+
+### Wykonane
+
+- Nowy skrypt `scripts/vps_n8n_telegram_wow_digest.py`: macierz health (5 URL-i), `POST /webhook/bot-invitation-test`, **15 aktywnych workflowów** z ostatnim `status` z `execution_entity`, jedna wiadomość **HTML** na Telegram (target z **RS AI Agent Monitor** `W1xRg73xFDUXYrRI`, bez logowania tokenu).
+- Deploy na VPS: `/tmp/vps_n8n_telegram_wow_digest.py`; run: **Telegram HTTP 200**, fleet 15, health 0 fail, webhook 200.
+- Aktualizacja skilli: `.agents/skills/rs-n8n-wow-2026/SKILL.md`, `.agents/skills/telegram-bot-skills/SKILL.md`.
+
+---
+
 ## [2026-04-12 ~01:15 CET] Cursor — VPS n8n: import Vertex-patched workflows
 
 ### Kontekst
