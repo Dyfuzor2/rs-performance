@@ -1,3 +1,8 @@
+> LEGACY PLAN NOTE (2026-03-29)
+> This plan contains historical Laravel 12 entries. Current verified runtime is Hosting = Laravel 13.1.1 / PHP 8.5.3 and VPS support-plane = Laravel 13.1.1 / PHP 8.5.3.
+> Do not use old Laravel 12 notes here as source of truth without a fresh live check.
+
+
 # RS Performance Master Plan
 
 Last update: 2026-03-15 (VPS programy: backup, Prometheus/Grafana, Portainer, Fail2ban)
@@ -17,11 +22,549 @@ Source of truth runtime: Cyber-Folks production + VPS support stack
 
 ## Current Focus
 
-- Current batch: stage 2 Vertex-backed publication draft pipeline for `rs-support-plane`.
-- Current objective: keep VPS as the async AI producer while shared hosting remains the canonical review and publish surface, and progressively turn VPS into the DTC/AI knowledge layer.
-- Current status: review queue on shared hosting is live, the DTC layer is imported on VPS, the first AI Lighthouse surfaces for DTC are public, the public `/kody-usterek` hub is live on shared hosting with local DTC storage and report linkage, answer/provenance/freshness JSON surfaces are public, the broader shared-host discovery layer now includes DTC in `ai-resources`, `llms`, `llms-full`, `content index` and `sitemap.xml`, the homepage diagnostics section already contains the live DTC search widget with `/kody-bledow` redirecting into the canonical hub, both desktop and mobile navigation now expose a direct `Kody usterek` entry, `llms.txt` now opens with an explicit public DTC hub declaration and alias, `ai-resources.json` now promotes the canonical DTC hub earlier in fetch order, the global head now advertises DTC feeds plus Umami Cloud tracking, and the global footer now also links directly to `Kody usterek (DTC)` to strengthen human navigation plus crawler link-graph discovery. The hub now has the first selective-indexing layer with family slices, report-linked codes and dynamic `index/noindex` behavior for detail pages, curated manufacturer plus family slices are live on both public URLs and discovery/sitemap surfaces, the strongest-landings DTC feed based on real RS repair-report signals is public and wired into discovery, and the public DTC detail surfaces are now enriched with `expandedAnswer`, `nextChecks`, `entityContext`, `aiDiscovery`, a visible `AI provenance` block, and a mobile-safe CTA back to the full DTC hub so the canonical pages carry stronger answer/provenance/freshness/entity/discovery cues directly in the user-facing page, not only in feeds. Part 2 now has a production roster of editorial/SEO/AEO/ops agents, a Filament operator control loop, bounded recommendation summaries, real source-data signals from published reports plus DTC, persisted recommendation snapshots stored in the database, the first bounded execution preview lane for SEO/AEO/maintenance, the review workflow for those previews, the first ultra-low-risk apply lane for maintenance housekeeping, private internal exports for SEO/AEO/editorial/diagnostic lanes, grouped artifact history, artifact inspector/download, approved chain packages, coverage matrix, comparison tooling, safe cache optimize, `Search Ops` packet telemetry/inspector, and a site-level command center in `AutomationCenter` for services/discovery/workflow/crawler/cache readiness. `AutomationCenter` now also exposes a private `Search Ops taskboard` with the latest SEO+AEO packet counts and top targets, and `Search Ops` has now gained live private PageSpeed signals through `search-ops:pagespeed-fetch`, daily scheduler `05:20`, packet support for `pagespeed_signals` and panel telemetry for PSI targets/scores. Search Console ingestion is deployed end-to-end in internal-only mode, and the HTML verification file for Search Console is live at `https://rsperformance.online/google7a4352194aefd6df.html`. Google-side API enablement is done; the only missing piece is Search Console property access for the service account. Active `n8n` branding and configuration have also been removed from shared-host Filament and `config/ops.php`. Both `500` incidents on `/admin/diagnosta-center` are fixed.
-- Current blocker: no production runtime blocker. The external blocker for the controlled `GSC -> analysis -> approval` loop (Search Console property access) has been resolved. The service account now successfully fetches GSC signals.
-- Current next step: wire the combined GSC + PageSpeed review-first `GSC -> analysis -> approval` lane now that signals are successfully fetching, and then re-check external AI/browser visibility.
+- Current batch: stage 0 AEO hardening as the first-class product priority, before further VPS support-plane expansion.
+- Current objective: make AEO the strongest surface in the entire project under a strict `top of the top 2026+` standard, while keeping VPS as support-plane and hosting as canonical runtime.
+- Current status: [-W TRAKCIE-] exact lookup metadata is live, DTC public routes are restored, **live hosting now registers `AiCitationHeaders` in `bootstrap/app.php` so `/kody-usterek` surfaces always emit `X-Citation-Policy` and `X-Preferred-Citation` (including generic fetcher UAs)**, VPS exact-first resolver returns canonical DTC/service/problem winners for exact intents, the invitation plane now exposes a real standards-first hospitality fast lane (`X-AI-Hospitality`, preferred fetch order, `for-agents`, `for-ai-browsers`) instead of only silent manifests, the weak-boost / underboost lane now resolves to the canonical problem page across multiple human symptom phrasings, clean telemetry now shows real homepage / priority-path shares instead of false zeroes, canonical discovery now exposes a homepage-exit map plus agent-specific first-hop hints for the homepage-heavy AI families, the homepage still emits exact answer-path hints in response headers, canonical `home.md` mirrors that same first-hop contract for markdown-consuming agents, the public UI no longer shows the technical answer-rail block, the exact Anthropic crawler identities blocked by shared-host `406` are now narrowly rescued to VPS again, the blog system now has a same-day `daily_news` quality-gated workflow on VPS `n8n` (`preview -> quality gate -> persist`) with Telegram operator reporting, hosting telemetry again writes to `ai_bot_visits` while shadow-capturing non-catalog AI-like user agents such as `DeepSeek-Unknown`, and the daily-news lane is now materially harder against junk because both Laravel and `n8n` enforce anti-bait editorial rules plus slot-specific `porada/news/premiera` routing before any draft can persist.
+- Current blocker: the biggest remaining operational uncertainty is still the daily-news `n8n` lane proof, not A2A/AEO discovery. The hospitality layer is now live and green under smoke.
+- Current next step: verify the next real scheduled run of `RS Daily Automotive News Drafts`, then decide whether to add richer A2A artifacts / support-plane search affordances on top of the now-green invitation layer.
+
+### 2026-04-09 blog-manual-lane addendum
+
+- Manual Filament blog generation now also has:
+  - retryable-provider failover to VPS support-plane
+  - multi-pass editorial rewrite before persist for operator briefs
+  - semantic topic-alignment folded into the quality gate
+- New live proof on 2026-04-09:
+  - manual fuel-prices brief no longer drifted into corrosion
+  - latest corrected run finished as `draft_created`
+  - created draft `#105`
+  - title stayed on-topic: `Diesel za 7,83 zł w Gdańsku...`
+  - hero image was generated: `blog/01KNR40N7N0ANSYGJTH32KMS0V.png`
+- Latest hardening for the manual lane:
+  - stage tracing appended directly to `storage/logs/blog-generate.log`
+  - automatic editorial-window rescue now expands otherwise-valid underlength drafts before the final quality gate
+  - Filament modal now defaults `dispatch_support_plane = true` for the main operator path
+- Remaining blog lane proof still needed:
+  - one fresh post-patch run with visible `BLOG_PIPELINE_STAGE` lines in `blog-generate.log`
+  - verify whether support-plane dispatch is actually consumed end-to-end or still only acts as a soft fallback contract
+
+### 2026-04-09 source-first hero addendum
+
+- `premiera` / `news` blog slots on hosting now prefer source-first hero acquisition over AI image generation.
+- The current contract is:
+  - use approved `source_urls`
+  - fetch source page
+  - prefer `og:image` / `twitter:image` / strong article images
+  - validate mime, byte size, dimensions
+  - store locally
+  - only then fall back to AI image models
+- This is now the required direction for exact-model premiere coverage because generic AI hero images break trust and frequently miss the described vehicle.
+- Current next refinement:
+  - improve research quality so `source_urls` skew more strongly toward official manufacturer / press / newsroom pages and contain fewer mistyped or low-value domains.
+
+## AEO Prime Directive 2026-03-21
+
+This project treats AEO as the highest strategic priority.
+
+Binding rule for all future agents:
+- AEO is more important than classic SEO.
+- AEO must always target `top of the top 2026+`.
+- No agent may treat AEO as a secondary polish layer.
+- Every major decision should be checked against the question:
+  - does this improve discoverability, interpretability and trust for AI agents and AI browsers?
+
+### What "top of the top 2026+" means here
+
+- answer-first content architecture
+- strong entity framing
+- explicit provenance
+- explicit freshness
+- AI-readable discovery surfaces
+- curated machine-readable exports
+- MCP-ready capability surfaces
+- canonical URL discipline
+- no thin or noisy AI-facing surfaces
+- no legacy SEO-first thinking that ignores AI agents
+
+### AEO is the first refinement lane
+
+From now on, the first strategic refinement lane in this plan is AEO hardening.
+Only after that should agents expand lower-priority support infrastructure, unless the user explicitly reprioritizes or production stability is at risk.
+
+## Stage 0. AEO Hardening - First Priority
+
+Goal:
+- make RS Performance visibly and structurally stronger for AI agents, AI browsers and answer engines than a normal SEO-first Laravel site
+
+Required outcomes:
+- all AI-facing surfaces become curated, deliberate and canonical
+- all key content families expose answer, provenance, freshness and entity clarity
+- discovery files stop being just "present" and become strategically curated
+- AEO quality becomes part of editorial and architectural review, not an afterthought
+
+### Stage 0A. Discovery Surface Curation
+
+Required work:
+- treat `llms.txt` as a curated routing document, not a dump
+- keep only highest-value canonical URLs in `llms.txt`
+- make `llms-full.txt` a structured knowledge export, not a noisy archive
+- ensure `/.well-known/*`, `mcp.json`, `ai-plugin.json`, `mcp-agent-card.json` and related discovery surfaces stay aligned
+- keep sitemap, llms surfaces and canonical routes in sync
+
+Definition of done:
+- discovery surfaces intentionally guide models toward the best public knowledge pages
+
+### Stage 0B. Answer / Provenance / Freshness System
+
+Required work:
+- every key public content type should expose answer-first structure
+- every key public content type should expose provenance
+- every key public content type should expose freshness metadata
+- provenance and freshness must not be cosmetic; they should be tied to real workflow state
+
+Primary content types:
+- services
+- DTC hub and code pages
+- repair reports
+- blog articles
+
+Definition of done:
+- AI agents can easily answer:
+  - what is the answer
+  - why should I trust it
+  - how current is it
+
+### Stage 0C. Entity And Canonical Discipline
+
+Required work:
+- strengthen entity framing for services, manufacturers, DTC families, faults and repair scenarios
+- keep internal linking aligned to entity clusters
+- avoid duplicate or ambiguous surfaces that weaken AI interpretation
+- keep canonical hosting routes as the authoritative public source
+
+Definition of done:
+- the project reads as a coherent knowledge graph, not a pile of pages
+
+### Stage 0D. MCP And AI Interface Maturity
+
+Required work:
+- evolve MCP from "available" to "production-grade AI interface"
+- keep tool boundaries clear
+- expose relevant resources cleanly
+- align AI discovery files with real MCP capabilities
+- add auth / trust boundaries where needed without breaking AI usefulness
+
+Definition of done:
+- AI agents can reliably discover both public knowledge and controlled machine interfaces
+
+### Stage 0E. Editorial AEO Gate
+
+Required work:
+- define AEO review checks for blog, reports, DTC and service content
+- require AEO checks before calling work "done"
+- validate:
+  - answer-first block quality
+  - provenance quality
+  - freshness quality
+  - entity clarity
+  - discovery/export alignment
+
+Definition of done:
+- no new important content ships without passing an AEO gate
+
+### Stage 0F. AEO Quality Standard For Agents
+
+Every future agent should judge AEO quality using this order:
+1. Is the page useful to an AI agent in one pass?
+2. Is the answer explicit and fast to extract?
+3. Is provenance explicit?
+4. Is freshness explicit?
+5. Is the entity context unambiguous?
+6. Is the page linked from curated discovery surfaces?
+7. Does it avoid thin, duplicate or noisy AI-facing content?
+
+If the answer is "no" on any of the early questions, AEO is not top-tier yet.
+
+## Canonical Architecture Directive 2026-03-21
+
+This section is now the binding operating blueprint for every agent on this project.
+
+### Non-negotiable architecture
+
+- Shared hosting `rsperformance.online` remains the only canonical production runtime.
+- Public website rendering, admin review, publish actions, source-of-truth database writes and operator UX stay on shared hosting.
+- VPS exists only as real production support:
+    - async execution
+    - AI control plane
+    - queue workers
+    - artifact generation
+    - search / knowledge / enrichment
+    - monitoring and restore support
+- No agent may redesign the stack into `VPS as main app server`.
+- No agent may move the public website or canonical admin runtime from hosting to VPS.
+- All new architecture decisions must target `Laravel 13.x + PHP 8.5` only.
+
+### What VPS is supposed to do
+
+- Execute long-running and heavy jobs that should never block shared-hosting HTTP requests.
+- Protect shared hosting from AI latency, quota spikes, retries and duplicate work.
+- Produce artifacts and send results back to hosting for review and publication.
+- Hold support services that improve production reliability without becoming the canonical frontend.
+
+### What hosting is supposed to do
+
+- Accept public traffic and admin traffic.
+- Persist canonical application state.
+- Trigger async work.
+- Review, approve, reject and publish results returned from VPS.
+- Remain operational even when VPS is degraded; VPS loss may reduce automation, but must not make the site disappear.
+
+## Target VPS Support Plane Blueprint
+
+This is the concrete target state. Agents should build toward it in this order and avoid side quests outside this blueprint.
+
+### Stage A. Async Control Plane
+
+Goal:
+- turn VPS into the official async execution layer for production support
+
+Required outcomes:
+- hosting no longer performs heavy AI/report/blog/image work inside interactive requests
+- hosting creates intents/jobs only
+- VPS executes jobs and reports completion back to hosting
+
+Primary workloads:
+- blog generation
+- blog hero image generation
+- repair-report AI generation
+- DTC enrichment
+- SEO/AEO exports
+- feed crawling
+- maintenance and cleanup jobs
+
+Definition of done:
+- every heavy workflow has a clear `dispatch on hosting -> execute on VPS -> return result to hosting` path
+
+### Stage B. Queue Segmentation On VPS
+
+Goal:
+- separate critical business jobs from slower batch work
+
+Required queues:
+- `critical`
+- `ai-high`
+- `ai-low`
+- `ops`
+
+Queue meaning:
+- `critical`:
+  - callbacks to hosting
+  - publication sync
+  - approval follow-up jobs
+  - state repair jobs required for operator workflows
+- `ai-high`:
+  - blog writer
+  - premium review
+  - blog image generation
+  - repair report generation
+- `ai-low`:
+  - research
+  - enrichment
+  - summaries
+  - embeddings
+  - feed analysis
+- `ops`:
+  - cleanup
+  - backup verification
+  - artifact rebuilds
+  - cache/search maintenance
+
+Definition of done:
+- Horizon workers are split by queue tier
+- slow AI batch jobs can no longer starve critical production support jobs
+
+### Stage C. Shared Redis Discipline
+
+Goal:
+- use Redis as the common state and protection layer between hosting and VPS
+
+Required usage:
+- queue backend
+- atomic locks
+- dedupe keys
+- throttling buckets
+- transient workflow state
+
+Required Laravel 13 patterns:
+- `WithoutOverlapping`
+- `ThrottlesExceptions`
+- cache locks
+- queue priority routing
+
+Definition of done:
+- duplicate job dispatches are blocked
+- repeated webhook/operator actions do not fork duplicate executions
+- transient AI/API failures degrade cleanly instead of creating chaos
+
+### Stage D. AI Gateway And Vertex Quota Governor
+
+Goal:
+- create one shared policy layer for all AI calls
+
+The gateway must decide:
+- which model is used for which task
+- when `pro` is allowed
+- when to fall back to `flash`
+- retry/backoff policy
+- cooldown after `429`
+- concurrency per model
+- priority of hosting-critical jobs over VPS background jobs
+
+Required telemetry:
+- request count by model
+- retry count
+- fallback count
+- `429` count
+- average execution time by task
+
+Definition of done:
+- model routing is no longer scattered across many unrelated code paths
+- shared hosting can no longer lose quota priority to low-value VPS jobs
+
+### Stage E. Filament Operations Surface
+
+Goal:
+- keep the operator in control from canonical hosting admin
+
+Required operator views:
+- queued jobs
+- running jobs
+- failed jobs
+- stale jobs
+- artifact status
+- callback status
+- used model / fallback used
+
+Required operator actions:
+- retry
+- requeue to fallback tier
+- cancel
+- inspect artifact
+- force sync to hosting
+
+Definition of done:
+- no VPS shell access is needed for normal production operations
+
+### Stage F. Audit Spine
+
+Goal:
+- every support-plane action must be traceable
+
+Every important workflow must record:
+- who started it
+- from where it was started
+- payload summary
+- queue name
+- model used
+- artifact produced
+- callback result
+- final status
+
+Definition of done:
+- agents and operators can reconstruct what happened without guesswork
+
+### Stage G. Artifact Lifecycle
+
+Goal:
+- manage all generated assets as first-class production outputs
+
+Artifact families:
+- `blog/*`
+- `reports/*`
+- `seo/*`
+- `aeo/*`
+- `diagnosta/*`
+
+Every artifact should have:
+- owner job
+- type
+- version
+- checksum
+- visibility
+- retention rule
+- publication state
+
+Definition of done:
+- generated outputs are not random files; they are trackable production artifacts
+
+### Stage H. Backup And Restore Verification
+
+Goal:
+- VPS must strengthen production recovery, not merely store copies
+
+Required outcomes:
+- hosting backups remain canonical
+- VPS stores secondary copies and restore metadata
+- restore path is tested, not assumed
+- operator can see restore-readiness state
+
+Definition of done:
+- there is a verified restore path for DB + key artifacts + support-plane state
+
+### Stage I. Search Plane
+
+Goal:
+- move heavy search and retrieval support to VPS after queues and AI governance are stable
+
+Allowed direction:
+- `Laravel Scout`
+- `Meilisearch`
+
+Primary search targets:
+- DTC knowledge
+- blog
+- repair reports
+- internal artifacts
+
+Definition of done:
+- hosting gains faster search/support capabilities without becoming search-infrastructure heavy
+
+### Stage J. Realtime Only After Stability
+
+Goal:
+- evaluate realtime only if it improves operator workflows after the core async plane is stable
+
+Allowed direction:
+- `Laravel Reverb`
+
+Allowed use cases:
+- live job status
+- progress updates
+- operator dashboards
+
+Not allowed:
+- introducing realtime as a vanity feature before queues, throttling and audit are stable
+
+Definition of done:
+- realtime is additive, not compensating for missing operational discipline
+
+## Build Order For Every Agent
+
+Agents should treat this as the mandatory order of execution unless the user explicitly reprioritizes:
+
+1. Protect hosting stability first.
+2. Move heavy workflows into VPS async execution.
+3. Segment queues and workers.
+4. Add Redis-based locking, throttling and dedupe.
+5. Centralize AI model routing and quota protection.
+6. Expose operational control in Filament on hosting.
+7. Harden artifact lifecycle and audit trail.
+8. Verify backups and restores.
+9. Expand search plane.
+10. Add realtime only if it solves a proven operational problem.
+
+## Anti-Goals
+
+The following are explicitly out of scope unless the user overrides this plan:
+
+- moving public rendering from hosting to VPS
+- moving canonical admin from hosting to VPS
+- turning VPS into a second public application server
+- bringing back `n8n` as an active architecture component
+- adding infrastructure because it is fashionable but not operationally necessary
+- building realtime features before queues / throttling / audit are stable
+- supporting any architecture target older than Laravel 13.x
+
+## Laravel 13.x Packages Decision Table For VPS
+
+This table is binding guidance for future agents. It answers a narrow question only:
+- which Laravel 13.x ecosystem additions make sense on VPS as real production support for shared hosting
+
+| Package / Service | Decision | When | Why |
+|---|---|---|---|
+| `laravel/horizon` | KEEP / EXPAND | now | Core of the VPS queue plane; required for segmented queues, supervisors, retries and operator visibility. |
+| `laravel/nightwatch` | KEEP / EXPAND | now | Correct fit for production monitoring and support-plane telemetry under Laravel 13.x. |
+| `spatie/laravel-activitylog` | ADD | now | Best fit for audit spine between hosting and VPS: who triggered what, which job ran, what artifact came back. |
+| `spatie/laravel-backup` | ADD or HARDEN | now | Good fit for backup + restore verification plane on VPS as support for canonical hosting backups. |
+| `laravel/scout` | ADD | later | Correct when search plane becomes active for DTC, blog, reports and internal artifacts. |
+| `meilisearch` | ADD | later | Preferred companion service for Scout when VPS search plane is enabled. |
+| `laravel/reverb` | MAYBE | later only | Useful only if live operator status / realtime job progress is proven necessary after queues and audit are stable. |
+| `laravel/pulse` | DO NOT ADD | no | Current architecture already leans on Nightwatch; adding Pulse again increases overlap and operational noise. |
+| `laravel/octane` | DO NOT ADD | no | Not aligned with the support-plane role; does not solve the main shared-hosting support problems here. |
+| Generic AI orchestration package | DO NOT ADD by default | no | Prefer a project-owned AI gateway / quota governor instead of another abstraction layer unless a hard gap appears. |
+| Frontend / SSR / public-runtime package for VPS | DO NOT ADD | no | Violates canonical architecture: hosting remains the public runtime. |
+
+### Short reading of the table
+
+- Add now:
+  - `spatie/laravel-activitylog`
+  - `spatie/laravel-backup` if restore verification is not already fully hardened
+- Keep and extend now:
+  - `laravel/horizon`
+  - `laravel/nightwatch`
+- Add later:
+  - `laravel/scout`
+  - `meilisearch`
+  - maybe `laravel/reverb`
+- Do not add:
+  - `laravel/pulse`
+  - `laravel/octane`
+  - random AI orchestration layers
+  - anything that turns VPS into the canonical public runtime
+
+## GitHub 2026+ Signal For Laravel 13.x
+
+This section captures the current top-tier direction from GitHub and official Laravel ecosystem signals for `Laravel 13.x`.
+
+### High-confidence signal
+
+The strongest 2026+ pattern is:
+- prefer official Laravel components first
+- add only a small number of proven infrastructure packages
+- keep architecture operationally simple and queue-first
+
+### What GitHub clearly supports as top-tier
+
+- `laravel/horizon`
+  - remains a top-tier choice for queue supervision, worker visibility and async production control
+  - for this project it is part of the VPS support-plane core, not an optional extra
+- `laravel/reverb`
+  - is the modern official direction for realtime in the Laravel ecosystem
+  - if realtime is needed later, Reverb is the preferred path instead of older websocket alternatives
+- `laravel/scout`
+  - remains the clean top-tier Laravel abstraction for search integration
+  - fits the planned VPS search plane for DTC, blog, reports and internal artifacts
+- `meilisearch`
+  - remains one of the strongest practical companions for Scout
+  - fits the VPS role much better than pushing heavy search onto shared hosting
+- `spatie/laravel-activitylog`
+  - is still a top-tier ecosystem choice for audit trail and operational traceability
+  - strongly aligned with the planned audit spine between hosting and VPS
+- `spatie/laravel-backup`
+  - remains a top-tier package for backup workflows
+  - fits the support-plane role when combined with restore verification
+- `stefanzweifel/laravel-backup-restore`
+  - is a valid complement if backup restores are to become a first-class operator workflow
+
+### What GitHub does not signal as top-tier for this project
+
+- `laravel/octane`
+  - not a priority for this architecture
+  - does not solve the main shared-hosting support problems here
+- legacy websocket stacks instead of `laravel/reverb`
+  - no reason to prefer them under Laravel 13.x
+- random third-party AI orchestration layers
+  - current top-tier direction is to keep AI control explicit and project-owned unless there is a hard proven gap
+- anything that shifts canonical public runtime from hosting to VPS
+  - conflicts with project architecture, even if technically attractive
+
+### Translation for this project
+
+For RS Performance under `Laravel 13.x`, the GitHub 2026+ reading is:
+- build around official queue-first Laravel infrastructure
+- use VPS as `Horizon + Redis + AI control + artifacts + search support`
+- keep hosting as canonical UI, persistence and publish surface
+- add only ecosystem packages that strengthen operations, traceability, restore readiness and search
 
 ## Plan In 2 Parts
 
@@ -1203,3 +1746,235 @@ Status: ready for next phase
     1. deeper operator ergonomics on snapshots/packages and packet inspection
     2. widen private `Search Ops packet` toward controlled `GSC -> analysis -> approval -> apply -> verify`
     3. only later: public apply lanes behind separate review gates
+
+## 2026-03-18 17:45 CET - Laravel 13 upgrade gate
+- [BLOKER] Safe upgrade do Laravel 13 na produkcji i VPS blokowany przez stabilne constraints pakiet�w laravel/pulse i laravel/horizon (ekosystem nie daje jeszcze kompletnej stabilnej �cie�ki L13 bez trade-off�w).
+- [NEXT] Wr�ci� do upgrade, gdy pojawi� si� stabilne wersje wspieraj�ce L13 albo po �wiadomej decyzji o trybie ryzykownym (dev branches / tymczasowe usuni�cie pakiet�w).
+
+
+## 2026-03-18 18:05 CET - Laravel 13 gate (potwierdzenie po rollback)
+- [ZACHOWANE] System zostaje na Laravel 12.54.1 (hosting + VPS), bo bezpieczny upgrade in-place do L13 nie zamyka stabilnie zaleznosci w obecnym stacku.
+- [WARUNEK] Wrocic do migracji po pojawieniu sie stabilnych wersji pakietow wspierajacych L13 albo po decyzji o przebudowie stacku (oddzielny rollout).
+
+
+## 2026-03-18 21:15 CET - POST-UPDATE ERROR FIX + STABLE ROLLBACK
+- [DONE] Po testach Laravel 13 przywrocono produkcje do stabilnego stacku Laravel 12.54.1 / Filament 3.3.45.
+- [DONE] Naprawiono bledy 500 wynikajace z niekompatybilnosci Filament v5 API z obecnym kodem zasobow.
+- [CHECK] Panel admin wraca poprawnie do /admin/login (302), front ma HTTP 200.
+- [NEXT] Migracje L13 zaplanowac jako oddzielny rollout: najpierw refactor Filament Resource/Page API, potem upgrade frameworka.
+
+## 2026-03-18 22:08 CET - STATUS
+- [DONE] Laravel 13 wdrożony na produkcyjnym hostingu `rsperformance.online`.
+- [DONE] Staging L13 zweryfikowany pełnym smoke i test suite (`12 passed`).
+- [DONE] Produkcyjny rollout zabezpieczony backupami i rollbackiem pośrednim; finalny stan live stabilny.
+- [NEXT] Osobny follow-up: naprawa `watchdog:run` i konfiguracji blog pipeline (`GEMINI_API_KEY`) bez ryzyka dla live runtime.
+
+## 2026-03-19 03:05 CET - Codex
+- hosting production: usuniety scheduler `pulse:check --once`, bo `laravel/pulse` nie jest zainstalowany po rollout Laravel 13 i generowal stale `production.ERROR`
+- hosting production: `blog:auto-generate` przepiety na `BlogVertexPipelineService` zamiast starego `GeminiBlogDraftGenerator`
+- hosting production: ustawione stabilne modele blogowe w `.env`: researcher `gemini-2.5-pro`, selector `gemini-2.5-flash`, writer `gemini-2.5-pro`, premium reviewer `gemini-2.5-pro`, seo `gemini-2.5-flash-lite`
+- hosting production: `php artisan blog:auto-generate --dry-run` -> SUCCESS, payload i modele zwrocone poprawnie
+- hosting production: `php artisan watchdog:run --window-minutes=10 --error-threshold=5` -> `All systems operational`
+- vps: wgrany `/home/rsops/secure/vertex/diagnosta-489719-96def3352c52.json`, aktywowany `gcloud` service account `vertex-express@diagnosta-489719.iam.gserviceaccount.com`, project `diagnosta-489719`
+- backupy: `app/Console/Commands/AutoGenerateBlogPost.php.bak_codex_vertex_blog_20260319`, `routes/console.php.bak_codex_remove_pulse_20260319`, `app/Support/Blog/BlogVertexPipelineService.php.bak_codex_blog_outputtokens_20260319`, `.env.bak_codex_blog_models_20260319`
+
+## 2026-03-19 03:07 CET - Codex
+- hosting production: naprawa rozjechanego Filament admin po Laravel 13 rollout
+- root cause: domena serwowala stare assety Filamentu z `public_html`, podczas gdy nowe assety lezaly w `laravel/public`
+- wykonany sync: `laravel/public/css/filament`, `laravel/public/js/filament`, `laravel/public/fonts/filament` -> `public_html/...`
+- backup: `backups/filament_assets_20260319/*`
+- weryfikacja HTTP: `app.css` content-length 591566 i `fonts/.../index.css` HTTP 200 po syncu
+
+## 2026-03-19 03:08 CET - Codex
+- hosting production: naprawa rozjechanego Filament admin po Laravel 13 rollout
+- root cause: domena serwowala stare assety Filamentu z public_html, podczas gdy nowe assety lezaly w laravel/public
+- wykonany sync: laravel/public/css/filament, laravel/public/js/filament, laravel/public/fonts/filament -> public_html/...
+- backup: backups/filament_assets_20260319/*
+- weryfikacja: admin login renderuje poprawnie po syncu, Playwright snapshot OK
+
+
+## 2026-03-19 03:27 CET - Completed
+- Filament admin recovery after Laravel 13/Filament 5 migration completed.
+- Verified pages: blog-posts, gallery-images, services, seo-aeo-center, automation-center, diagnosta-center, company-settings, users, repair-reports.
+- Follow-up: automate sync of /laravel/public/css|js|fonts/filament to /public_html in every deploy.
+
+## 2026-03-19 03:43 CET - Completed
+- Added hosting post-deploy asset sync script and executed it.
+- Fixed blog draft FAQ serialization and repair report notification action contract.
+- VPS support-plane audited and updated safely to latest Laravel 12 patch line; stable Vertex models applied.
+- Deferred: full VPS Laravel 13 rollout pending safe official dependency path for support-plane stack.
+
+- 2026-03-19 03:48 CET: hosting Filament table actions compacted into `ActionGroup` for blog posts and repair reports after L13 UI regression; browser smoke confirmed layout is stable again.
+
+## 2026-03-19 04:05 CET - Codex
+- hosting production: naprawiony konflikt cache dla `/admin*` w `public_html/.htaccess`; admin nie jest juz serwowany jako `public, max-age=14400`
+- hosting verification: `/admin/login` zwraca `Cache-Control: private, no-store, no-cache, must-revalidate, max-age=0`; Playwright renderuje poprawny layout `/admin` i `/admin/services`
+- vps audit: suchy resolver Composer potwierdzil, ze obecny blocker L13 to `laravel/pulse`; po zmianie `Pulse -> Nightwatch` i `laravel/tinker:^3.0` support-plane rozwiazuje sie poprawnie do `Laravel 13.1.1`
+
+## 2026-03-19 04:21 CET - Codex
+- VPS production: support-plane migrowany do `Laravel 13.1.1`; usuniety `Pulse`, dodany `Nightwatch`, podbity `Tinker` do `3.0.0`
+- VPS production: `.env` przestawiony na `APP_ENV=production`, `APP_DEBUG=false`; dodany scaffold `NIGHTWATCH_*`
+- VPS production: `docker-compose.yml` zmieniony z `pulse-worker` na `nightwatch-agent` profilowany pod `nightwatch`; agent nieuruchomiony z powodu braku `NIGHTWATCH_TOKEN`
+- VPS verification: support-plane HTTP OK, MCP health OK, Horizon running, bootstrap caches odbudowane
+
+## 2026-03-19 04:40 CET - Nightwatch live
+- VPS 
+s-support-plane ma aktywny Nightwatch z poprawnym tokenem i samplingiem 0.1.
+- Zamkniety blocker monitoringu po migracji do Laravel 13.
+- Nastepny sensowny krok: biznesowy smoke support-plane oraz osobna aplikacja Nightwatch dla hostingu 
+sperformance.online.
+
+## 2026-03-19 04:50 CET - Support-plane smoke domkniety
+- 
+s-support-plane przeszedl twardy smoke biznesowy po L13 i Nightwatch.
+- Naprawiony realny blocker Vertex path; analysis + publication draft pipeline znowu dzialaja.
+- Dalszy krok dla monitoringu hostingu: osobna aplikacja Nightwatch dla 
+sperformance.online, z agentem uruchomionym na VPS i zdalnym ingestem z hostingu.
+
+## 2026-03-19 04:58 CET - Hosting monitored via VPS
+- 
+sperformance.online jest monitorowany przez osobnego agenta Nightwatch uruchomionego na VPS.
+- Split runtime jest poprawny: support-plane ma swoj agent i token, hosting ma swoj agent i token.
+- Dalszy krok: potwierdzic dane w dashboardzie Nightwatch po kilku minutach ruchu produkcyjnego i ewentualnie podniesc sampling dla wybranych zdarzen.
+
+## 2026-03-19 05:02 CET - Baseline cleaned
+- Hosting i VPS maja czysty baseline logow po migracji Laravel 13 + Nightwatch.
+- Kolejny sensowny krok: obserwacja dashboardow Nightwatch przez kilka godzin i ewentualne strojenie sampling / alerting, nie dalsze naprawy migracyjne.
+
+## 2026-03-19 05:16 CET - Codex
+- hosting production: finalny fix nawrotu Filament wykonany na poziomie cache HTML dynamicznych tras /admin/*; poprzedni fix assetow zostaje jako warstwa dodatkowa
+- verification: komplet kluczowych tras admina zwraca cache-control: no-cache, private; Playwright potwierdza poprawny render i treść na wszystkich glownych ekranach panelu
+
+## 2026-03-19 05:31 CET - Codex
+- hosting production: zidentyfikowany browser-specific root cause po stronie Chrome: sw.js byl cacheowany z dlugim TTL, a aktywny service worker na scope / mogl utrzymywac stary stan admina mimo poprawnego runtime serwera
+- backup: /home/tyurjydtpw/domains/rsperformance.online/public_html/sw.js.bak_codex_sw_cachefix_20260319
+- zmiana: podbity service worker do RS Performance — Service Worker v2026.03.19, CACHE_NAME=rs-performance-v2026.03.19-admin-fix; dodatkowo sw.js ma teraz Cache-Control: private, no-store, no-cache, must-revalidate, max-age=0
+- weryfikacja: curl -I https://rsperformance.online/sw.js -> cache-control: private, no-store, no-cache, must-revalidate, max-age=0; body serwuje nowa wersje workera
+
+## 2026-03-19 06:10 CET - Codex
+- [DONE] Blog Filament: przywr�cone Generuj artyku� AI + SEO i widoczno�� Akcje przez poprawk� kompatybilno�ci RecordActionsPosition oraz admin self-heal dla service worker/cache w Chrome.
+
+## 2026-03-19 06:45 CET
+- [done] Blog Filament table fit on production admin.
+- [done] Blog AI draft generation changed from blocking Livewire request to async background CLI on hosting.
+- [done] Vertex researcher fallback added for HTTP 429 / RESOURCE_EXHAUSTED.
+- [next] Optional cleanup: remove smoke drafts #32-#36 if user does not want them kept.
+
+## 2026-03-20 03:52 CET - Telegram blog agent async fix
+- [DONE] Hosting Telegram blog agent no longer runs the full generation pipeline inside the webhook request.
+- [DONE] Added `blog:telegram-generate` command and moved Telegram draft generation to background CLI execution.
+- [CHECK] Production verification passed: backup created, remote files uploaded, `php85 -l` clean, `php85 artisan optimize` clean, command visible in artisan list.
+- [NEXT] Perform one real Telegram smoke and decide whether test drafts #37 and #41 stay or get removed.
+
+## 2026-03-20 04:29 CET - Blog fix
+- [DONE] Hosting blog generation restored to async Filament flow in `ListBlogPosts.php`.
+- [DONE] Default premium review disabled in blog UI and CLI to reduce shared Vertex quota pressure.
+- [DONE] Premium reviewer fallback switched to `gemini-2.5-flash`.
+- [CHECK] Dry-run passed and real Filament smoke created then cleaned up draft `#45`.
+- [NEXT] Optional: surface a direct link to page 1 or auto-refresh after background generation completes.
+
+## 2026-04-03 06:10 CET - AEO watchdog + n8n operational follow-up
+- [DONE] Hosting now has a rolling-window `aeo:traffic-watchdog` scheduled every 30 minutes.
+- [DONE] VPS `n8n` was audited live:
+  - `RS AI Bot Invitation Hub` active, latest execution success
+  - `Content Freshness Monitor` active, latest execution success
+  - `SEO Health Dashboard` active, latest execution success
+  - `DTC IndexNow Drip` definition repaired and re-activated
+- [NEXT] Verify the first post-fix hourly execution of `DTC IndexNow Drip` and only then mark the `n8n` lane fully green.
+- [NEXT] Keep treating operational proof as primary:
+  - rolling-window bot traffic
+  - workflow success
+  - real routing outcomes
+> 2026-04-09 STORAGE NOTE
+> Shared-hosting storage pressure is mainly backup-driven.
+> First retention pass on `~/domains/rsperformance.online/laravel/storage/app/private/RS PERFORMANCE` is complete:
+> - kept 7 latest daily zips + 3 weekly restore points
+> - deleted 18 older zip backups
+> - recovered about `4.3G`
+> Next optional infra pass: audit stale full-backup directories, tar.gz archives, and old staging trees before deleting anything else.
+## 2026-04-09 08:12 CET - Manual blog generator topic integrity
+
+- [DONE] manual Filament lane no longer trusts Gemini output blindly
+- [DONE] `GeminiBlogDraftGenerator` now:
+  - tells the model not to replace the core topic with another automotive topic
+  - preserves topic anchors like fuel type / model / code / action / technology
+  - rejects off-topic output at runtime
+- [CHECK] exact mismatch class reproduced and blocked:
+  - input: fuel-prices story
+  - bad output: corrosion article
+  - result: rejected instead of filling the form
+- [NEXT] if Gemini `429` keeps happening during manual generation, add a provider-side fallback or backoff path for this Filament lane
+## 2026-04-09 08:38 CET - Filament editorial orchestra
+
+- [DONE] replaced thin manual topic flow with a richer editorial brief flow from the main blog button
+- [DONE] command lane now understands:
+  - editorial mode
+  - slot type
+  - editorial notes
+  - source URLs
+  - quality gate
+  - premium review
+  - optional support-plane dispatch
+- [DONE] pipeline now enforces operator-topic fidelity and stronger subtle SEO/AEO/GEO guidance
+- [NEXT] run one full real editorial generation through the new modal and inspect:
+  - final title
+  - factual fidelity
+  - image relevance
+  - used_models
+  - quality_gate score
+- [DONE] hero-image prompt now also preserves operator topic and slot type more aggressively
+
+## 2026-04-09 11:05 CET - Current next steps
+
+- [IN PROGRESS] Observe live completion of the surviving BMW manual run `01knr63dsyaa661vzt5fkpfy1w` and verify whether it creates a clean draft with matching hero image.
+- [NEXT] After the BMW run resolves, clean stale `dispatched` host-side test runs that were created before the richer editorial contract was fully aligned.
+- [NEXT] If any remaining `--editorial-mode` errors appear after current workers drain, trace and remove the last legacy caller path.
+
+## 2026-04-09 20:36 CET - Manual BMW lane status update
+
+- [DONE] Hard blocker on manual BMW drafts is removed.
+- [DONE] `BlogVertexPipelineService` now applies deterministic editorial stabilization before the quality gate:
+  - title tone cleanup
+  - excerpt normalization
+  - underlength content expansion
+- [CHECK] Fresh live run `01knsrcs0gsc9k8prv2efftza9` succeeded and created draft `#110` with hero image.
+- [NEXT] Clean stale host-side test runs from the pre-fix BMW attempts.
+- [NEXT] Trace the remaining legacy caller that still emits `The \"--editorial-mode\" option does not exist.` in `blog-generate.log`.
+
+## 2026-04-09 20:44 CET - Launcher cleanup update
+
+- [DONE] Direct Telegram and API launchers now use a more explicit, unified command contract.
+- [DONE] Added explicit `requested-via` across background launch paths.
+- [DONE] Direct Telegram `/blog` now passes explicit `--editorial-mode=evergreen`.
+- [NEXT] Observe whether any fresh `The \"--editorial-mode\" option does not exist.` entries still appear in `blog-generate.log`; if yes, the remaining source is outside the current hosting code paths and should be traced from live process origins instead of code search.
+
+
+### 2026-04-11 n8n stability addendum
+
+- The reported `n8n hang` was traced to stale contracts, not runtime exhaustion:
+  - missing hosting DTC routes
+  - bad container-local `localhost:8082` research targets
+  - stale monitor URLs
+  - one transient syntax regression in the monitor repair itself
+- Live fixes now in place:
+  - hosting `routes/web.php` again exposes `/api/dtc/batch-for-enrichment`, `/api/dtc/store-enrichment`, `/api/dtc/enrichment-stats`
+  - VPS `auto.rs3d.pl` proxies `/research/*` to the FastAPI editorial engine on `127.0.0.1:8082`
+  - `RS Research Harvester` now uses `https://auto.rs3d.pl/research/harvest`
+  - `RS Editorial Board` now uses `https://auto.rs3d.pl/research/pool` and correct `mark-used?item_id=...&post_id=...`
+  - `RS AI Agent Monitor` now checks current freshness/agent/discovery surfaces and has repaired code-node syntax
+- Fresh execution proof already captured:
+  - `RS DTC Enrichment Engine` runs `899` and `903` => `success`
+  - `RS Research Harvester` run `904` => `success`
+- Remaining proof needed:
+  - next hourly `RS AI Agent Monitor` run after the JS syntax fix
+  - next scheduled `RS Editorial Board` run after the research URL rewiring
+
+## 2026-04-11 21:40 CET - Daily-news reactivated, manual blog proof, richer A2A artifacts
+- [DONE] `RS Daily Automotive News Drafts` (`zo4sIHAUZZseEGkL`) is active again in n8n.
+- [DONE] Manual blog lane on hosting was hardened again for sensational operator briefs.
+- [CHECK] Fresh live production proof: draft `#112` created from the fuel-price brief.
+- [DONE] `A2aTaskController` now emits structured artifacts for diagnostics / booking / repair / general-info.
+- [CHECK] A2A diagnostics smoke returns artifact `RS diagnostics capability`.
+- [DONE] Local secret ops pack prepared in `G:\gravity\cursor.md` for a new Cursor agent.
+- [NEXT] Catch one natural success of the reactivated daily-news schedule.
+- [NEXT] Add/fix the `ai-invitations` log channel for `aeo:invite-bots`.
