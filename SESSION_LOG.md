@@ -36,4 +36,4 @@ Pomiar `redirects` / `final_url`: `curl -L` (follow), `-w '%{num_redirects} %{ur
 
 ### Git
 
-- Planowany commit: `SESSION_LOG.md`, `HANDOFF.md`, `plan.md`, `handoff-log.md` (razem z sesją).
+- Commit: `15520e6` na gałęzi `feature/v9-architecture-rebuild` — `SESSION_LOG.md`, `HANDOFF.md`, `plan.md`, `handoff-log.md`.
