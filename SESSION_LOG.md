@@ -12,6 +12,10 @@ Format relay: jeden blok na sesję, bez kasowania cudzych wpisów. Starsze wpisy
 - Deploy na VPS: `/tmp/vps_n8n_telegram_wow_digest.py`; run: **Telegram HTTP 200**, fleet 15, health 0 fail, webhook 200.
 - Aktualizacja skilli: `.agents/skills/rs-n8n-wow-2026/SKILL.md`, `.agents/skills/telegram-bot-skills/SKILL.md`.
 
+### Harmonogram (cron na hoście VPS)
+
+- Trwała ścieżka: `/srv/ops-stack/scripts/vps_n8n_telegram_wow_digest.py` + flaga **`--quiet`**. Instalator: `scripts/vps_install_wow_digest_cron.sh` → **`CRON_TZ=Europe/Warsaw`**, **`0 8 * * *`**, log `/srv/ops-stack/logs/n8n_wow_digest.log`. Uzasadnienie: obraz Docker n8n nie ma Pythona — orchestracja „wow” raportu na hoście obok SQLite.
+
 ---
 
 ## [2026-04-12 ~01:15 CET] Cursor — VPS n8n: import Vertex-patched workflows

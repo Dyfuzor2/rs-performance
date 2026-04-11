@@ -14,13 +14,13 @@ Project coordination skill for `n8n` work in `G:\gravity`.
 ## Primary sources
 
 - local MCP runtime:
-  - `G:\gravity\tools\n8n-mcp-runtime`
+    - `G:\gravity\tools\n8n-mcp-runtime`
 - local source repo:
-  - `G:\gravity\mcp-servers\n8n-mcp`
+    - `G:\gravity\mcp-servers\n8n-mcp`
 - local docs mirror:
-  - `G:\gravity\research\docs-sources\n8n-docs`
+    - `G:\gravity\research\docs-sources\n8n-docs`
 - local expert skill pack:
-  - `G:\gravity\n8n-skills`
+    - `G:\gravity\n8n-skills`
 
 ## Use this skill for
 
@@ -38,9 +38,9 @@ Project coordination skill for `n8n` work in `G:\gravity`.
 3. `observability-engineer`
 4. `systematic-debugging`
 5. n8n local assets:
-   - `G:\gravity\n8n-skills\skills\n8n-mcp-tools-expert`
-   - `G:\gravity\n8n-skills\skills\n8n-validation-expert`
-   - `G:\gravity\n8n-skills\skills\n8n-workflow-patterns`
+    - `G:\gravity\n8n-skills\skills\n8n-mcp-tools-expert`
+    - `G:\gravity\n8n-skills\skills\n8n-validation-expert`
+    - `G:\gravity\n8n-skills\skills\n8n-workflow-patterns`
 
 ## Runtime rules
 
@@ -60,6 +60,6 @@ Project coordination skill for `n8n` work in `G:\gravity`.
 
 ## Operator WOW surface (Telegram + fleet)
 
-- **`scripts/vps_n8n_telegram_wow_digest.py`** (run on VPS): health matrix + invitation webhook + **per-workflow last execution status** for all active workflows, one HTML message to the same Telegram chat as **RS AI Agent Monitor** (parsed from workflow JSON — no token echo).
+- **`scripts/vps_n8n_telegram_wow_digest.py`** (run on VPS): health matrix + invitation webhook + **per-workflow last execution status** for all active workflows, one HTML message to the same Telegram chat as **RS AI Agent Monitor** (parsed from workflow JSON — no token echo). Flags: **`--quiet`** for cron (stderr only on failure).
+- **Daily automation:** host cron (not inside n8n container — no Python there): **`0 8 * * *`** with **`CRON_TZ=Europe/Warsaw`**, script path **`/srv/ops-stack/scripts/vps_n8n_telegram_wow_digest.py`**, install via **`scripts/vps_install_wow_digest_cron.sh`**.
 - Pair with **`scripts/vps_n8n_wow_smoke.py`** for CLI matrix + minimal ping when you do not need the full fleet table.
-

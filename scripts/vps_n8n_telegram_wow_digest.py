@@ -10,8 +10,10 @@ Per skills: rs-n8n-wow-2026 + telegram-bot-skills — one rich operator message:
 Run on VPS only. Does not print bot tokens. Parses Telegram target from Monitor workflow JSON.
 
 Usage:
-  python3 scripts/vps_n8n_telegram_wow_digest.py
+  python3 scripts/vps_n8n_telegram_wow_digest.py [--quiet]
   N8N_SQLITE=/path/to/database.sqlite python3 scripts/vps_n8n_telegram_wow_digest.py
+
+  --quiet: only stderr on failure (for cron); success is silent except Telegram message.
 """
 from __future__ import annotations
 
@@ -137,6 +139,7 @@ def post_telegram(url: str, chat_id: str, text: str) -> tuple[int, str]:
 
 
 def main() -> int:
+    quiet = "--quiet" in sys.argv
     db = resolve_db()
     if not os.path.isfile(db):
         print(f"ERROR: SQLite not found: {db}", file=sys.stderr)
@@ -212,9 +215,15 @@ def main() -> int:
 
     send_url, chat_id = tg
     code, _ = post_telegram(send_url, chat_id, body)
-    safe = re.sub(r"bot[^/]+/", "bot***/", send_url)
-    print(f"Telegram HTTP {code} via {safe[:55]}...")
-    print(f"Fleet rows: {len(fleet)}, health fails: {fails}, webhook: {wh_c}")
+    if not quiet:
+        safe = re.sub(r"bot[^/]+/", "bot***/", send_url)
+        print(f"Telegram HTTP {code} via {safe[:55]}...")
+        print(f"Fleet rows: {len(fleet)}, health fails: {fails}, webhook: {wh_c}")
+    elif code != 200 or fails:
+        print(
+            f"WOW digest: Telegram HTTP {code}, fails={fails}, webhook={wh_c}",
+            file=sys.stderr,
+        )
     return 0 if code == 200 and fails == 0 else 1
 
 
