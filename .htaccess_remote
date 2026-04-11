@@ -1,0 +1,295 @@
+# === LITESPEED CACHE ===
+
+<IfModule LiteSpeed>
+    CacheLookup on
+    CacheEngine on
+</IfModule>
+# Exclude dynamic routes from LSCache
+SetEnvIf Request_URI ^/$ no_lscache
+SetEnvIf Request_URI ^/(admin|api|klient|flota|livewire|sanctum|pulse|sw\.js|manifest\.json|site\.webmanifest|offline\.html) no_lscache
+# Long TTL for static content pages (24h)
+SetEnvIf Request_URI "^/(uslugi|problemy|raporty-napraw|blog)/" long_cache
+SetEnvIf Request_URI "^/(css|js|fonts)/filament/" no_filament_asset_cache
+<IfModule mod_headers.c>
+    # Default: 4 hours + stale-while-revalidate
+    Header set X-LiteSpeed-Cache-Control "public, max-age=14400, stale-while-revalidate=3600" env=!no_lscache
+    Header set X-LiteSpeed-Tag "app" env=!no_lscache
+    # Service/problem/blog pages: 24 hours (content rarely changes)
+    Header set X-LiteSpeed-Cache-Control "public, max-age=86400, stale-while-revalidate=7200" env=long_cache
+    # Dynamic app surfaces must never be stored client-side or at the edge.
+    Header always set Cache-Control "private, no-store, no-cache, must-revalidate, max-age=0" env=no_lscache
+    Header always unset Expires env=no_lscache
+    Header always unset X-LiteSpeed-Cache-Control env=no_lscache
+    Header always unset X-LiteSpeed-Tag env=no_lscache
+</IfModule>
+# === END LITESPEED CACHE ===
+
+# ModSecurity + fortress + edge headers MUST NOT live inside mod_rewrite (LiteSpeed/Apache parse order).
+<IfModule mod_security.c>
+    # RS Performance - Smart ModSecurity (March 2026)
+    SecRuleRemoveById 8800016
+    SecRuleRemoveById 8800018
+    SecRuleRemoveById 8800026
+    SecRuleRemoveById 8800028
+    SecRuleRemoveById 8800032
+    SecRuleRemoveById 8800038
+    SecRuleRemoveById 210492
+    SecRuleRemoveById 210493
+    SecRuleRemoveById 210494
+    # \x25\x32\x30 = literal %20 in UA (avoids Apache % parsing in .htaccess)
+    SecRule REQUEST_HEADERS:User-Agent "(?i:(AI2Bot|AhrefsBot|Ai2Bot-Dolma|Amazonbot|Applebot|Applebot-Extended|ArcSearch|Brave|BraveSearch|Bytespider|CCBot|ChatGPT-User|ChatGPT\x20Atlas|ChatGPTBrowser|Claude-SearchBot|Claude-User|Claude-Web|ClaudeBot|CopilotUser|DataForSeoBot|DeepSeek-User|DeepSeekBot|Diffbot|DuckAssistBot|DuckDuckBot|FacebookBot|FirecrawlBot|GPTBot|GeminiBot|Gensparkbot|Google-CloudVertexBot|Google-Extended|GoogleOther|GoogleOther-Image|GoogleOther-Video|Grok-DeepSearch|GrokBot|KagiBot|LinkedInBot|Manus-User|Meta-ExternalAds|Meta-ExternalAgent|Meta-ExternalFetcher|MistralAI-User|MistralBot|Neeva-Crawler|OAI-SearchBot|Omgilibot|OpenAI-SearchBot|PanguBot|Perplexity-User|PerplexityBot|PetalBot|PhindBot|Quora-Bot|ReaderBot|SemrushBot|Storebot-Google|Timpibot|Twitterbot|VelenPublicWebCrawler|WebPilot|YouBot|Zapier|anthropic-ai|BrightEdge|Brightbot|chatgpt\x25\x32\x30atlas|cohere-ai|facebookexternalhit|iaskbot|img2dataset|magpie-crawler|meta-externalfetcher|meta-webindexer|xAI-Grok))" \
+        "id:99000,phase:1,pass,nolog,ctl:ruleEngine=Off"
+    SecRule REQUEST_HEADERS:User-Agent "(?i:AI2Bot|AhrefsBot|Ai2Bot-Dolma|Amazonbot|Applebot|Applebot-Extended|ArcSearch|Brave|BraveSearch|Bytespider|CCBot|ChatGPT-User|ChatGPT\x20Atlas|ChatGPTBrowser|Claude-SearchBot|Claude-User|Claude-Web|ClaudeBot|CopilotUser|DataForSeoBot|DeepSeek-User|DeepSeekBot|Diffbot|DuckAssistBot|DuckDuckBot|FacebookBot|FirecrawlBot|GPTBot|GeminiBot|Gensparkbot|Google-CloudVertexBot|Google-Extended|GoogleOther|GoogleOther-Image|GoogleOther-Video|Grok-DeepSearch|GrokBot|KagiBot|LinkedInBot|Manus-User|Meta-ExternalAds|Meta-ExternalAgent|Meta-ExternalFetcher|MistralAI-User|MistralBot|Neeva-Crawler|OAI-SearchBot|Omgilibot|OpenAI-SearchBot|PanguBot|Perplexity-User|PerplexityBot|PetalBot|PhindBot|Quora-Bot|ReaderBot|SemrushBot|Storebot-Google|Timpibot|Twitterbot|VelenPublicWebCrawler|WebPilot|YouBot|Zapier|anthropic-ai|BrightEdge|Brightbot|chatgpt\x25\x32\x30atlas|cohere-ai|facebookexternalhit|iaskbot|img2dataset|magpie-crawler|meta-externalfetcher|meta-webindexer|xAI-Grok|Googlebot|Bingbot)" \
+        "id:99001,phase:1,pass,nolog,ctl:ruleRemoveById=210492,ctl:ruleRemoveById=210493,ctl:ruleRemoveById=210494"
+</IfModule>
+# SERVER FORTRESS (Protocol V16.0)
+<FilesMatch "^\.env|composer\.(json|lock)|package\.(json|lock)|yarn\.lock|\.git">
+    Require all denied
+</FilesMatch>
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+<FilesMatch "(^#.*#|\.(bak|config|dist|fla|inc|ini|log|psd|sh|sql|sw[op])|~)$">
+    Require all denied
+</FilesMatch>
+<IfModule mod_headers.c>
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+    Header always set Cross-Origin-Opener-Policy "same-origin"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set X-Robots-Tag "all, max-snippet:-1, max-image-preview:large, max-video-preview:-1"
+    Header always set X-AI-Training-Policy "permitted; license=CC-BY-SA-4.0; attribution=RS Performance"
+    Header always set X-AI-Crawl-Depth "full-site; follow-sections; priority-pages=/uslugi,/problemy,/raporty-napraw,/blog,/kody-usterek"
+    Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://unpkg.com https://analytics.rs3d.pl; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://cdn.jsdelivr.net https://unpkg.com https://analytics.rs3d.pl https://mcp.rs3d.pl; frame-src 'self' https://www.google.com https://maps.google.com;"
+    <FilesMatch "\.(html|php)$">
+        Header set Cache-Control "public, max-age=14400, stale-while-revalidate=3600" env=!no_lscache
+        Header set Cache-Control "private, no-store, no-cache, must-revalidate, max-age=0" env=no_lscache
+        Header unset X-LiteSpeed-Cache-Control env=no_lscache
+        Header unset X-LiteSpeed-Tag env=no_lscache
+    </FilesMatch>
+</IfModule>
+<IfModule mod_rewrite.c>
+    <IfModule mod_negotiation.c>
+        Options -MultiViews -Indexes
+    </IfModule>
+    RewriteEngine On
+    # SEO: Force HTTPS
+    RewriteCond %{HTTPS} off
+    RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+    # SEO: Redirect WWW to non-WWW
+    RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
+    RewriteRule ^(.*)$ https://%1/$1 [R=301,L]
+    # === RS WAF EDGE SHIELD (Apr 2026) — sync with config/waf.php edge_uri_fragments ===
+    # Drops credential-phishing probes & script-kiddie paths before PHP.403 = hard edge.
+    RewriteCond %{REQUEST_URI} (?i)(wp-login\.php|wp-admin|wp-content/|wp-includes/|xmlrpc\.php|phpmyadmin|/pma/|pma\.php|adminer\.php|adminer/|vendor/phpunit|/\.git/|/\.svn/|cgi-bin/|boaform|shell\.php|c99\.php|r57\.php|thinkphp|laravel/\.env|/\.env|actuator/|server-status|telescope/|_profiler/|phpinfo\.php|info\.php|alfacgiapi) [OR]
+    RewriteCond %{QUERY_STRING} (?i)(union.*select|sleep\s*\(|benchmark\s*\(|into\s+(outfile|dumpfile)|%00%00|<script|javascript:|onerror=|onload=|eval\s*\(|base64_decode\s*\(|0x[0-9a-f]{32,}|169\.254\.169\.254|metadata\.google|127\.0\.0\.1:\d+) [OR]
+    RewriteCond %{QUERY_STRING} (?i)(\.\./\.\./etc/passwd)
+    RewriteRule .* - [F,L]
+    # Do not hard-block non-dangerous bots on canonical.
+    # Policy March 2026+: observe, attribute and route where useful instead of denying by default.
+    # WOW AEO Gateway Routing Strategy (Upgraded 2026-04-06)
+    # Full AI Discovery Stack: Redirects LLM search, agentic fetchers, and training bots
+    # to the VPS support-plane (Qdrant) to achieve 10/10 AI citability and routing wow effect.
+    # Gateway: no loop on ai.*; canonical apex + www only (shared-hosting safe).
+    RewriteCond %{HTTP_HOST} !^ai\.rsperformance\.online$ [NC]
+    RewriteCond %{HTTP_HOST} ^(www\.)?rsperformance\.online$ [NC]
+    RewriteCond %{REQUEST_METHOD} ^(GET|HEAD)$
+    # UA catalogue: avoid spaces inside one huge alternation (LiteSpeed PCRE edge). Use \x20 for literal space where needed.
+    RewriteCond %{HTTP_USER_AGENT} (AI2Bot|AhrefsBot|Ai2Bot-Dolma|Amazonbot|Applebot|Applebot-Extended|ArcSearch|Brave|BraveSearch|Bytespider|CCBot|ChatGPT-User|ChatGPT\x20Atlas|ChatGPTBrowser|Claude-SearchBot|Claude-User|Claude-Web|ClaudeBot|CopilotUser|DataForSeoBot|DeepSeek-User|DeepSeekBot|Diffbot|DuckAssistBot|DuckDuckBot|FacebookBot|FirecrawlBot|GPTBot|GeminiBot|Gensparkbot|Google-CloudVertexBot|Google-Extended|GoogleOther|GoogleOther-Image|GoogleOther-Video|Grok-DeepSearch|GrokBot|KagiBot|LinkedInBot|Manus-User|Meta-ExternalAds|Meta-ExternalAgent|Meta-ExternalFetcher|MistralAI-User|MistralBot|Neeva-Crawler|OAI-SearchBot|Omgilibot|OpenAI-SearchBot|PanguBot|Perplexity-User|PerplexityBot|PetalBot|PhindBot|Quora-Bot|ReaderBot|SemrushBot|Storebot-Google|Timpibot|Twitterbot|VelenPublicWebCrawler|WebPilot|YouBot|Zapier|anthropic-ai|BrightEdge|Brightbot|chatgpt\x25\x32\x30atlas|cohere-ai|facebookexternalhit|iaskbot|img2dataset|magpie-crawler|meta-externalfetcher|meta-webindexer|xAI-Grok) [NC]
+    RewriteRule ^(.*)$ https://ai.rsperformance.online/$1 [R=302,L,QSA]
+    # Handle Authorization Header
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+    # Handle X-XSRF-Token Header
+    RewriteCond %{HTTP:x-xsrf-token} .
+    RewriteRule .* - [E=HTTP_X_XSRF_TOKEN:%{HTTP:X-XSRF-Token}]
+    # Friendly discovery redirects for public artifact directories / section aliases
+    RewriteRule ^feeds/?$ feeds/changes.xml [R=302,L]
+    RewriteRule ^gallery/?$ /#galeria [R=302,L]
+    # Force all Filament admin routes through Laravel front controller.
+    RewriteRule ^admin(/.*)?$ index.php [L]
+    # Force Laravel hub routes to index.php even when markdown mirror directories exist
+    RewriteRule ^(uslugi|problemy|raporty-napraw|blog)/?$ index.php [L]
+    # Blog sub-routes must always go to Laravel (blog/ dir exists for storage)
+    RewriteRule ^blog/.+ index.php [L]
+    # Redirect Trailing Slashes If Not A Folder...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} (.+)/$
+    RewriteRule ^ %1 [L,R=301]
+    # Send Requests To Front Controller...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [L]
+
+</IfModule>
+<FilesMatch "\.php$">
+   AddHandler application/x-httpd-php85 .php
+</FilesMatch>
+
+# === AVIF IMAGE SUPPORT ===
+
+<IfModule mod_mime.c>
+    AddType image/avif .avif
+    AddType image/avif-sequence .avifs
+    AddType text/markdown .md
+    AddType text/yaml .yaml .yml
+</IfModule>
+
+<Files "changes.json">
+<IfModule mod_headers.c>
+Header set Content-Type "application/feed+json; charset=UTF-8"
+</IfModule>
+</Files>
+
+<FilesMatch "^(openapi)\.(yaml|yml)$">
+<IfModule mod_headers.c>
+Header set Content-Type "text/yaml; charset=UTF-8"
+</IfModule>
+</FilesMatch>
+
+<Files "sw.js">
+<IfModule mod_headers.c>
+Header set Cache-Control "private, no-store, no-cache, must-revalidate, max-age=0"
+Header unset Expires
+</IfModule>
+</Files>
+
+# AVIF content negotiation (serve AVIF when browser supports it)
+
+<IfModule mod_rewrite.c>
+    RewriteCond %{HTTP_ACCEPT} image/avif
+    RewriteCond %{REQUEST_URI} \.(jpe?g|png|webp)$
+    RewriteCond %{DOCUMENT_ROOT}/img/avif/$1.avif -f
+    RewriteRule ^img/(.+)\.(jpe?g|png|webp)$ img/avif/$1.avif [T=image/avif,L]
+</IfModule>
+
+# === GZIP COMPRESSION ===
+
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/css text/javascript application/javascript application/json application/xml application/xhtml+xml image/svg+xml font/woff2 font/woff
+</IfModule>
+# === BROTLI (if available) ===
+<IfModule mod_brotli.c>
+    AddOutputFilterByType BROTLI_COMPRESS text/html text/plain text/css text/javascript application/javascript application/json
+</IfModule>
+
+# === AI DISCOVERY FILES ===
+
+# CORS + cache bypass for AI agents, crawlers, and LLM tools
+
+<IfModule mod_headers.c>
+    <FilesMatch "(llms\.txt|llms-full\.txt|mcp\.json|ai-plugin\.json|mcp-agent-card\.json|ai-resources\.json)$">
+        Header always set Access-Control-Allow-Origin "*"
+        Header always set Access-Control-Allow-Methods "GET, OPTIONS"
+        Header always set Cache-Control "public, max-age=3600, no-transform"
+        Header always unset Vary
+        Header always unset Retry-After
+    </FilesMatch>
+</IfModule>
+# Exclude AI discovery files from LSCache (prevent Vary: User-Agent)
+<IfModule LiteSpeed>
+    <FilesMatch "(llms\.txt|llms-full\.txt|mcp\.json|ai-plugin\.json|mcp-agent-card\.json|ai-resources\.json)$">
+        CacheLookup off
+        CacheStore off
+    </FilesMatch>
+</IfModule>
+# === BROWSER CACHE ===
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/webp "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+        ExpiresByType image/avif "access plus 1 year"
+        ExpiresByType image/avif-sequence "access plus 1 year"
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+    ExpiresByType font/woff2 "access plus 1 year"
+    ExpiresByType font/woff "access plus 1 year"
+</IfModule>
+# === CACHE CONTROL HEADERS ===
+<IfModule mod_headers.c>
+    <FilesMatch "\.(webp|jpg|jpeg|png|gif|ico|svg|woff2|woff|ttf|eot)$">
+        Header set Cache-Control "public, max-age=31536000, immutable" env=!no_filament_asset_cache
+    </FilesMatch>
+    <FilesMatch "\.(css|js)$">
+        Header set Cache-Control "public, max-age=2592000" env=!no_filament_asset_cache
+    </FilesMatch>
+    <FilesMatch "\.(css|js|woff2|woff)$">
+        Header set Cache-Control "private, no-store, no-cache, must-revalidate, max-age=0" env=no_filament_asset_cache
+        Header unset Expires env=no_filament_asset_cache
+    </FilesMatch>
+</IfModule>
+
+<Files "sw.js">
+<IfModule mod_headers.c>
+Header set Cache-Control "private, no-store, no-cache, must-revalidate, max-age=0"
+Header unset Expires
+</IfModule>
+</Files>
+
+# Permissions-Policy (SEO 2026)
+
+<IfModule mod_headers.c>
+    Header set Permissions-Policy "camera=(), microphone=(), geolocation=(self), payment=()"
+</IfModule>
+
+# === AEO 10/10 PATCH (2026-03-24) ===
+
+# Correct MIME types for AI discovery files
+
+<IfModule mod_mime.c>
+    # AddType text/markdown .txt  # Removed: breaks robots.txt
+    AddType application/manifest+json .webmanifest
+</IfModule>
+
+# Force correct Content-Type for specific files
+
+<Files "llms.txt">
+<IfModule mod_headers.c>
+Header set Content-Type "text/plain; charset=UTF-8"
+</IfModule>
+</Files>
+<Files "llms-full.txt">
+<IfModule mod_headers.c>
+Header set Content-Type "text/plain; charset=UTF-8"
+</IfModule>
+</Files>
+<Files "site.webmanifest">
+<IfModule mod_headers.c>
+Header set Content-Type "application/manifest+json; charset=UTF-8"
+</IfModule>
+</Files>
+<Files "humans.txt">
+<IfModule mod_headers.c>
+Header set Content-Type "text/plain; charset=UTF-8"
+</IfModule>
+</Files>
+
+# CORS for ALL .well-known files (agent-card, agents, security)
+
+<IfModule mod_headers.c>
+    <Directory ".well-known">
+        Header always set Access-Control-Allow-Origin "*"
+        Header always set Access-Control-Allow-Methods "GET, OPTIONS"
+    </Directory>
+</IfModule>
+
+# AI-friendly response headers on all pages
+
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+#AEO_MOVED_TO_MIDDLEWARE#     Header set X-AI-Discovery "llms.txt, ai-resources.json, mcp.json"
+    Header set X-AI-Gateway-Fallback "https://ai.rsperformance.online"
+#AEO_MOVED_TO_MIDDLEWARE#     Header set Link "</llms.txt>; rel=\"ai-content-index\", </.well-known/ai-resources.json>; rel=\"ai-resources\""
+</IfModule>
+
+# Fix robots.txt Content-Type (must be text/plain per spec)
+
+<Files "robots.txt">
+<IfModule mod_headers.c>
+Header set Content-Type "text/plain; charset=UTF-8"
+</IfModule>
+</Files>
