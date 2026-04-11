@@ -16,6 +16,12 @@ Format relay: jeden blok na sesję, bez kasowania cudzych wpisów. Starsze wpisy
 
 - Trwała ścieżka: `/srv/ops-stack/scripts/vps_n8n_telegram_wow_digest.py` + flaga **`--quiet`**. Instalator: `scripts/vps_install_wow_digest_cron.sh` → **`CRON_TZ=Europe/Warsaw`**, **`0 8 * * *`**, log `/srv/ops-stack/logs/n8n_wow_digest.log`. Uzasadnienie: obraz Docker n8n nie ma Pythona — orchestracja „wow” raportu na hoście obok SQLite.
 
+### Weryfikacja wdrożenia (2026-04-11)
+
+- Backup na VPS przed uploadem: `vps_n8n_telegram_wow_digest.py.bak_cursor_wow_digest_20260411`.
+- `vps_exec.py --upload` z repo → `/srv/ops-stack/scripts/`; `bash vps_install_wow_digest_cron.sh` → crontab z `CRON_TZ` + wpis 08:00.
+- Smoke: `https://auto.rs3d.pl/healthz` OK; ręczny run skryptu (bez `--quiet`) → Telegram HTTP 200, fleet 15, webhook test 200, health fails 0.
+
 ---
 
 ## [2026-04-12 ~01:15 CET] Cursor — VPS n8n: import Vertex-patched workflows

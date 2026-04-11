@@ -1278,9 +1278,10 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhNTIzYmM3ZC0wMjIwLTQ3NjktYjYyNC0
 - Blocker: Brak
 - Architektura aktywna: `n8n` przywrocone na VPS (auto.rs3d.pl), kontener w docker-compose
 - n8n: v2.14.2, owner: admin@rsperformance.online, API key: hub (JWT)
-- n8n workflow: "RS AI Bot Invitation Hub" (FM1BxBIDKRmhr57i) — aktywny, cron co 1h
+- n8n workflow: **RS AI Bot Invitation Hub** — aktywny tylko **`F6uosr6xSCJZM4fO`** (canonical z Vertex); duplikat **`FM1BxBIDKRmhr57i`** wyłączony (dedup hourly IndexNow)
     - IndexNow ping (22 URLi), health checks (llms.txt, sitemap, a2a.json), raport Telegram
     - Webhook test: POST https://auto.rs3d.pl/webhook/bot-invitation-test
+- VPS host cron (rsops): codzienny **08:00 Europe/Warsaw** WOW digest Telegram → `/srv/ops-stack/scripts/vps_n8n_telegram_wow_digest.py --quiet`, log `/srv/ops-stack/logs/n8n_wow_digest.log` (instalator: `scripts/vps_install_wow_digest_cron.sh`)
 
 ## AKTUALNA OPERACJA (W TRAKCIE)
 

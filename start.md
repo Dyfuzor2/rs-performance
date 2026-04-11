@@ -1,3 +1,5 @@
+> LIVE VPS N8N WOW DIGEST CRON NOTE (2026-04-11 CET)
+> User **rsops** on VPS `185.180.207.211`: daily **08:00 Europe/Warsaw** runs `/usr/bin/python3 /srv/ops-stack/scripts/vps_n8n_telegram_wow_digest.py --quiet` with `N8N_SQLITE=/srv/ops-stack/n8n/storage/database.sqlite`, append log `/srv/ops-stack/logs/n8n_wow_digest.log`. Repo installer (idempotent): `scripts/vps_install_wow_digest_cron.sh`. **Canonical Bot Invitation Hub workflow:** `F6uosr6xSCJZM4fO`; keep duplicate `FM1BxBIDKRmhr57i` **inactive** (dedup). Verify: `curl -s https://auto.rs3d.pl/healthz` => `{"status":"ok"}`; optional manual run without `--quiet` => Telegram HTTP 200, ~15 active workflows in fleet matrix.
 > LIVE AEO GATEWAY HTACCESS NOTE (2026-04-12)
 > Canonical `302` to `https://ai.rsperformance.online/` for listed AI UAs works again on LiteSpeed. Root cause: a **literal space inside `ChatGPT Atlas`** within one long `RewriteCond` alternation broke the entire condition (silent no-match). Fix in repo `G:\gravity\.htaccess_remote` (deployed to `public_html/.htaccess`): `ChatGPT\x20Atlas`, encoded `%20` as `chatgpt\x25\x32\x30atlas`, UA case via trailing `[NC]` (avoid `(?i:(...))` in this cond), `ModSecurity` + fortress `FilesMatch` moved **outside** `IfModule mod_rewrite.c`, gatewayconds: `!^ai\.rsperformance\.online$`, `^(www\.)?rsperformance\.online$`, `^(GET|HEAD)$`, rule `[R=302,L,QSA]`. Backups on hosting: `.htaccess.bak_cursor_rewritefix_20260412`, earlier `.bak_cursor_wow_full_20260412`. Verify: `curl -sD - -o NUL -A GPTBot https://rsperformance.online/` => `302` + `Location: https://ai.rsperformance.online/`; browser UA => `200`; `/wp-admin` => `403`.
 > LIVE DTC CITATION HEADERS NOTE (2026-04-12)
@@ -72,6 +74,8 @@
 > - service account activation works
 > - project `diagnosta-489719` is active
 > - Vertex AI API `aiplatform.googleapis.com` is enabled
+>   LIVE VERTEX PROD VERIFY (2026-04-11)
+>   Hosting `.env` already had `VERTEX_PROJECT_ID`, `VERTEX_LOCATION=us-central1`, `VERTEX_SERVICE_ACCOUNT_JSON=/home/tyurjydtpw/secure/vertex/diagnosta-489719-96def3352c52.json`. Smoke: `VertexAccessTokenFactory::make()` => `VERTEX_OK`. Local `.env` appended with same IDs and `G:/gravity/...json` path for workspace.
 >   LIVE BLOG HERO NOTE (2026-04-09 21:35 CET)
 >   Manual/newsroom blog pipeline on hosting is no longer AI-image-only for `premiera` / `news`.
 >   Updated live files:
