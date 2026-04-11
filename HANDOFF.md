@@ -1,3 +1,16 @@
+## 2026-04-12 ~03:00 CET - VPS n8n: jeden aktywny Bot Invitation Hub (F6uos canonical)
+
+### Agent: Cursor
+
+### STATUS: LIVE ON VPS (n8n Docker)
+
+- **Problem:** przez smoke wcześniej aktywowano też duplikat `FM1BxBIDKRmhr57i` obok canonical `F6uosr6xSCJZM4fO` — podwójny hourly cron / IndexNow.
+- **Fix:** `n8n unpublish:workflow --id=FM1BxBIDKRmhr57i` w kontenerze `n8n`, `docker compose restart n8n` w `/srv/ops-stack/compose`.
+- **Backup:** `cp` SQLite → `.bak_n8n_hub_dedup` (`vps_exec.py --backup /srv/ops-stack/n8n/storage/database.sqlite n8n_hub_dedup`).
+- **Verify:** `list:workflow --active=true | grep -E 'F6uos|FM1Bx'` → tylko `F6uosr6xSCJZM4fO`; webhook `POST /webhook/bot-invitation-test` → `200`.
+- **Repo:** `scripts/vps_n8n_wow_smoke.py` — komentarz pod F6uos.
+- **Rollback:** `n8n publish:workflow --id=FM1BxBIDKRmhr57i` + restart (świadomie przywraca ryzyko duplikatu).
+
 ## 2026-04-12 ~23:55 CET - DTC citation headers + `AiCitationHeaders` registered on hosting
 
 ### Agent: Cursor
@@ -1382,13 +1395,13 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhNTIzYmM3ZC0wMjIwLTQ3NjktYjYyNC0
 ## OSTATNI AGENT
 
 - **Kto:** Cursor (Composer)
-- **Kiedy:** 2026-04-12 (relay / dokumentacja + retest bramki)
-- **Co zrobił:** Retest łańcucha 302 → `ai.rsperformance.online` (GPTBot vs przeglądarka): brak pętli, 200 na bramce; nagłówki hospitality na `/for-agents`; dopisanie `SESSION_LOG.md`, `plan.md`, `handoff-log.md`; synchronizacja tego bloku w `HANDOFF.md`.
-- **Czego NIE ruszać:** Sekrety w sekcji KLUCZOWE USTALENIA — nie duplikować; hosting `.htaccess` bez nowego deployu w tej mini-sesji (źródło repo: `.htaccess_remote`).
+- **Kiedy:** 2026-04-12 (VPS n8n Vertex import + masowa publikacja)
+- **Co zrobił:** Import Vertex JSON (jak wcześniej), potem **`n8n publish:workflow`** dla 16 workflowów produkcyjnych, **pominięty** duplikat hub `FM1BxBIDKRmhr57i` (zostaje nieaktywny), **`docker compose restart n8n`**. Stan: **16 aktywnych** /1 celowo wyłączony duplikat nazwy „Invitation Hub”; `healthz` OK.
+- **Czego NIE ruszać:** Sekrety w sekcji KLUCZOWE USTALENIA — nie duplikować; nie kasować plików backup/import na VPS bez świadomego rollbacku.
 
 ## NASTĘPNE KROKI (priorytet)
 
-1. Uruchomić / zweryfikować pipeline dzienny newsroom (n8n) i raport Telegram po zmianach AEO.
+1. Smoke **n8n**: pierwszy zaplanowany lub ręczny przebieg `RS Daily Automotive News Drafts`, Telegram z monitorów; opcjonalnie `curl` proxy `https://rsperformance.online/api/n8n/vertex/*` z tokenem jak w węzłach HTTP. (Reaktywacja masowa — zrobiona.)
 2. Biznesowy smoke support-plane (VPS) po L13 — nie tylko health i artisan.
 3. Decyzja: osobna aplikacja Nightwatch dla hostingu `rsperformance.online` vs tylko VPS.
 4. Wzbogacić A2A / affordances pod agentów (karty, discovery) bez regresji canonical.

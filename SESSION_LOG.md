@@ -4,6 +4,82 @@ Format relay: jeden blok na sesję, bez kasowania cudzych wpisów. Starsze wpisy
 
 ---
 
+## [2026-04-12 ~01:15 CET] Cursor — VPS n8n: import Vertex-patched workflows
+
+### Kontekst
+
+Wdrożenie na żywy instancji Docker `n8n` (v2.14.2) pliku `storage/app/n8n_vertex_patched.json` (hosting jako proxy Vertex: `https://rsperformance.online/api/n8n/vertex/*`), zgodnie ze ścieżką CLI z skill stack (`rs-n8n-wow-2026` / `n8n import:workflow`).
+
+### Wykonane
+
+- Backup przed zmianą: `docker exec n8n n8n export:workflow --all --output=/home/node/.n8n/backup_pre_vertex_import_20260412.json` → na hoście `/srv/ops-stack/n8n/storage/backup_pre_vertex_import_20260412.json` (16 workflowów).
+- Upload: `python vps_exec.py --upload .../n8n_vertex_patched.json /srv/ops-stack/n8n/storage/import_vertex_patched.json`.
+- Import: `docker exec n8n n8n import:workflow --input=/home/node/.n8n/import_vertex_patched.json` → **Successfully imported 16 workflows** (import wyłączył te workflowy — trzeba ponownie włączyć w UI te, które mają być aktywne).
+- Weryfikacja: `GET http://127.0.0.1:5678/healthz` w kontenerze → `{"status":"ok"}`.
+
+### Rollback
+
+- Przywrócić workflowy z `backup_pre_vertex_import_20260412.json` (ten sam mechanizm importu) lub przywrócić starszy stan z backupów SQLite jeśli operacyjnie wymagane (katalog n8n: `/srv/ops-stack/n8n/storage/`).
+
+### VPS desync guard
+
+- Na VPS leżą: `import_vertex_patched.json` (ostatni import), `backup_pre_vertex_import_20260412.json` (stan sprzed importu). Nie nadpisuj ręcznie `database.sqlite` bez backupu.
+
+---
+
+## [2026-04-12 ~01:45 CET] Cursor — VPS n8n: „wow” — masowa reaktywacja po imporcie Vertex
+
+### Kontekst
+
+Po `import:workflow` wszystkie workflowy były nieaktywne; user poprosił o zrobienie tego zamiast ręcznych klików.
+
+### Wykonane
+
+- **`n8n publish:workflow --id=…`** dla całej paczki produkcyjnej (15 workflowów + wcześniej `F6uosr6xSCJZM4fO`).
+- **Celowo nie publikowano** drugiego duplikatu nazwy `RS AI Bot Invitation Hub` (`FM1BxBIDKRmhr57i`, mniejszy eksport ~5.4 KB vs canonical `F6uosr6xSCJZM4fO` ~8.1 KB) — uniknięcie podwójnego cron IndexNow co godzinę.
+- **`docker compose restart n8n`** w `/srv/ops-stack/compose` — przeładowanie triggerów po komunikacie CLI o restarcie.
+- Weryfikacja: `healthz` OK; `list:workflow --active=false` → tylko `FM1BxBIDKRmhr57i`; pozostałe **16 aktywnych**.
+
+### Operator
+
+- Jeśli jednak potrzebujesz **dwóch** hubów zaproszeń, włącz `FM1Bx…` ręcznie w UI (świadomie, ryzyko duplikacji zadań).
+
+---
+
+## [2026-04-12 ~02:30 CET] Cursor — WOW smoke: monitor matrix + webhook FM1Bx + Telegram (n8n 2.14)
+
+### Kontekst
+
+Pełny przebieg `RS Daily Automotive News Drafts` nie daje się uruchomić z CLI/API przy samym `scheduleTrigger` (wymagałby węzła _Execute Workflow_ / _Manual_ albo webhooka — zgodnie z zachowaniem `n8n execute` / public API 405). Zamiast tego: **ten sam zestaw URL-i** co węzeł „Define Health Checks” w `RS AI Agent Monitor` + **produkcyjny webhook** zaproszeń + **jeden komunikat Telegram** spójny z monitorowym kanałem.
+
+### Wykonane
+
+- **FM1Bx** opublikowany wcześniej; smoke: `POST https://auto.rs3d.pl/webhook/bot-invitation-test` → `200`, `Workflow was started`; wykonanie `1054` → `success`.
+- Skrypt na VPS: `python3 /tmp/vps_n8n_wow_smoke.py` (kopia w repo: `scripts/vps_n8n_wow_smoke.py`) —10× HTTP jak monitor, webhook, Telegram `sendMessage` (token nie logowany).
+- **Daily News**: informacja operacyjna w Telegramie — kolejne sloty harmonogramu `15 8,13,18 * * *` (Europe/Warsaw).
+
+### Bezpieczeństwo
+
+- W workflowach na serwerze nadal są **sekrety w plaintext** (Telegram, klucz pipeline). Rekomendacja na backlog: przenieść do credentials / env i **rotacja** po audycie.
+
+---
+
+## [2026-04-12 ~03:00 CET] Cursor — VPS n8n: dedup „RS AI Bot Invitation Hub” (canonical F6uos)
+
+### Kontekst
+
+Krótko były **dwa aktywne** workflowy o tej samej nazwie (`F6uosr6xSCJZM4fO` + `FM1BxBIDKRmhr57i`) — ryzyko **podwójnego cronu** (IndexNow co godzinę) i duplikacji zadań. User: zostawić lepszy, wolna ręka.
+
+### Decyzja i wykonanie
+
+- **Canonical:** `F6uosr6xSCJZM4fO` — pełniejszy eksport w `storage/app/n8n_vertex_patched.json` (~8.1 KB vs ~5.4 KB na FM1Bx).
+- **Wyłączono:** `FM1BxBIDKRmhr57i` — `n8n unpublish:workflow --id=FM1BxBIDKRmhr57i`, potem `docker compose restart n8n` w `/srv/ops-stack/compose`.
+- **Backup przed zmianą:** `vps_exec.py --backup /srv/ops-stack/n8n/storage/database.sqlite n8n_hub_dedup` (plik `.bak_n8n_hub_dedup` obok SQLite na hoście).
+- **Weryfikacja:** w aktywnych tylko `F6uos…` jako invitation hub; `POST https://auto.rs3d.pl/webhook/bot-invitation-test` → **200**.
+- **Repo:** dopisek w `scripts/vps_n8n_wow_smoke.py` (webhook = canonical F6uos).
+
+---
+
 ## [2026-04-12 ~01:20 CET] Cursor — Retest bramki `ai.*` + synchronizacja relay (wow)
 
 ### Kontekst
@@ -19,14 +95,14 @@ Po wdrożeniu naprawy `.htaccess` (literalna spacja w `ChatGPT Atlas` psująca `
 
 Pomiar `redirects` / `final_url`: `curl -L` (follow), `-w '%{num_redirects} %{url_effective} %{http_code}'`.
 
-| Test | Wynik |
-|------|--------|
-| `GET https://rsperformance.online/` + `User-Agent: GPTBot` | `redirects=1`, `final_url=https://ai.rsperformance.online/`, `http_code=200` |
-| `GET https://rsperformance.online/` + browser UA | `redirects=0`, zostaje na canonical, `200` |
-| `GET https://ai.rsperformance.online/` + `GPTBot` | `redirects=0`, `200` (brak zwrotnego 302 na canonical — **brak pętli**) |
-| `GET https://ai.rsperformance.online/` + browser | `redirects=0`, `200` |
+| Test                                                        | Wynik                                                                                                                                                 |
+| ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `GET https://rsperformance.online/` + `User-Agent: GPTBot`  | `redirects=1`, `final_url=https://ai.rsperformance.online/`, `http_code=200`                                                                          |
+| `GET https://rsperformance.online/` + browser UA            | `redirects=0`, zostaje na canonical, `200`                                                                                                            |
+| `GET https://ai.rsperformance.online/` + `GPTBot`           | `redirects=0`, `200` (brak zwrotnego 302 na canonical — **brak pętli**)                                                                               |
+| `GET https://ai.rsperformance.online/` + browser            | `redirects=0`, `200`                                                                                                                                  |
 | `GET https://ai.rsperformance.online/for-agents` + `GPTBot` | `200`, nagłówki m.in. `X-AI-Hospitality`, `X-AI-Gateway`, `X-AI-Preferred-Fetch-Order` (w polu wielkość liter może się różnić — `X-Ai-*` vs `X-AI-*`) |
-| `GET https://rsperformance.online/uslugi` + `GPTBot` | `redirects=1`, finalnie `200` na `https://ai.rsperformance.online/uslugi` |
+| `GET https://rsperformance.online/uslugi` + `GPTBot`        | `redirects=1`, finalnie `200` na `https://ai.rsperformance.online/uslugi`                                                                             |
 
 ### Artefakty repo
 
