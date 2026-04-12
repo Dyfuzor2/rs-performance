@@ -34,3 +34,4 @@ Root **`G:\gravity\.mcp.json`** uses server **`laravel-boost`** → `run-laravel
 
 - Boost MCP speaks **stdio** to Cursor; the Laravel app code lives in **`G:\gravity`** — not on VPS for this MCP entry.
 - No secrets in this folder; `.env` stays in project root (gitignored).
+- **Environment:** Laravel Boost only boots when `APP_ENV=local` or `APP_DEBUG=true`. The launcher and install check set `APP_ENV=local` for that process only, so `boost:mcp` works even if your `.env` says `production` (common on a shared dev PC).

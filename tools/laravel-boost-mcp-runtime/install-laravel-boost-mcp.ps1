@@ -22,6 +22,10 @@ if (-not (Test-Path -LiteralPath $boostPath)) {
 
 Write-Host "[laravel-boost-mcp] Checking boost:mcp ..."
 Set-Location -LiteralPath $ProjectRoot
+
+# Match run-laravel-boost-mcp.ps1: Boost registers commands only when local or debug.
+$env:APP_ENV = 'local'
+
 $list = & $Php @("artisan", "list", "--raw", "--no-ansi") 2>&1 | Out-String
 if ($LASTEXITCODE -ne 0) {
     Write-Host "FAIL: php artisan list --raw" -ForegroundColor Red

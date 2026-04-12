@@ -23,4 +23,9 @@ if (-not (Test-Path -LiteralPath $Artisan)) {
 }
 
 Set-Location -LiteralPath $ProjectRoot
+
+# BoostServiceProvider::shouldRun() enables Boost only for local env OR app.debug=true.
+# Many dev machines keep APP_ENV=production in .env; MCP still needs Boost registered.
+$env:APP_ENV = 'local'
+
 & $Php @("artisan", "boost:mcp")
