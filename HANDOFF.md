@@ -1,3 +1,27 @@
+## 2026-04-12 — Hosting `.htaccess`: pełna parity UA z `config/ai_agents.php` (Exabot / OpenRouter / Cohere…)
+
+### Agent: Cursor
+
+### STATUS: PRODUKCJA (canonical)
+
+- **Plik repo:** `.htaccess_remote` → deploy: `ssh_exec.py --upload` → `public_html/.htaccess`.
+- **Zmiana:** ModSecurity **99000/99001** + WOW gateway `RewriteCond` — dopisane tokeny wcześniej tylko w PHP (`Exabot`, `BingPreview`, `OpenRouter`, `HuggingFaceBot`, `RedditBot`, `ShapBot`, `ScaleAI-Crawler`, `Together-Bot`, `cohere-crawler`, `cohere-training-data-crawler`, `hugging-face-ai`).
+- **Backup rollback:** `public_html/.htaccess.bak_cursor_aitokens_20260412`.
+- **Smoke:** `scripts/smoke_ai_agent_catalog.py` — **0** zaproszonych z **406** na `/`.
+- **Repo:** `3502630`, `7c67058` na `feature/v9-architecture-rebuild`.
+
+---
+
+## 2026-04-12 — Prod snapshot + `ssh_exec` ↔ `.cursor/mcp.env`
+
+### Agent: Cursor
+
+### STATUS: REPO (dokumentacja + `ssh_exec.py`)
+
+- **Dokument:** `docs/ops-production-verification-snapshot.md` — skrócony obraz **hosting + VPS** (wersje Laravel/PHP, A2A, artefakty `.well-known`, smoke), **bez sekretów**.
+- **`ssh_exec.py`:** przed SSH ładuje `.cursor/mcp.env` (`gravity_cursor_env.load_cursor_env`), żeby **`CYBERFOLKS_SSH_PASSWORD`** / host / port / user były w jednym gitignored pliku z pozostałymi kluczami — patrz `.cursor/mcp.env.example`.
+- **Weryfikacja (sesja):** hosting SSH: Laravel 13.1.1, PHP 8.5.3, A2A trasy, curl z serwera na canonical OK; VPS: health n8n / auto / bramka OK.
+
 ## 2026-04-12 — Filament n8n hub: VPS Public API + MCP health + n8n-mcp WOW env
 
 ### Agent: Cursor
@@ -1402,7 +1426,7 @@
 
 ## AKTUALNA OPERACJA (W TRAKCIE)
 
-- **Obecnie brak** (2026-04-12: reguła startowa `.cursor/rules/agent-start-inventory.mdc` + RELAY §1; commit `f580d69`. Wcześniej 2026-04-11 wieczór: polonizacja blog/newsroom, n8n Select Fresh Story, skille; retest AEO `ai.rsperformance.online` — OK.)
+- **Obecnie brak** (2026-04-12 wieczór: zsynchronizowano `public_html/.htaccess` z `config/ai_agents.php` — ModSec 99000/99001 + WOW `RewriteCond`; backup `.htaccess.bak_cursor_aitokens_20260412`; smoke `smoke_ai_agent_catalog.py` → 0×406 na zaproszonych; repo `3502630` / `7c67058` na `feature/v9-architecture-rebuild`.)
     > **[RACE CONDITION & DEAD AGENT GUARD]**: ZANIM siebie tu wpiszesz, sprawdź czy ktoś już nie pracuje. Jeśli inny agent wisi tu od >3 godzin, zrób **Dead Agent Recovery** (git status -> git diff -> napraw/usuń jego resztki) i dopiero przejmij pałeczkę.
 
 ## ZAMROĹ»ONE BLOCKERY (Fail-Forward)
@@ -1513,17 +1537,17 @@
 ## OSTATNI AGENT
 
 - **Kto:** Cursor (Composer)
-- **Kiedy:** 2026-04-12 CET
-- **Co zrobił:** Deploy na **hosting** Filament **n8n WOW Ops Hub** (`N8nWorkflowDocumentResource`, widget overview, migracja `n8n_workflow_documents`, seed `N8nWorkflowDocumentSeeder`, `config/n8n.php`, `OpsVerifyN8nHostingBridgeCommand`). Backupy: `DatabaseSeeder.php.bak_cursor_n8n_wow_20260412`, `config/n8n.php.bak_cursor_n8n_wow_20260412`. Po migracji: `composer dump-autoload`, `optimize:clear`. Smoke: HTTP 200 `/` i `/admin/login`; trasy `admin/n8n-workflow-documents`.
-- **Czego NIE ruszać:** Sekrety w sekcji KLUCZOWE USTALENIA — nie duplikować; nie kasować plików backup/import na VPS bez świadomego rollbacku.
+- **Kiedy:** 2026-04-12 ~18:40 CET
+- **Co zrobił:** **Hosting `public_html/.htaccess`** — dopisanie brakujących UA z `config/ai_agents.php` do **ModSecurity 99000/99001** i **WOW `RewriteCond`** (m.in. `Exabot`, `OpenRouter`, Cohere/HF/Reddit/Shap/ScaleAI/Together/BingPreview). **Przyczyna:** zaproszone agenty bez dopasowania w liście dostawały **406** zamiast bypass/302 na `ai.rsperformance.online`. Backup przed uploadem: `.htaccess.bak_cursor_aitokens_20260412`. Weryfikacja: `curl -I` z UA Exabot → **302**; `scripts/smoke_ai_agent_catalog.py` → **0** zaproszonych z **406**. Repo: `.htaccess_remote` + wpis `handoff-log.md` — commity `3502630`, `7c67058` na `feature/v9-architecture-rebuild`. VPS bez zmian (trasy/health już OK).
+- **Czego NIE ruszać:** Sekrety w sekcji KLUCZOWE USTALENIA — nie duplikować; nie kasować plików backup/import na VPS bez świadomego rollbacku. Przy kolejnej edycji `config/ai_agents.php` — **zsynchronizuj** te same tokeny w `.htaccess_remote` (komentarz w pliku wskazuje na parity).
 
 ## NASTĘPNE KROKI (priorytet)
 
-1. **Panel:** zalogować się do Filament i sprawdzić **n8n WOW Ops Hub** (`/admin/n8n-workflow-documents`) — widok WOW, sync z API jeśli w `.env` są `N8N_API_URL` / `N8N_API_KEY`; opcjonalnie `php85 artisan ops:verify-n8n-hosting-bridge`.
-2. **Deploy hosting:** backup → wgranie `BlogVertexPipelineService.php` → `php85 artisan optimize:clear` → smoke pipeline bloga / Vertex (jeśli jeszcze nie zrobione).
-3. **Bezpieczeństwo n8n:** jeśli token bota jest w `n8n_workflow_blog_draft_cadence.json` lub innym eksporcie — rotacja + credentiale w n8n; nie commitować sekretów.
-4. **n8n VPS:** import/sync workflow po zmianach JSON; smoke **Select Fresh Story** / cadence draftów; obserwacja zielonego runu po fixach HttpRequest.
-5. `git`: repo lokalne ma dużo nieśledzonych plików — przed masowym commitem **Dead Agent Recovery** (`git status` / `git diff`); zsynchronizować źródło prawdy z hostingiem tam gdzie to ma sens.
+1. **`git push`:** wypchnąć `feature/v9-architecture-rebuild` (commity htaccess + handoff) na `origin`; merge do `main` wg procedury właściciela.
+2. **Panel:** zalogować się do Filament i sprawdzić **n8n WOW Ops Hub** (`/admin/n8n-workflow-documents`) — widok WOW, sync z API jeśli w `.env` są `N8N_API_URL` / `N8N_API_KEY`; opcjonalnie `php85 artisan ops:verify-n8n-hosting-bridge`.
+3. **n8n VPS:** `n8n_fleet_health_apr2026.py` po kolejnym cyklu cron; triage workflowów wciąż w `error` (trasy hosting / OpenRouter / Diagnosta).
+4. **Bezpieczeństwo n8n:** tokeny tylko w credentiale n8n / `mcp.env` — nie w eksporcie JSON w repo.
+5. **Dead Agent Recovery** przed masowym commitem: `git status` / `git diff` na branchu roboczym; nie mieszać niepowiązanych zmian z htaccess.
 
 ## KLUCZOWE USTALENIA Z TEJ SESJI
 

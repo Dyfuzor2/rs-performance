@@ -4,6 +4,26 @@ Format relay: jeden blok na sesję, bez kasowania cudzych wpisów. Starsze wpisy
 
 ---
 
+## [2026-04-12] Cursor — hosting `.htaccess`: parity UA z `config/ai_agents.php` (naprawa 406 / Exabot)
+
+### Wykonane
+
+- Zaktualizowano `.htaccess_remote`: te same brakujące tokeny w **SecRule 99000**, **99001** oraz **RewriteCond** bramki WOW (zsynchronizowane z PHP, minus `stayCanonicalForSeo` dla WOW zgodnie z polityką).
+- **Produkcja:** backup `public_html/.htaccess.bak_cursor_aitokens_20260412`, upload przez `ssh_exec.py --upload`.
+- **Weryfikacja:** `curl -I` z UA zawierającym Exabot → **302** na `ai.rsperformance.online`; `scripts/smoke_ai_agent_catalog.py` → **0** zaproszonych z **406** na `/`.
+- **Dokumentacja relay:** `handoff-log.md`, `HANDOFF.md` (Ostatni agent / Następne kroki), `plan.md` (current status), `start.md` (blok LIVE).
+
+### Commity (branch `feature/v9-architecture-rebuild`)
+
+- `3502630` — `fix(htaccess): sync ModSec and gateway UA list with ai_agents (…)`.
+- `7c67058` — `docs(handoff): log .htaccess UA sync with ai_agents (Exabot fix)`.
+
+### VPS
+
+- Bez zmian w tej iteracji (endpointy discovery/health wcześniej OK).
+
+---
+
 ## [2026-04-12] Cursor — n8n: domyślny URL = auto.rs3d.pl (nie SOCmid)
 
 - Ujednolicono szablony: `.cursor/mcp.env.example`, `n8n.env.example`, `merge_n8n_env_hosting.py` (DEFAULT_BASE), `HANDOFF.md`, `RELAY.md`, `activeContext.md`, skill `rs-n8n-wow-2026`.
