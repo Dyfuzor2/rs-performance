@@ -2,7 +2,42 @@
 
 declare(strict_types=1);
 
-use App\Support\N8n\N8nPublicApiKeyNormalizer;
+/**
+ * Config must not reference App\* classes: configuration files load before the
+ * container is ready, and some bootstrap paths resolve autoload differently than
+ * HTTP/Artisan. Logic is kept in sync with `App\Support\N8n\N8nPublicApiKeyNormalizer`.
+ */
+$normalizeN8nBaseUrl = static function (?string $value): string {
+    $s = trim((string) $value);
+    if (str_starts_with($s, "\xEF\xBB\xBF")) {
+        $s = substr($s, 3);
+    }
+
+    return rtrim($s, '/');
+};
+
+$normalizeN8nApiKey = static function (?string $value): string {
+    $s = trim((string) $value);
+    if (str_starts_with($s, "\xEF\xBB\xBF")) {
+        $s = substr($s, 3);
+    }
+
+    if ($s === '') {
+        return '';
+    }
+
+    $s = rtrim($s, ';');
+
+    if (
+        (str_starts_with($s, '"') && str_ends_with($s, '"'))
+        || (str_starts_with($s, "'") && str_ends_with($s, "'"))
+    ) {
+        $s = substr($s, 1, -1);
+        $s = trim($s);
+    }
+
+    return trim($s);
+};
 
 return [
     /*
@@ -28,8 +63,8 @@ return [
     |
     */
     'public_api' => [
-        'base_url' => N8nPublicApiKeyNormalizer::baseUrl(env('N8N_API_URL')),
-        'key' => N8nPublicApiKeyNormalizer::apiKey(env('N8N_API_KEY')),
+        'base_url' => $normalizeN8nBaseUrl(env('N8N_API_URL')),
+        'key' => $normalizeN8nApiKey(env('N8N_API_KEY')),
     ],
 
     /*
@@ -37,7 +72,7 @@ return [
     | Link “Otwórz w edytorze n8n” w panelu (bez sekretów)
     |--------------------------------------------------------------------------
     */
-    'editor_base_url' => N8nPublicApiKeyNormalizer::baseUrl(
+    'editor_base_url' => $normalizeN8nBaseUrl(
         env('N8N_EDITOR_BASE_URL') ?: env('N8N_API_URL')
     ),
 
