@@ -4,8 +4,37 @@
     @endphp
 
     <style>
-        .bpd-wrap { display: flex; flex-direction: column; gap: 1.25rem; }
-        .bpd-grid { display: grid; gap: 1rem; grid-template-columns: repeat(2, 1fr); }
+        .bpd-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            position: relative;
+        }
+
+        .bpd-wrap::before {
+            content: '';
+            pointer-events: none;
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            opacity: 0.14;
+            background:
+                radial-gradient(ellipse 80% 50% at 20% 10%, rgba(220, 38, 38, 0.35), transparent 55%),
+                radial-gradient(ellipse 60% 40% at 90% 80%, rgba(59, 130, 246, 0.2), transparent 50%),
+                radial-gradient(ellipse 50% 30% at 50% 100%, rgba(16, 185, 129, 0.12), transparent 45%);
+        }
+
+        .bpd-wrap > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .bpd-grid {
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: repeat(2, 1fr);
+        }
+
         .bpd-stat {
             position: relative;
             overflow: hidden;
@@ -15,11 +44,13 @@
             border: 1px solid rgba(148, 163, 184, 0.12);
             transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
         }
+
         .bpd-stat:hover {
             border-color: rgba(248, 113, 113, 0.25);
             transform: translateY(-1px);
             box-shadow: 0 16px 32px -12px rgba(0, 0, 0, 0.45);
         }
+
         .bpd-stat-val {
             font-size: 1.75rem;
             font-weight: 800;
@@ -27,6 +58,7 @@
             line-height: 1.1;
             color: #f8fafc;
         }
+
         .bpd-stat-lbl {
             font-size: 0.625rem;
             font-weight: 700;
@@ -35,7 +67,13 @@
             color: #64748b;
             margin-top: 0.35rem;
         }
-        .bpd-stat-sub { font-size: 0.7rem; color: #94a3b8; margin-top: 0.25rem; }
+
+        .bpd-stat-sub {
+            font-size: 0.7rem;
+            color: #94a3b8;
+            margin-top: 0.25rem;
+        }
+
         .bpd-toolbar {
             display: flex;
             flex-wrap: wrap;
@@ -47,6 +85,7 @@
             background: rgba(15, 23, 42, 0.55);
             border: 1px solid rgba(51, 65, 85, 0.35);
         }
+
         .bpd-select {
             appearance: none;
             border-radius: 0.5rem;
@@ -61,7 +100,13 @@
             background-position: right 0.4rem center;
             background-size: 1rem;
         }
-        .bpd-tbl { width: 100%; border-collapse: collapse; font-size: 0.8125rem; }
+
+        .bpd-tbl {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8125rem;
+        }
+
         .bpd-tbl thead th {
             text-align: left;
             padding: 0.65rem 0.75rem;
@@ -76,13 +121,18 @@
             top: 0;
             z-index: 2;
         }
+
         .bpd-tbl tbody td {
             padding: 0.5rem 0.75rem;
             vertical-align: middle;
             border-top: 1px solid rgba(51, 65, 85, 0.25);
             color: #e2e8f0;
         }
-        .bpd-tbl tbody tr:hover td { background: rgba(30, 41, 59, 0.35); }
+
+        .bpd-tbl tbody tr:hover td {
+            background: rgba(30, 41, 59, 0.35);
+        }
+
         .bpd-pill {
             display: inline-flex;
             align-items: center;
@@ -95,16 +145,46 @@
             white-space: nowrap;
             max-width: 11rem;
         }
-        .bpd-dot { height: 0.35rem; width: 0.35rem; border-radius: 9999px; flex-shrink: 0; box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.9); }
-        .bpd-topic { max-width: 14rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; color: #f1f5f9; }
-        .bpd-meta { font-size: 0.6875rem; color: #94a3b8; font-variant-numeric: tabular-nums; }
+
+        .bpd-dot {
+            height: 0.35rem;
+            width: 0.35rem;
+            border-radius: 9999px;
+            flex-shrink: 0;
+            box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.9);
+        }
+
+        .bpd-topic {
+            max-width: 14rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-weight: 600;
+            color: #f1f5f9;
+        }
+
+        .bpd-meta {
+            font-size: 0.6875rem;
+            color: #94a3b8;
+            font-variant-numeric: tabular-nums;
+        }
+
         .bpd-panel {
             border-radius: 1rem;
             overflow: hidden;
-            border: 1px solid rgba(51, 65, 85, 0.35);
-            background: rgba(2, 6, 23, 0.35);
+            border: 1px solid rgba(51, 65, 85, 0.45);
+            background: linear-gradient(165deg, rgba(15, 23, 42, 0.55) 0%, rgba(2, 6, 23, 0.72) 100%);
+            box-shadow:
+                0 0 0 1px rgba(248, 113, 113, 0.06) inset,
+                0 24px 48px -24px rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(8px);
         }
-        .bpd-scroll { overflow-x: auto; max-width: 100%; }
+
+        .bpd-scroll {
+            overflow-x: auto;
+            max-width: 100%;
+        }
+
         .bpd-live {
             display: inline-flex;
             align-items: center;
@@ -112,6 +192,7 @@
             font-size: 0.75rem;
             color: #94a3b8;
         }
+
         .bpd-live-dot {
             width: 6px;
             height: 6px;
@@ -120,10 +201,21 @@
             box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.25);
             animation: bpd-pulse 2.2s ease-in-out infinite;
         }
+
         @@keyframes bpd-pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.65; transform: scale(1.15); }
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.65;
+                transform: scale(1.15);
+            }
         }
+
         .bpd-hero-icon {
             width: 2.5rem;
             height: 2.5rem;
@@ -134,7 +226,12 @@
             background: linear-gradient(135deg, #dc2626, #f97316);
             box-shadow: 0 4px 14px rgba(220, 38, 38, 0.35);
         }
-        @@media (min-width: 768px) { .bpd-grid { grid-template-columns: repeat(5, 1fr); } }
+
+        @@media (min-width: 768px) {
+            .bpd-grid {
+                grid-template-columns: repeat(5, 1fr);
+            }
+        }
     </style>
 
     <div class="bpd-wrap" wire:poll.15s>
@@ -143,8 +240,10 @@
         <div class="flex flex-wrap items-start justify-between gap-4">
             <div class="flex items-center gap-3 min-w-0">
                 <div class="bpd-hero-icon shrink-0">
-                    <svg class="h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M8.25 18.75h.008v.008H8.25v-.008Z" />
+                    <svg class="h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M8.25 18.75h.008v.008H8.25v-.008Z" />
                     </svg>
                 </div>
                 <div class="min-w-0">
@@ -154,7 +253,8 @@
                         <span class="text-slate-500">·</span>
                         <span class="tabular-nums">{{ now()->format('H:i:s') }}</span>
                     </div>
-                    <p class="mt-1 text-xs text-slate-500 dark:text-slate-400 max-w-xl">KPI i tabela na żywo — bez przeładowania całej strony.</p>
+                    <p class="mt-1 text-xs text-slate-500 dark:text-slate-400 max-w-xl">KPI i tabela na żywo — bez
+                        przeładowania całej strony.</p>
                 </div>
             </div>
         </div>
@@ -204,17 +304,17 @@
             </div>
         </div>
 
-        {{-- Table --}}
-        @php $runs = $this->getRuns(); @endphp
-
+        {{-- Table — $this->runs: Livewire paginator (WithPagination) --}}
         <div class="bpd-panel">
-            @if ($runs->isEmpty())
+            @if ($this->runs->isEmpty())
                 <div class="px-6 py-14 text-center">
-                    <div class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-800/80 ring-1 ring-slate-600/50">
+                    <div
+                        class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-800/80 ring-1 ring-slate-600/50">
                         <x-heroicon-o-inbox class="h-6 w-6 text-slate-500" />
                     </div>
                     <p class="text-base font-semibold text-slate-200">Brak uruchomień</p>
-                    <p class="mt-1 max-w-md mx-auto text-sm text-slate-500">Jak tylko pipeline bloga wystartuje (cron, Filament lub Telegram), rekordy pojawią się w tej tabeli.</p>
+                    <p class="mt-1 max-w-md mx-auto text-sm text-slate-500">Jak tylko pipeline bloga wystartuje (cron,
+                        Filament lub Telegram), rekordy pojawią się w tej tabeli.</p>
                 </div>
             @else
                 <div class="bpd-scroll">
@@ -232,7 +332,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($runs as $run)
+                            @foreach ($this->runs as $run)
                                 <tr wire:key="run-{{ $run->id }}">
                                     <td>
                                         <span class="bpd-pill bg-slate-800/90 ring-1 ring-white/5">
@@ -248,7 +348,8 @@
                                     <td>
                                         @if ($run->requested_via)
                                             <span class="bpd-pill bg-slate-800/90 ring-1 ring-white/5">
-                                                <span class="bpd-dot {{ $this->sourceAccentClasses($run->requested_via) }}"></span>
+                                                <span
+                                                    class="bpd-dot {{ $this->sourceAccentClasses($run->requested_via) }}"></span>
                                                 <span>{{ $run->requested_via->label() }}</span>
                                             </span>
                                         @else
@@ -257,17 +358,16 @@
                                     </td>
                                     <td>
                                         @if ($run->vps_dispatched)
-                                            <span class="inline-flex items-center rounded-full bg-emerald-500/15 px-2 py-0.5 text-[0.65rem] font-bold uppercase tracking-wide text-emerald-300 ring-1 ring-emerald-500/30">Tak</span>
+                                            <span
+                                                class="inline-flex items-center rounded-full bg-emerald-500/15 px-2 py-0.5 text-[0.65rem] font-bold uppercase tracking-wide text-emerald-300 ring-1 ring-emerald-500/30">Tak</span>
                                         @else
                                             <span class="bpd-meta">Nie</span>
                                         @endif
                                     </td>
                                     <td>
                                         @if ($run->blog_post_id)
-                                            <a
-                                                href="{{ url('/admin/blog-posts/' . $run->blog_post_id . '/edit') }}"
-                                                class="font-semibold text-primary-400 underline decoration-primary-500/40 underline-offset-2 hover:text-primary-300"
-                                            >
+                                            <a href="{{ url('/admin/blog-posts/' . $run->blog_post_id . '/edit') }}"
+                                                class="font-semibold text-primary-400 underline decoration-primary-500/40 underline-offset-2 hover:text-primary-300">
                                                 #{{ $run->blog_post_id }}
                                             </a>
                                         @else
@@ -277,17 +377,23 @@
                                     <td>
                                         @switch($run->telegram_result)
                                             @case('sent')
-                                                <span class="inline-flex rounded-full bg-emerald-500/15 px-2 py-0.5 text-[0.65rem] font-bold text-emerald-300 ring-1 ring-emerald-500/25">Wysłano</span>
-                                                @break
+                                                <span
+                                                    class="inline-flex rounded-full bg-emerald-500/15 px-2 py-0.5 text-[0.65rem] font-bold text-emerald-300 ring-1 ring-emerald-500/25">Wysłano</span>
+                                            @break
+
                                             @case('failed')
-                                                <span class="inline-flex rounded-full bg-rose-500/15 px-2 py-0.5 text-[0.65rem] font-bold text-rose-300 ring-1 ring-rose-500/25">Błąd</span>
-                                                @break
+                                                <span
+                                                    class="inline-flex rounded-full bg-rose-500/15 px-2 py-0.5 text-[0.65rem] font-bold text-rose-300 ring-1 ring-rose-500/25">Błąd</span>
+                                            @break
+
                                             @case('skipped')
                                                 <span class="bpd-meta">—</span>
-                                                @break
+                                            @break
+
                                             @default
                                                 @if ($run->telegram_chat_id)
-                                                    <span class="inline-flex rounded-full bg-slate-600/40 px-2 py-0.5 text-[0.65rem] font-semibold text-slate-300 ring-1 ring-slate-500/30">Oczekuje</span>
+                                                    <span
+                                                        class="inline-flex rounded-full bg-slate-600/40 px-2 py-0.5 text-[0.65rem] font-semibold text-slate-300 ring-1 ring-slate-500/30">Oczekuje</span>
                                                 @else
                                                     <span class="bpd-meta">—</span>
                                                 @endif
@@ -310,7 +416,7 @@
                 </div>
 
                 <div class="border-t border-slate-700/50 bg-slate-950/40 px-3 py-2">
-                    {{ $runs->links() }}
+                    {{ $this->runs->links('pagination.bpd-tailwind') }}
                 </div>
             @endif
         </div>

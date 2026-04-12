@@ -9,9 +9,11 @@ use App\Enums\BlogPipelineStatus;
 use App\Models\BlogPipelineRun;
 use Filament\Pages\Page;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Livewire\WithPagination;
 
 final class BlogPipelineDashboard extends Page
 {
+    use WithPagination;
     protected static ?string $navigationLabel = 'Blog Pipeline';
 
     protected static ?string $title = 'Blog Pipeline';
@@ -97,7 +99,7 @@ final class BlogPipelineDashboard extends Page
         ];
     }
 
-    public function getRuns(): LengthAwarePaginator
+    public function getRunsProperty(): LengthAwarePaginator
     {
         $query = BlogPipelineRun::query()
             ->with('blogPost:id,title,slug')
@@ -122,7 +124,7 @@ final class BlogPipelineDashboard extends Page
         return [
             ['value' => '', 'label' => 'Wszystkie'],
             ...array_map(
-                static fn (BlogPipelineStatus $status): array => [
+                static fn(BlogPipelineStatus $status): array => [
                     'value' => $status->value,
                     'label' => $status->label(),
                 ],
@@ -137,7 +139,7 @@ final class BlogPipelineDashboard extends Page
     public function getSourceOptions(): array
     {
         return array_map(
-            static fn (BlogPipelineSource $source): array => [
+            static fn(BlogPipelineSource $source): array => [
                 'value' => $source->value,
                 'label' => $source->label(),
             ],
@@ -147,7 +149,7 @@ final class BlogPipelineDashboard extends Page
 
     public function updatedStatusFilter(): void
     {
-        // Livewire reactive — rerender on filter change
+        $this->resetPage();
     }
 
     public function formatDuration(?int $seconds): string
