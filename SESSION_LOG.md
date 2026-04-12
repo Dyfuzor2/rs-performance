@@ -4,6 +4,40 @@ Format relay: jeden blok na sesję, bez kasowania cudzych wpisów. Starsze wpisy
 
 ---
 
+## [2026-04-12] Cursor — n8n VPS: HttpRequest v4.2 object-literal bodies + Google ping 404
+
+### Wykonane
+
+- `n8n_fix_http_jsonbody_expressions_apr2026.py`: **Preview Blog Pipeline** → `={{ ({ ... }) }}`; Monitor **Notify Diagnosta** → ten sam wzorzec (spójnie z `Prepare Diagnosta Body`).
+- `n8n_monitor_diagnosta_code_node.py`: `Notify Diagnosta` jsonBody jak wyżej.
+- `n8n_apply_apr2026_repairs.py` + `n8n_patch_workflows_apr2026_round2.py`: Invitation Hub **Build Report** — Google ping **404** jako akceptowalny.
+- `n8n_workflow_blog_draft_cadence.json`: zsynchronizowany jsonBody preview.
+- VPS: upload do `/tmp/rs-n8n-apr26/scripts/`, uruchomienie `vps_n8n_run_repairs_on_vps.py` — sukces PUT (fleet, hub, monitor, daily, editorial, content).
+
+### Uwaga
+
+- Pozostałe błędy wykonań (brak trasy na hostingu, OpenRouter, kontrakt Diagnosta) wymagają strony kanonicznej / API, nie tylko n8n.
+
+---
+
+## [2026-04-12] Cursor — Filament n8n WOW Ops Hub (produkcja hosting)
+
+### Wykonane
+
+- Deploy na **Cyber-Folks** (`domains/rsperformance.online/laravel/`): resource Filament, strony list/create/edit, widget overview, model, enum, `N8nWorkflowCatalogService`, migracja, seeder, `config/n8n.php`, komenda `ops:verify-n8n-hosting-bridge`; `DatabaseSeeder` na produkcji rozszerzony o `N8nWorkflowDocumentSeeder` (backup pliku seedera przed podmianą).
+- Utworzenie brakujących katalogów na serwerze przed uploadem SFTP.
+- `composer dump-autoload -o`, `migrate --force`, `db:seed --class=N8nWorkflowDocumentSeeder`, `optimize:clear`.
+
+### Weryfikacja
+
+- `route:list --path=n8n` => 3 trasy; `curl` homepage + `/admin/login` => 200.
+
+### Uwaga dla kolejnego agenta
+
+- **VPS desync:** jeśli poprawiasz ten sam kod ręcznie na VPS lub w innym panelu — zsynchronizuj z hostingiem lub odwrotnie; hub w panelu czyta DB + opcjonalnie API n8n z `.env` (`N8N_API_URL` / `N8N_API_KEY`).
+
+---
+
 ## [2026-04-12] Cursor — n8n April 2026+ fleet: HttpRequest jsonBody + Monitor Code node
 
 ### Wykonane

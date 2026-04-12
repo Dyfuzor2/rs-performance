@@ -1,0 +1,504 @@
+{
+  "name": "RS Daily Automotive News Drafts",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "15 8,13,18 * * *"
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Three Times Daily",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const now = new Date();\nconst warsawDate = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Warsaw' }).format(now);\nconst hour = Number(new Intl.DateTimeFormat('en-GB', { hour: '2-digit', hour12: false, timeZone: 'Europe/Warsaw' }).format(now));\nconst slot = hour < 11 ? 'morning' : hour < 16 ? 'midday' : 'evening';\nreturn [{ json: {\n  generated_at: now.toISOString(),\n  warsaw_date: warsawDate,\n  slot,\n  polish_feed_url: 'https://news.google.com/rss/search?q=(motoryzacja%20OR%20samochody%20OR%20warsztat%20OR%20serwis%20OR%20usterka%20OR%20diagnostyka)%20when%3A1d&hl=pl&gl=PL&ceid=PL:pl',\n  global_feed_url: 'https://news.google.com/rss/search?q=(automotive%20OR%20car%20industry%20OR%20vehicle%20recall%20OR%20car%20service%20OR%20diagnostics)%20when%3A1d&hl=en-US&gl=US&ceid=US:en'\n} }];"
+      },
+      "id": "build-feed-pack",
+      "name": "Build Feed Pack",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.polish_feed_url }}",
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "fetch-polish-feed",
+      "name": "Fetch Polish Moto Feed",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        500,
+        -120
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.global_feed_url }}",
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "fetch-global-feed",
+      "name": "Fetch Global Auto Feed",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        500,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "append"
+      },
+      "id": "merge-feeds",
+      "name": "Merge Feeds",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        640,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "﻿const staticData = $getWorkflowStaticData('global');\nconst recentLinks = Array.isArray(staticData.recentLinks) ? staticData.recentLinks : [];\nconst recentFamilies = Array.isArray(staticData.recentFamilies) ? staticData.recentFamilies : [];\nconst input = $('Build Feed Pack').first().json;\nconst today = input.warsaw_date;\nconst slot = input.slot;\nconst slotTypeMap = { morning: 'porada', midday: 'news', evening: 'premiera' };\nconst slotType = slotTypeMap[slot] || 'news';\nconst parser = (xml, feedName) => {\n  const items = [];\n  const body = typeof xml === 'string' ? xml : (xml?.data ?? '');\n  const itemBlocks = String(body).match(/<item>[\\s\\S]*?<\\/item>/g) || [];\n  for (const block of itemBlocks) {\n    const read = (tag) => {\n      const match = block.match(new RegExp(`<${tag}>([\\\\s\\\\S]*?)<\\\\/${tag}>`, 'i'));\n      if (!match) return '';\n      return match[1]\n        .replace(/<!\\[CDATA\\[([\\s\\S]*?)\\]\\]>/g, '$1')\n        .replace(/&amp;/g, '&')\n        .replace(/&quot;/g, '\"')\n        .replace(/&#39;/g, \"'\")\n        .replace(/<[^>]+>/g, ' ')\n        .replace(/\\s+/g, ' ')\n        .trim();\n    };\n    const title = read('title');\n    const link = read('link');\n    const description = read('description');\n    const pubDate = read('pubDate');\n    if (!title || !link) continue;\n    let localDate = '';\n    try {\n      localDate = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Warsaw' }).format(new Date(pubDate));\n    } catch {\n      localDate = '';\n    }\n    items.push({ feed: feedName, title, link, description, pubDate, localDate });\n  }\n  return items;\n};\nconst mergedFeeds = $input.all();\nconst plFeed = mergedFeeds.find(item => item.json?.data && String(item.json.data).includes('news.google.com'))?.json?.data ?? mergedFeeds[0]?.json?.data ?? '';\nconst globalFeed = mergedFeeds.find((item, index) => index > 0 && item.json?.data)?.json?.data ?? mergedFeeds[1]?.json?.data ?? '';\nconst allItems = [\n  ...parser(plFeed, 'pl'),\n  ...parser(globalFeed, 'global')\n];\nconst familyRules = [\n  { key: 'diagnostyka-serwis', needles: ['diagnost', 'serwis', 'warsztat', 'napraw', 'service', 'repair', 'maintenan', 'inspection'] },\n  { key: 'awarie-przywoly', needles: ['awaria', 'usterk', 'recall', 'przywol', 'safety', 'pozar', 'defect', 'fault'] },\n  { key: 'elektryka-ev', needles: ['battery', 'akumulator', 'alternator', 'electric', 'ev', 'hybrid', 'hybryd', 'charging', 'ladowan', 'ładowan'] },\n  { key: 'emisje-dpf', needles: ['dpf', 'adblue', 'emission', 'diesel', 'euro 7', 'scr', 'filtr czastek', 'filtr cząstek'] },\n  { key: 'turbo-silnik', needles: ['turbo', 'silnik', 'engine', 'moc', 'underboost', 'boost', 'inject', 'wtrysk'] },\n  { key: 'biznes-rynek', needles: ['fabry', 'produkcj', 'factory', 'market', 'sales', 'sprzedaz', 'sprzedaż', 'fleet', 'plant', 'pricing'] },\n  { key: 'premiery-modele', needles: ['launch', 'premier', 'debiut', 'nowy model', 'facelift', 'revealed', 'unveils'] }\n];\nconst blockedNeedles = ['celebrity', 'plotk', 'gossip', 'manicure', 'lifestyle', 'influencer', 'tiktok', 'instagram', 'f1', 'formula 1', 'motorsport', 'supercar lifestyle', 'luxury handbag', 'praktycznie niezawodne', 'bezawaryjne'];\nconst scoreKeywords = [\n  ['awaria', 12], ['usterk', 12], ['serwis', 10], ['warsztat', 10], ['diagnost', 12], ['napraw', 12],\n  ['recall', 11], ['przywol', 11], ['safety', 9], ['emission', 8], ['dpf', 10], ['adblue', 10],\n  ['turbo', 10], ['battery', 8], ['alternator', 9], ['electric', 6], ['hybrid', 5], ['ev', 5],\n  ['premier', 7], ['launch', 7], ['nowy model', 6], ['debiut', 6], ['facelift', 6], ['produkcj', 4], ['fabry', 3], ['fleet', 4], ['rynek', 3]\n];\nconst slotTargets = {\n  morning: ['diagnostyka-serwis', 'awarie-przywoly', 'elektryka-ev', 'emisje-dpf', 'turbo-silnik'],\n  midday: ['biznes-rynek', 'awarie-przywoly', 'elektryka-ev', 'emisje-dpf', 'diagnostyka-serwis'],\n  evening: ['premiery-modele', 'biznes-rynek', 'elektryka-ev']\n};\nconst classifyFamily = (item) => {\n  const hay = `${item.title} ${item.description}`.toLowerCase();\n  for (const rule of familyRules) {\n    if (rule.needles.some(needle => hay.includes(needle))) return rule.key;\n  }\n  return item.feed === 'pl' ? 'polska-ogolne' : 'global-ogolne';\n};\nconst isBlockedItem = (item) => {\n  const hay = `${item.title} ${item.description}`.toLowerCase();\n  if (blockedNeedles.some(needle => hay.includes(needle))) return true;\n  if (/^(te|ten|ta)\\b/.test(hay) && !/(recall|dpf|adblue|ev|battery|alternator|turbo|diagnost|serwis|warsztat|premier|model)/i.test(hay)) return true;\n  if (!/(auto|samoch|motoryz|pojazd|warsztat|serwis|diagnost|recall|ev|hybrid|battery|diesel|engine|turbo|dpf|adblue|model|premier|factory|fleet|charging|dealer)/i.test(hay)) return true;\n  return false;\n};\nconst sameDay = allItems.filter(item => item.localDate === today && !recentLinks.includes(item.link) && !isBlockedItem(item));\nconst scoreItem = (item) => {\n  const hay = `${item.title} ${item.description}`.toLowerCase();\n  let score = item.feed === 'pl' ? 12 : 5;\n  for (const [needle, weight] of scoreKeywords) {\n    if (hay.includes(needle)) score += weight;\n  }\n  if (hay.includes('gdansk') || hay.includes('gdańsk') || hay.includes('trojmiasto') || hay.includes('trójmiasto') || hay.includes('polska') || hay.includes('poland')) score += 4;\n  if (hay.includes('dealer') || hay.includes('showroom')) score -= 4;\n  const family = classifyFamily(item);\n  if ((slotTargets[slot] || []).includes(family)) score += 9;\n  if (recentFamilies.includes(family)) score -= 10;\n  if (slot === 'morning' && ['awarie-przywoly', 'turbo-silnik', 'elektryka-ev', 'diagnostyka-serwis'].includes(family)) score += 5;\n  if (slot === 'midday' && ['biznes-rynek', 'diagnostyka-serwis', 'awarie-przywoly'].includes(family)) score += 4;\n  if (slot === 'evening' && ['premiery-modele', 'biznes-rynek'].includes(family)) score += 6;\n  return score;\n};\nconst ranked = sameDay\n  .map(item => ({ ...item, family: classifyFamily(item) }))\n  .map(item => ({ ...item, score: scoreItem(item) }))\n  .sort((a, b) => b.score - a.score || a.title.localeCompare(b.title, 'pl'));\nif (ranked.length === 0) {\n  return [{ json: { has_story: false, warsaw_date: today, slot, slot_type: slotType, candidate_count: 0, backup_titles: [] } }];\n}\nconst preferred = ranked.filter(item => (slotTargets[slot] || []).includes(item.family));\nconst sourcePool = preferred.length > 0 ? preferred : ranked;\nconst uniqueFamilies = [];\nconst diversified = [];\nfor (const item of sourcePool) {\n  if (!uniqueFamilies.includes(item.family) || diversified.length === 0) {\n    diversified.push(item);\n    uniqueFamilies.push(item.family);\n  }\n  if (diversified.length >= 5) break;\n}\nfor (const item of sourcePool) {\n  if (diversified.length >= 5) break;\n  if (!diversified.find(existing => existing.link === item.link)) diversified.push(item);\n}\nconst primary = diversified[0];\nconst backups = diversified.slice(1, 5);\nrecentLinks.unshift(primary.link);\nstaticData.recentLinks = recentLinks.slice(0, 50);\nrecentFamilies.unshift(primary.family);\nstaticData.recentFamilies = recentFamilies.slice(0, 8);\nconst supportAngle = slot === 'morning'\n  ? 'To ma być porada osadzona w newsie dnia: objawy, ryzyko, co kierowca powinien sprawdzić lub zlecić od razu.'\n  : slot === 'midday'\n    ? 'To ma być newsroom praktyczny: co ta wiadomość zmienia dla kierowcy, warsztatu i rynku serwisowego.'\n    : 'To ma być premiera albo nowość rynkowa rozpisana praktycznie: co naprawdę wnosi i jak może wyglądać eksploatacja lub serwis.';\nconst categoryMap = {\n  morning: 'Porady serwisowe',\n  midday: 'Aktualności motoryzacyjne',\n  evening: 'Premiery i rynek'\n};\nconst familyLeadMap = {\n  'diagnostyka-serwis': 'To ma pokazać profesjonalny tok myślenia warsztatu, nie suchy newsroom.',\n  'awarie-przywoly': 'To ma być tekst alarmowy, ale rzeczowy: co grozi i jak reagować bez paniki.',\n  'elektryka-ev': 'Pokaż praktyczne skutki dla ładowania, akumulatora, instalacji i codziennej eksploatacji.',\n  'emisje-dpf': 'Powiąż news z DPF, AdBlue, emisjami i kosztami zaniedbania w realnym serwisie.',\n  'turbo-silnik': 'Połącz news z objawami, utratą mocy, diagnostyką live data i błędami P-codes.',\n  'biznes-rynek': 'Pokaż, jak zmiana rynkowa uderza w kierowców, floty, części i decyzje serwisowe.',\n  'premiery-modele': 'Pokaż nie tylko premierę, ale też to, co nowy model zmienia dla utrzymania, awaryjności i serwisu.'\n};\nconst buildTopicLine = (item) => {\n  const cleanTitle = item.title.replace(/\\s+/g, ' ').trim();\n  if (slot === 'morning') return `${cleanTitle}. Co to oznacza dla kierowcy i co sprawdzić od razu?`;\n  if (slot === 'evening') return `${cleanTitle}. Co nowość naprawdę wnosi i na co uważać w eksploatacji?`;\n  return `${cleanTitle}. Co to zmienia dla kierowców i warsztatów?`;\n};\nconst topicLine = buildTopicLine(primary);\nconst editorialNotes = [\n  'Tryb: daily_news',\n  'Wirtualna redakcja (kwiecień 2026 — 7 ról): (1) Redaktor śledczy — wyłącznie fakty, bez zmyślonych recalli i cen. (2) Korespondent warsztatowy — objawy, co zlecić w pierwszej kolejności. (3) Redaktor prawno-rynkowy — bez niepotwierdzonych tez. (4) Desk międzynarodowy — globalny kontekst dla polskiego kierowcy. (5) Copy desk — ludzki rytm, zero „brzmi jak AI”. (6) AEO/GEO — cytowalne odpowiedzi, praktyczne FAQ. (7) Art director — featured_image_alt jak brief fotograficzny (bez marek/logo), zgodny z leadem; Vertex Imagen 4 / Gemini image.',\n  `Data newsroomu: ${today}`,\n  `Slot: ${slot}`,\n  `Typ slotu: ${slotType}`,\n  `Rodzina tematu: ${primary.family}`,\n  `Sugerowana kategoria: ${categoryMap[slot] || 'Aktualności motoryzacyjne'}`,\n  `Główny news: ${primary.title}`,\n  `Link główny: ${primary.link}`,\n  `Kontekst: ${supportAngle}`,\n  familyLeadMap[primary.family] || 'Napisz to jak doświadczony dziennikarz motoryzacyjny, który rozumie warsztat i kierowcę.',\n  'Tekst ma być mocny, ale uczciwy: bez kłamstwa clickbaitowego, bez sztucznego dramatyzmu, bez plotkarskiego tonu, bez brzmienia AI.',\n  `Nie wolno opierać głównej osi tekstu o news starszy niż ${today}.`,\n  'Każde twierdzenie musi wynikać z aktualnych źródł i być możliwe do obrony redakcyjnie.',\n  'Wpis ma mieć mocne AEO, SEO i GEO, ale ma czytać się naturalnie jak tekst człowieka.'\n].join('\\n');\nreturn [{ json: {\n  has_story: true,\n  warsaw_date: today,\n  slot,\n  slot_type: slotType,\n  candidate_count: ranked.length,\n  primary_story: primary,\n  backup_stories: backups,\n  topic_for_pipeline: topicLine,\n  editorial_notes: editorialNotes,\n  source_urls: [primary.link, ...backups.map(item => item.link)].slice(0, 6),\n  backup_titles: backups.map((item, index) => `${index + 1}. ${item.title} [${item.family}] (${item.feed}, ${item.score})`).join('\\n')\n} }];\n"
+      },
+      "id": "select-fresh-story",
+      "name": "Select Fresh Story",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        760,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.has_story }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "if-has-story",
+      "name": "Has Same-Day Story?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1000,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://rsperformance.online/api/blog/pipeline/run",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "X-RS-Blog-Pipeline-Key",
+              "value": "dad9f6e1563b97d0a0ab3250c67fc95513848e73b0926e62"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ ({ topic: $json.topic_for_pipeline, premium_review: true, create_draft: false, quality_gate_enforced: true, editorial_mode: \"daily_news\", editorial_notes: $json.editorial_notes, news_date: $json.warsaw_date, source_urls: $json.source_urls }) }}",
+        "options": {
+          "timeout": 600000
+        }
+      },
+      "id": "preview-blog-pipeline",
+      "name": "Preview Blog Pipeline",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1260,
+        -120
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "ok",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "if-preview-ok",
+      "name": "Preview OK?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1510,
+        -120
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.result.quality_gate.passed }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            },
+            {
+              "leftValue": "={{ $json.result.quality_gate.score }}",
+              "rightValue": 85,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            },
+            {
+              "leftValue": "={{ !!$json.result.hero_image }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "if-quality-pass",
+      "name": "Quality Gate Passes?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        -120
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://rsperformance.online/api/blog/pipeline/persist",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "X-RS-Blog-Pipeline-Key",
+              "value": "dad9f6e1563b97d0a0ab3250c67fc95513848e73b0926e62"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ topic_pack: $json.result.topic, draft: $json.result.draft, used_models: $json.result.used_models, pipeline_run_id: $json.result.pipeline_run_id }) }}",
+        "options": {
+          "timeout": 600000
+        }
+      },
+      "id": "persist-approved-draft",
+      "name": "Persist Approved Draft",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2010,
+        -220
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.telegram.org/bot8657034872:AAHNOek1HWJ-WtKKD3LXCm4l9AqTEezYey8/sendMessage",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ chat_id: '6534705697', text: 'RS Daily Automotive News Drafts\\n\\nStatus: DRAFT READY\\nDate: ' + $node['Select Fresh Story'].json.warsaw_date + '\\nSlot: ' + $node['Select Fresh Story'].json.slot + '\\nTopic: ' + $node['Select Fresh Story'].json.primary_story.title + '\\nFamily: ' + $node['Select Fresh Story'].json.primary_story.family + '\\nQuality score: ' + $node['Preview Blog Pipeline'].json.result.quality_gate.score + '/100\\nSources: ' + $node['Preview Blog Pipeline'].json.result.quality_gate.stats.source_count + '\\nWord count: ' + $node['Preview Blog Pipeline'].json.result.quality_gate.stats.word_count + '\\nHero image: ' + ($node['Preview Blog Pipeline'].json.result.hero_image || '-') + '\\n\\nDraft ID: ' + ($json.post.id || '-') + '\\nDraft title: ' + ($json.post.title || '-') + '\\nAdmin: ' + ($json.post.admin_edit_url || '-') + '\\n\\nBackup stories:\\n' + ($node['Select Fresh Story'].json.backup_titles || '-'), disable_web_page_preview: true }) }}",
+        "options": {}
+      },
+      "id": "telegram-draft-ready",
+      "name": "Telegram Draft Ready",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2250,
+        -220
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.telegram.org/bot8657034872:AAHNOek1HWJ-WtKKD3LXCm4l9AqTEezYey8/sendMessage",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ chat_id: '6534705697', text: 'RS Daily Automotive News Drafts\\n\\nStatus: QUALITY GATE BLOCKED\\nDate: ' + $node['Select Fresh Story'].json.warsaw_date + '\\nSlot: ' + $node['Select Fresh Story'].json.slot + '\\nTopic: ' + $node['Select Fresh Story'].json.primary_story.title + '\\nFamily: ' + $node['Select Fresh Story'].json.primary_story.family + '\\nQuality score: ' + ($json.result.quality_gate.score || 0) + '/100\\nHero image: ' + ($json.result.hero_image || 'missing') + '\\n\\nFailed checks:\\n- ' + (($json.result.quality_gate.failed_reasons || []).join('\\n- ') || 'Unknown') + ( !$json.result.hero_image ? '\\n- Hero image missing from pipeline output' : '' ) + '\\n\\nBackup stories:\\n' + ($node['Select Fresh Story'].json.backup_titles || '-'), disable_web_page_preview: true }) }}",
+        "options": {}
+      },
+      "id": "telegram-quality-blocked",
+      "name": "Telegram Quality Blocked",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2010,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.telegram.org/bot8657034872:AAHNOek1HWJ-WtKKD3LXCm4l9AqTEezYey8/sendMessage",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ chat_id: '6534705697', text: 'RS Daily Automotive News Drafts\\n\\nStatus: PREVIEW FAILED\\nDate: ' + $node['Select Fresh Story'].json.warsaw_date + '\\nSlot: ' + $node['Select Fresh Story'].json.slot + '\\nTopic: ' + $node['Select Fresh Story'].json.primary_story.title + '\\nFamily: ' + $node['Select Fresh Story'].json.primary_story.family + '\\n\\nResponse: ' + JSON.stringify($json).slice(0, 1200) + '\\n\\nBackup stories:\\n' + ($node['Select Fresh Story'].json.backup_titles || '-'), disable_web_page_preview: true }) }}",
+        "options": {}
+      },
+      "id": "telegram-preview-failed",
+      "name": "Telegram Preview Failed",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1760,
+        140
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.telegram.org/bot8657034872:AAHNOek1HWJ-WtKKD3LXCm4l9AqTEezYey8/sendMessage",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ chat_id: '6534705697', text: 'RS Daily Automotive News Drafts\\n\\nStatus: NO SAME-DAY STORY\\nDate: ' + $json.warsaw_date + '\\nSlot: ' + $json.slot + '\\nCandidates found: ' + $json.candidate_count + '\\n\\nWorkflow intentionally skipped draft creation because there was no fresh automotive story worth publishing today.', disable_web_page_preview: true }) }}",
+        "options": {}
+      },
+      "id": "telegram-no-story",
+      "name": "Telegram No Story",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1260,
+        160
+      ]
+    }
+  ],
+  "connections": {
+    "Three Times Daily": {
+      "main": [
+        [
+          {
+            "node": "Build Feed Pack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Feed Pack": {
+      "main": [
+        [
+          {
+            "node": "Fetch Polish Moto Feed",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch Global Auto Feed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Polish Moto Feed": {
+      "main": [
+        [
+          {
+            "node": "Merge Feeds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Global Auto Feed": {
+      "main": [
+        [
+          {
+            "node": "Merge Feeds",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge Feeds": {
+      "main": [
+        [
+          {
+            "node": "Select Fresh Story",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select Fresh Story": {
+      "main": [
+        [
+          {
+            "node": "Has Same-Day Story?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Same-Day Story?": {
+      "main": [
+        [
+          {
+            "node": "Preview Blog Pipeline",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram No Story",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preview Blog Pipeline": {
+      "main": [
+        [
+          {
+            "node": "Preview OK?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preview OK?": {
+      "main": [
+        [
+          {
+            "node": "Quality Gate Passes?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram Preview Failed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Quality Gate Passes?": {
+      "main": [
+        [
+          {
+            "node": "Persist Approved Draft",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram Quality Blocked",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Persist Approved Draft": {
+      "main": [
+        [
+          {
+            "node": "Telegram Draft Ready",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "tags": [
+    "Blog",
+    "AEO",
+    "SEO",
+    "GEO",
+    "News"
+  ]
+}

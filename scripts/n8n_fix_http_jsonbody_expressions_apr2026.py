@@ -2,7 +2,8 @@
 """
 April 2026+ — Fix HttpRequest jsonBody expressions that break n8n v4.2+ execution.
 
-- Monitor: Notify Diagnosta — use object body {{ $json }} (not JSON.stringify string).
+- Monitor: Notify Diagnosta — parenthesized object literal (v4.2 JSON body validation).
+- Daily News: Preview Blog Pipeline — same (avoid JSON.stringify in JSON body mode).
 - Daily News: =JSON.stringify(...) -> ={{ JSON.stringify(...) }}.
 - Editorial: Gemini + Persist to Blog — valid ={{ }} expressions.
 
@@ -61,7 +62,15 @@ def put_workflow(base: str, headers: dict, wf: dict) -> bool:
 
 
 MONITOR_DIAGNOSTA_BODY = (
-    "={{ JSON.stringify({ text: $json.text, source: $json.source, category: $json.category }) }}"
+    "={{ ({ text: $json.text, source: $json.source, category: $json.category }) }}"
+)
+
+# n8n HttpRequest v4.2: "JSON" body mode validates the field as JSON before expressions run;
+# JSON.stringify(...) in a string often triggers "not valid JSON". Use a parenthesized object literal.
+PREVIEW_BLOG_PIPELINE_JSON_BODY = (
+    "={{ ({ topic: $json.topic_for_pipeline, premium_review: true, create_draft: false, "
+    "quality_gate_enforced: true, editorial_mode: \"daily_news\", editorial_notes: $json.editorial_notes, "
+    "news_date: $json.warsaw_date, source_urls: $json.source_urls }) }}"
 )
 
 
@@ -75,13 +84,23 @@ def patch_monitor(wf: dict) -> int:
         if cur != MONITOR_DIAGNOSTA_BODY:
             p["jsonBody"] = MONITOR_DIAGNOSTA_BODY
             n += 1
-            print("  Notify Diagnosta: explicit text/source/category JSON.stringify")
+            print("  Notify Diagnosta: object-literal jsonBody (v4.2-safe)")
     return n
 
 
 def patch_daily(wf: dict) -> int:
     n = 0
     for node in wf.get("nodes") or []:
+        name = node.get("name") or ""
+        if name == "Preview Blog Pipeline" and node.get("type") == "n8n-nodes-base.httpRequest":
+            p = node.setdefault("parameters", {})
+            cur = (p.get("jsonBody") or "").strip()
+            if cur != PREVIEW_BLOG_PIPELINE_JSON_BODY:
+                p["jsonBody"] = PREVIEW_BLOG_PIPELINE_JSON_BODY
+                p.setdefault("specifyBody", "json")
+                print("  Preview Blog Pipeline: object-literal body (fixes v4.2 JSON validation)")
+                n += 1
+            continue
         if node.get("type") != "n8n-nodes-base.httpRequest":
             continue
         p = node.get("parameters") or {}

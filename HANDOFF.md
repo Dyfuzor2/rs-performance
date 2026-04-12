@@ -1,3 +1,16 @@
+## 2026-04-12 — n8n v4.2 JSON body: Preview Blog Pipeline + Google ping 404 + Monitor object body
+
+### Agent: Cursor
+
+### STATUS: REPO + **VPS n8n (PUT przez API, auto.rs3d.pl)**
+
+- **Problem:** HttpRequest `specifyBody: json` + `jsonBody: ={{ JSON.stringify(...) }}` potrafi zgłaszać „not valid JSON” w n8n **4.2** (walidacja przed ewaluacją wyrażenia).
+- **Fix:** Literał obiektu w nawiasach: `={{ ({ ... }) }}` dla **Preview Blog Pipeline** (Daily News), **Notify Diagnosta** (Monitor), **Persist to Blog** (Editorial) już był w kolejce `fix_http_jsonbody_expressions`.
+- **Invitation Hub:** raport Telegram — **Google Sitemap ping 404** traktowany jako OK (endpoint wycofany); `Build Report` w `n8n_apply_apr2026_repairs.py` + `n8n_patch_workflows_apr2026_round2.py`.
+- **Lokalny eksport:** `n8n_workflow_blog_draft_cadence.json` zsynchronizowany z tym samym `jsonBody`.
+- **VPS:** `python vps_exec.py` → upload skryptów do `/tmp/rs-n8n-apr26/scripts/` → `vps_n8n_run_repairs_on_vps.py` — **PUT OK** m.in. Daily News (Preview), Hub, Monitor, Editorial, Content (Extract Topic).
+- **Next:** jeśli **Notify Diagnosta** nadal zwraca „Field required” — zweryfikuj kontrakt API (Diagnosta MCP / hosting), nie sam jsonBody; trasy `diagnostyka`, `api/dtc/enrichment-stats`, OpenRouter w Trinity — strona kanoniczna / sekrety.
+
 ## 2026-04-12 — n8n fleet April 2026+: HttpRequest jsonBody + Monitor (Code + Recepcja)
 
 ### Agent: Cursor
@@ -1481,17 +1494,17 @@
 ## OSTATNI AGENT
 
 - **Kto:** Cursor (Composer)
-- **Kiedy:** 2026-04-11 wieczór CET
-- **Co zrobił:** Polonizacja ścieżki blog/newsroom: `references/blog_newsroom_crew_2026.md`; `n8n_workflow_blog_draft_cadence.json` (node **Select Fresh Story**, `jsCode` PL); `.agents/skills/rs-blog-newsroom-wow-2026/SKILL.md`, `.agents/skills/rs-n8n-wow-2026/SKILL.md`; `app/Support/Blog/BlogVertexPipelineService.php` (prompty PL, naprawa mojibake przy „źródło”). **Bez** potwierdzonego deploy na hosting w tej sesji. **Ryzyko:** token Telegram w eksporcie workflow — sprawdzić repo, rotować, użyć credentiali n8n.
+- **Kiedy:** 2026-04-12 CET
+- **Co zrobił:** Deploy na **hosting** Filament **n8n WOW Ops Hub** (`N8nWorkflowDocumentResource`, widget overview, migracja `n8n_workflow_documents`, seed `N8nWorkflowDocumentSeeder`, `config/n8n.php`, `OpsVerifyN8nHostingBridgeCommand`). Backupy: `DatabaseSeeder.php.bak_cursor_n8n_wow_20260412`, `config/n8n.php.bak_cursor_n8n_wow_20260412`. Po migracji: `composer dump-autoload`, `optimize:clear`. Smoke: HTTP 200 `/` i `/admin/login`; trasy `admin/n8n-workflow-documents`.
 - **Czego NIE ruszać:** Sekrety w sekcji KLUCZOWE USTALENIA — nie duplikować; nie kasować plików backup/import na VPS bez świadomego rollbacku.
 
 ## NASTĘPNE KROKI (priorytet)
 
-1. **Deploy hosting:** backup → wgranie `BlogVertexPipelineService.php` → `php85 artisan optimize:clear` → smoke pipeline bloga / Vertex.
-2. **Bezpieczeństwo n8n:** jeśli token bota jest w `n8n_workflow_blog_draft_cadence.json` lub innym eksporcie — rotacja + credentiale w n8n; nie commitować sekretów.
-3. **n8n VPS:** import/sync workflow po zmianach JSON; smoke **Select Fresh Story** / cadence draftów.
-4. Opcjonalnie **Telegram `/blog`:** tryb `daily_news` + `news_date` / `editorial_notes` — `BlogTelegramBotService::handleBlogCommand` (dziś sztywno `evergreen`).
-5. `git`: uporządkować drzewo, commit plików z tej sesji; dalej: smoke support-plane, Nightwatch, A2A, Uptime Kuma (jak wcześniej w planie).
+1. **Panel:** zalogować się do Filament i sprawdzić **n8n WOW Ops Hub** (`/admin/n8n-workflow-documents`) — widok WOW, sync z API jeśli w `.env` są `N8N_API_URL` / `N8N_API_KEY`; opcjonalnie `php85 artisan ops:verify-n8n-hosting-bridge`.
+2. **Deploy hosting:** backup → wgranie `BlogVertexPipelineService.php` → `php85 artisan optimize:clear` → smoke pipeline bloga / Vertex (jeśli jeszcze nie zrobione).
+3. **Bezpieczeństwo n8n:** jeśli token bota jest w `n8n_workflow_blog_draft_cadence.json` lub innym eksporcie — rotacja + credentiale w n8n; nie commitować sekretów.
+4. **n8n VPS:** import/sync workflow po zmianach JSON; smoke **Select Fresh Story** / cadence draftów; obserwacja zielonego runu po fixach HttpRequest.
+5. `git`: repo lokalne ma dużo nieśledzonych plików — przed masowym commitem **Dead Agent Recovery** (`git status` / `git diff`); zsynchronizować źródło prawdy z hostingiem tam gdzie to ma sens.
 
 ## KLUCZOWE USTALENIA Z TEJ SESJI
 

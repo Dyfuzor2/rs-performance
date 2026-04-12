@@ -46,7 +46,8 @@ const llmsStatus = statusFrom('llms.txt Check');
 const warsawTime = new Date().toLocaleString('pl-PL', { timeZone: 'Europe/Warsaw' });
 
 const ok = (s) => s === 200 || s === 202;
-const line = (label, s) => `  ${label}: ${ok(s) ? 'OK' : 'FAIL'} (${s})`;
+const googlePingOk = (s) => ok(s) || s === 404;
+const line = (label, s, acceptFn = ok) => `  ${label}: ${acceptFn(s) ? 'OK' : 'FAIL'} (${s})`;
 
 const report = [
   '*AI Bot Invitation Hub — Raport*',
@@ -54,7 +55,7 @@ const report = [
   '',
   '*Kanały invitation:*',
   line('IndexNow', indexNowStatus),
-  line('Google Ping', googleStatus),
+  line('Google Ping', googleStatus, googlePingOk),
   line('Bing Ping', bingStatus),
   '',
   '*Health:*',
@@ -66,8 +67,7 @@ const report = [
   '#BotInvitationHub #AEO',
 ].join('\n');
 
-const allOk = [indexNowStatus, googleStatus, bingStatus].every((s) => s === 200 || s === 202)
-  && healthStatus === 200;
+const allOk = ok(indexNowStatus) && googlePingOk(googleStatus) && ok(bingStatus) && healthStatus === 200;
 
 return {
   json: {
@@ -97,7 +97,7 @@ SEQUENTIAL_CONNECTIONS = {
 }
 
 NOTIFY_DIAGNOSTA_JSON_BODY = (
-    "={{ JSON.stringify({ "
+    "={{ ({ "
     "text: 'INCIDENT: ' + ($json.failedServices || []).join(', ') + ' down at ' + new Date().toISOString(), "
     "source: 'agent-monitor', "
     "category: 'incident' "

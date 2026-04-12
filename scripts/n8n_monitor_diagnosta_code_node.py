@@ -36,7 +36,9 @@ return {
 """
 
 # After Code node, body is a plain object — pass through as JSON (n8n v4.2+ serializes object).
-NOTIFY_JSON_BODY = "={{ $json }}"
+NOTIFY_JSON_BODY = (
+    "={{ ({ text: $json.text, source: $json.source, category: $json.category }) }}"
+)
 
 NOTIFY_RECEPCJA_JSON_BODY = (
     "={{ JSON.stringify({ "
