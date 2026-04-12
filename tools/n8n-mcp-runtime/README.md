@@ -7,6 +7,7 @@ Pinned **`n8n-mcp@^2.47.5`** — no per-session `npx` resolution. Cursor talks t
 1. `powershell -ExecutionPolicy Bypass -File install-n8n-mcp.ps1`
 2. Copy `G:\gravity\.cursor\mcp.env.example` → `G:\gravity\.cursor\mcp.env` (file is gitignored).
 3. Set `N8N_API_URL` (e.g. `https://auto.rs3d.pl`) and `N8N_API_KEY` from n8n **Settings → API**.
+ - Or run **`python G:\gravity\scripts\hydrate_mcp_env_from_workspace.py`** once (merges from local `cursor.md` + JSON exports; no secret echo).
 4. Optional: `powershell -File verify-n8n-api.ps1` — must print `OK`.
 5. Optional: `powershell -File smoke-critical-webhooks.ps1` — manifest-driven POST smoke (`critical-webhooks.manifest.json`).
 6. **Cursor:** reload window (or restart MCP). Entry `n8n-mcp` must use `run-n8n-mcp.ps1` (see `.mcp.json` / `.cursor/mcp.json`).
