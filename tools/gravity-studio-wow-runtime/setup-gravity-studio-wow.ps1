@@ -1,5 +1,8 @@
-# Gravity Studio WOW (April 2026+) - one entry: GitHub MCP + Laravel Boost + optional Qdrant local.
+# Gravity Studio WOW (April 2026+) - one entry: PHP WOW gate + GitHub MCP + Laravel Boost + Qdrant + RAG readyz.
 # Opens a single hub deck; sub-runtimes stay headless (no browser spam).
+param(
+    [switch]$NoBrowser
+)
 $ErrorActionPreference = "Stop"
 # Fresh PATH for child processes (PHP from winget may not be in legacy session PATH).
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
@@ -15,19 +18,36 @@ function Invoke-Ps {
 }
 
 $results = [ordered]@{
+    gravityPhpWow   = $false
+    gravityPhpSkip  = $false
     githubMcpBinary = $false
     githubToken     = $false
     laravelBoost    = $false
     qdrantLocal     = $false
+    ragReadyzOk     = $false
     dockerRunning   = $false
 }
 
 Write-Host ""
 Write-Host "  === Gravity Studio WOW ===" -ForegroundColor Cyan
-Write-Host "  (GitHub MCP + Laravel Boost + Qdrant local)" -ForegroundColor DarkGray
+Write-Host "  (PHP gate + GitHub + Boost + Qdrant + RAG readyz)" -ForegroundColor DarkGray
 Write-Host ""
 
-# --- Docker probe (Qdrant) — stderr from docker must not stop the script ---
+# --- PHP WOW gate (WinGet php.ini + mbstring) before any PHP child ---
+if ($env:GRAVITY_SKIP_PHP_INI) {
+    $results.gravityPhpSkip = $true
+    $results.gravityPhpWow = $true
+    Write-Host "[studio] PHP WOW gate: skipped (GRAVITY_SKIP_PHP_INI)" -ForegroundColor Yellow
+} else {
+    Write-Host "[studio] PHP WOW gate: Ensure-GravityPhpIni ..." -ForegroundColor Cyan
+    $pe = Invoke-Ps (Join-Path $Tools "laravel-boost-mcp-runtime\Ensure-GravityPhpIni.ps1")
+    $results.gravityPhpWow = ($pe -eq 0)
+    if (-not $results.gravityPhpWow) {
+        Write-Host "[studio] PHP gate FAILED - fix WinGet PHP or set GRAVITY_PHP (see laravel-boost-mcp-runtime/README)" -ForegroundColor Red
+    }
+}
+
+# --- Docker probe (Qdrant) - stderr from docker must not stop the script ---
 $dk = Get-Command docker -ErrorAction SilentlyContinue
 if ($dk) {
     $prevEa = $ErrorActionPreference
@@ -53,7 +73,7 @@ if ($results.githubMcpBinary) {
     $results.githubToken = ($tok -eq 0)
 }
 
-# --- Laravel Boost ---
+# --- Laravel Boost (install script also re-runs Ensure; harmless if gate already green) ---
 $lb = Invoke-Ps (Join-Path $Tools "laravel-boost-mcp-runtime\install-laravel-boost-mcp.ps1")
 $results.laravelBoost = ($lb -eq 0)
 
@@ -64,6 +84,11 @@ if ($results.dockerRunning) {
         Start-Sleep -Seconds 2
         $qt = Invoke-Ps (Join-Path $Tools "qdrant-local-runtime\test-qdrant-local.ps1")
         $results.qdrantLocal = ($qt -eq 0)
+        if ($results.qdrantLocal) {
+            Write-Host "[studio] RAG plane: verify-rag-ready (readyz + collections) ..." -ForegroundColor Cyan
+            $vr = Invoke-Ps (Join-Path $Tools "qdrant-local-runtime\verify-rag-ready.ps1")
+            $results.ragReadyzOk = ($vr -eq 0)
+        }
     }
 }
 
@@ -71,11 +96,14 @@ if ($results.dockerRunning) {
 $statusPath = Join-Path $Base "last-run-status.json"
 $payload = [PSCustomObject]@{
     generatedAtUtc = (Get-Date).ToUniversalTime().ToString("o")
+    gravityPhpWowOk = $results.gravityPhpWow
+    gravityPhpGateSkipped = $results.gravityPhpSkip
     githubMcpBinary = $results.githubMcpBinary
     githubTokenOk   = $results.githubToken
     laravelBoostOk  = $results.laravelBoost
     dockerRunning   = $results.dockerRunning
     qdrantLocalOk   = $results.qdrantLocal
+    ragReadyzOk     = $results.ragReadyzOk
 }
 $payload | ConvertTo-Json -Depth 3 | Set-Content -LiteralPath $statusPath -Encoding UTF8
 
@@ -86,13 +114,34 @@ function Html-Bool {
     return "<li><span class=""pill $cls"">$txt</span> $Label</li>"
 }
 
+function Html-Warn {
+    param([string]$Label)
+    return "<li><span class=""pill warn"">SKIP</span> $Label</li>"
+}
+
+$phpLine = if ($results.gravityPhpSkip) {
+    Html-Warn "PHP WOW gate (GRAVITY_SKIP_PHP_INI)"
+} else {
+    Html-Bool $results.gravityPhpWow "PHP WOW gate (mbstring / WinGet php.ini)"
+}
+
+$ragLine = if (-not $results.dockerRunning) {
+    Html-Bool $false "RAG readyz /collections (start Docker)"
+} elseif (-not $results.qdrantLocal) {
+    Html-Bool $false "RAG readyz (Qdrant not up)"
+} else {
+    Html-Bool $results.ragReadyzOk "RAG readyz + collections API"
+}
+
 $statusHtml = @"
 <ul class="status">
+$phpLine
 $(Html-Bool $results.githubMcpBinary "GitHub MCP binary")
 $(Html-Bool $results.githubToken "GitHub API token")
 $(Html-Bool $results.laravelBoost "Laravel Boost (boost:mcp)")
 $(Html-Bool $results.dockerRunning "Docker engine")
 $(Html-Bool $results.qdrantLocal "Qdrant local (127.0.0.1:6333)")
+$ragLine
 </ul>
 <p class="ts">Last run (UTC): $($payload.generatedAtUtc)</p>
 "@
@@ -109,18 +158,28 @@ if (Test-Path $tpl) {
 if (Test-Path $Wow) {
     $uri = ([System.Uri]$Wow).AbsoluteUri
     Write-Host ""
-    Write-Host "  Opening Gravity Studio hub: $uri" -ForegroundColor DarkGray
-    Start-Process $uri
+    if ($NoBrowser) {
+        Write-Host "  Hub ready (no browser): $uri" -ForegroundColor DarkGray
+    } else {
+        Write-Host "  Opening Gravity Studio hub: $uri" -ForegroundColor DarkGray
+        Start-Process $uri
+    }
 }
 
 Write-Host ""
 Write-Host "  SUMMARY" -ForegroundColor Cyan
+$phpSummary = if ($results.gravityPhpSkip) { 'SKIP (env)' } elseif ($results.gravityPhpWow) { 'OK' } else { 'FAIL' }
+$phpColor = if ($results.gravityPhpSkip) { 'Yellow' } elseif ($results.gravityPhpWow) { 'Green' } else { 'Red' }
+Write-Host "  PHP WOW gate:       $phpSummary" -ForegroundColor $phpColor
 Write-Host "  GitHub MCP exe:     $(if ($results.githubMcpBinary) { 'OK' } else { 'FAIL' })" -ForegroundColor $(if ($results.githubMcpBinary) { 'Green' } else { 'Red' })
 Write-Host "  GitHub token (API): $(if ($results.githubToken) { 'OK' } else { 'SKIP/FAIL' })" -ForegroundColor $(if ($results.githubToken) { 'Green' } else { 'Yellow' })
 Write-Host "  Laravel Boost:      $(if ($results.laravelBoost) { 'OK' } else { 'FAIL' })" -ForegroundColor $(if ($results.laravelBoost) { 'Green' } else { 'Red' })
 Write-Host "  Docker engine:      $(if ($results.dockerRunning) { 'OK' } else { 'OFF' })" -ForegroundColor $(if ($results.dockerRunning) { 'Green' } else { 'Yellow' })
 Write-Host "  Qdrant local:       $(if ($results.qdrantLocal) { 'OK' } else { if (-not $results.dockerRunning) { 'Start Docker Desktop' } else { 'FAIL' } })" -ForegroundColor $(if ($results.qdrantLocal) { 'Green' } else { 'Yellow' })
+$ragS = if (-not $results.dockerRunning) { 'N/A (Docker)' } elseif (-not $results.qdrantLocal) { 'N/A (Qdrant)' } elseif ($results.ragReadyzOk) { 'OK' } else { 'FAIL' }
+$ragC = if ($results.ragReadyzOk) { 'Green' } elseif ($ragS -like 'N/A*') { 'DarkGray' } else { 'Red' }
+Write-Host "  RAG readyz:         $ragS" -ForegroundColor $ragC
 Write-Host ""
-Write-Host "  Next: Cursor - Reload MCP. Enable github, laravel-boost, qdrant-*-local as needed." -ForegroundColor Green
+Write-Host "  Next: Cursor - Reload MCP. Enable github, laravel-boost, qdrant-rs-*-local as needed." -ForegroundColor Green
 Write-Host ""
 exit 0

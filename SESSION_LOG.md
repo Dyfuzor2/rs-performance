@@ -190,3 +190,17 @@ Pomiar `redirects` / `final_url`: `curl -L` (follow), `-w '%{num_redirects} %{ur
 ### Uwagi
 
 - Zmiana dotyczy **lokalnego** `php.ini` w katalogu WinGet użytkownika (nie hosting/VPS).
+
+---
+
+## [2026-04-12] Cursor — Gravity Studio WOW: PHP gate + RAG readyz + `-NoBrowser`
+
+### Wykonane
+
+- `tools/gravity-studio-wow-runtime/setup-gravity-studio-wow.ps1` — na początku **Ensure-GravityPhpIni**; po sukcesie Qdrant **`verify-rag-ready.ps1`**; JSON `last-run-status.json` rozszerzony (`gravityPhpWowOk`, `ragReadyzOk`, …); hub HTML — nowe chipy (PHP gate, RAG) + styl `.pill.warn` dla SKIP.
+- `wow.template.html` — lead + statusy; `README.md` — opis; **`param(-NoBrowser)`** (agenty bez auto-otwarcia przeglądarki).
+- `RELAY.md` — zaktualizowany opis Hub WOW.
+
+### Weryfikacja
+
+- `setup-gravity-studio-wow.ps1 -NoBrowser` → SUMMARY all OK (Docker + Qdrant + Boost + RAG).

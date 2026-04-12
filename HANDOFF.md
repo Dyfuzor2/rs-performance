@@ -9,6 +9,7 @@
 - **Na tej maszynie:** utworzono `php.ini` w katalogu pakietu WinGet; `run-pint.ps1 --version` → Pint OK.
 - **Git:** commit `820d68c` na `feature/v9-architecture-rebuild` (RELAY, SESSION_LOG, README).
 - **Next:** Reload MCP w Cursorze; RAG: `tools/qdrant-local-runtime/verify-rag-ready.ps1` po starcie Dockera.
+- **Studio WOW (2026-04-12 wieczór):** `setup-gravity-studio-wow.ps1` robi teraz **PHP gate + RAG readyz** w jednym przebiegu; `-NoBrowser` dla agentów.
 
 ## 2026-04-12 ~03:00 CET - VPS n8n: jeden aktywny Bot Invitation Hub (F6uos canonical)
 
