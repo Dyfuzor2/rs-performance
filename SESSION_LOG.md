@@ -248,3 +248,16 @@ Pomiar `redirects` / `final_url`: `curl -L` (follow), `-w '%{num_redirects} %{ur
 ### Weryfikacja
 
 - `setup-gravity-studio-wow.ps1 -NoBrowser` EXIT=0; `wow.html` zawiera `serveCmd` i `launchFullCmd` w `gravity-studio-copy`.
+
+---
+
+## [2026-04-12] Cursor — Studio WOW hub: command palette Ctrl+K + theme persistence
+
+### Wykonane
+
+- `wow.template.html` — paleta poleceń (filtr, strzałki, Enter, Esc), przełącznik motywu (system / jasny / ciemny, `localStorage`), Open Graph, porządek pól fallback (studio → serve → launch → MCP).
+- `README.md` — opis UX.
+
+### Weryfikacja
+
+- `setup-gravity-studio-wow.ps1 -NoBrowser` regeneruje `wow.html`.

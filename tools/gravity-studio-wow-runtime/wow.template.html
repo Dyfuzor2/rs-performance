@@ -7,6 +7,9 @@
   <meta name="theme-color" content="#120808" media="(prefers-color-scheme: dark)" />
   <meta name="theme-color" content="#f6f2ea" media="(prefers-color-scheme: light)" />
   <meta name="description" content="Gravity Studio WOW — jeden hub: PHP WinGate, GitHub MCP, Laravel Boost, Qdrant RAG, Cursor MCP reload. April 2026+ AEO-ready." />
+  <meta property="og:title" content="Gravity Studio WOW · RS Performance · 2026" />
+  <meta property="og:description" content="Single-entry dev hub: PHP gate, MCP, Boost, Qdrant RAG. Command palette Ctrl+K." />
+  <meta property="og:type" content="website" />
   <title>Gravity Studio WOW · RS · 2026</title>
   <style>
     @property --hub-hue { syntax: "<angle>"; inherits: false; initial-value: 45deg; }
@@ -21,16 +24,33 @@
       --font: "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
     }
     @media (prefers-color-scheme: light) {
-      :root {
+      html:not([data-theme]) {
         --bg: oklch(0.98 0.01 85);
         --glass: color-mix(in oklch, oklch(0.55 0.08 75) 14%, transparent);
         --border: color-mix(in oklch, oklch(0.35 0.06 55) 22%, transparent);
         --text: oklch(0.2 0.03 280);
         --muted: oklch(0.45 0.03 280);
       }
-      .mesh {
+      html:not([data-theme]) .mesh {
         opacity: 0.92;
       }
+    }
+    html[data-theme="light"] {
+      --bg: oklch(0.98 0.01 85);
+      --glass: color-mix(in oklch, oklch(0.55 0.08 75) 14%, transparent);
+      --border: color-mix(in oklch, oklch(0.35 0.06 55) 22%, transparent);
+      --text: oklch(0.2 0.03 280);
+      --muted: oklch(0.45 0.03 280);
+      color-scheme: light;
+    }
+    html[data-theme="light"] .mesh { opacity: 0.92; }
+    html[data-theme="dark"] {
+      --bg: oklch(0.09 0.02 25);
+      --glass: color-mix(in oklch, oklch(0.5 0.12 55) 22%, transparent);
+      --border: color-mix(in oklch, oklch(0.85 0.16 55) 26%, transparent);
+      --text: oklch(0.97 0.01 280);
+      --muted: oklch(0.62 0.03 280);
+      color-scheme: dark;
     }
     @media (prefers-reduced-motion: reduce) {
       * { animation-duration: 0.01ms !important; }
@@ -268,6 +288,87 @@
       text-decoration: underline;
       padding: 0;
     }
+    .hub-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem;
+      margin: 0 0 0.85rem;
+    }
+    .btn-ghost {
+      font-size: 0.72rem;
+      padding: 0.32rem 0.6rem;
+      letter-spacing: 0.06em;
+    }
+    .cp-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      display: none;
+      align-items: flex-start;
+      justify-content: center;
+      padding: min(12vh, 6rem) 1rem 2rem;
+      background: color-mix(in oklch, oklch(0.05 0.02 280) 55%, transparent);
+      backdrop-filter: blur(6px);
+    }
+    .cp-backdrop.is-on { display: flex; }
+    .cp-modal {
+      width: min(28rem, 94vw);
+      border-radius: 1rem;
+      border: 1px solid var(--border);
+      background: color-mix(in oklch, var(--glass) 92%, var(--bg));
+      backdrop-filter: blur(20px);
+      box-shadow: 0 24px 80px color-mix(in oklch, oklch(0.1 0.06 290) 45%, transparent);
+      overflow: hidden;
+    }
+    .cp-modal header {
+      padding: 0.65rem 1rem 0.5rem;
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--gold);
+      border-bottom: 1px solid var(--border);
+    }
+    .cp-input {
+      width: 100%;
+      border: 0;
+      background: transparent;
+      color: var(--text);
+      font: inherit;
+      font-size: 0.95rem;
+      padding: 0.75rem 1rem;
+      outline: none;
+    }
+    .cp-input::placeholder { color: var(--muted); opacity: 0.85; }
+    .cp-list {
+      list-style: none;
+      margin: 0;
+      padding: 0.35rem;
+      max-height: min(42vh, 22rem);
+      overflow: auto;
+    }
+    .cp-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+      padding: 0.55rem 0.75rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      border: 1px solid transparent;
+    }
+    .cp-item span:first-child { font-weight: 700; font-size: 0.86rem; }
+    .cp-item span:last-child { font-size: 0.72rem; color: var(--muted); }
+    .cp-item[aria-selected="true"] {
+      background: color-mix(in oklch, var(--gold) 12%, transparent);
+      border-color: color-mix(in oklch, var(--gold) 22%, var(--border));
+    }
+    .cp-hint {
+      padding: 0.45rem 1rem 0.65rem;
+      font-size: 0.68rem;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+    }
   </style>
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"WebApplication","name":"Gravity Studio WOW","applicationCategory":"DeveloperApplication","description":"Single-entry health hub for GitHub MCP, Laravel Boost, and local Qdrant RAG on RS Performance Gravity (April 2026+).","operatingSystem":"Windows","browserRequirements":"Requires JavaScript. Clipboard API recommended over http://127.0.0.1.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
@@ -280,8 +381,20 @@
   <div class="mesh" aria-hidden="true"></div>
   <div class="grain" aria-hidden="true"></div>
   <div id="hub-toast" role="status" aria-live="polite"></div>
+  <div class="cp-backdrop" id="cp-backdrop" role="dialog" aria-modal="true" aria-labelledby="cp-title" hidden>
+    <div class="cp-modal">
+      <header id="cp-title">Polecenia</header>
+      <input type="search" class="cp-input" id="cp-input" autocomplete="off" spellcheck="false" placeholder="Filtruj lub wybierz strzałkami..." aria-controls="cp-list" />
+      <ul class="cp-list" id="cp-list" role="listbox"></ul>
+      <div class="cp-hint">Enter = wykonaj · Esc = zamknij · <kbd style="font:inherit;opacity:.9">Ctrl</kbd>+<kbd style="font:inherit;opacity:.9">K</kbd></div>
+    </div>
+  </div>
   <main class="wrap" style="view-transition-name:hub-main">
     <div class="badge">April 2026+ · Gravity Studio · single entry</div>
+    <div class="hub-toolbar">
+      <button type="button" class="btn-wow btn-ghost" id="btn-theme" title="Motyw: system, jasny, ciemny">Motyw: auto</button>
+      <button type="button" class="btn-wow btn-ghost" id="btn-palette" title="Otwórz paletę poleceń">Polecenia · Ctrl+K</button>
+    </div>
     <h1>Gravity Studio WOW</h1>
     <p class="lead">
       Jedna komenda: <strong>PHP WOW gate</strong> (WinGet <code>php.ini</code> + mbstring), potem <strong>GitHub MCP</strong>, <strong>Laravel Boost</strong>,
@@ -305,12 +418,12 @@
         <p style="margin:0;font-size:0.8rem;color:var(--muted)">Zaznacz w polu i Ctrl+C. Albo uruchom <code>serve-wow-hub.ps1</code> i otwórz hub z <code>http://127.0.0.1</code> (Clipboard odblokowany).</p>
         <label for="fb-studio">Komenda Studio</label>
         <textarea id="fb-studio" readonly rows="2" spellcheck="false"></textarea>
-        <label for="fb-mcp">Lista MCP</label>
-        <textarea id="fb-mcp" readonly rows="5" spellcheck="false"></textarea>
         <label for="fb-serve">Komenda localhost (-Open)</label>
         <textarea id="fb-serve" readonly rows="2" spellcheck="false"></textarea>
         <label for="fb-launch">Komenda launch (jednym strzałem)</label>
         <textarea id="fb-launch" readonly rows="2" spellcheck="false"></textarea>
+        <label for="fb-mcp">Lista MCP</label>
+        <textarea id="fb-mcp" readonly rows="5" spellcheck="false"></textarea>
         <label for="fb-hint">Checklista Reload</label>
         <textarea id="fb-hint" readonly rows="5" spellcheck="false"></textarea>
         <div class="row">
@@ -414,6 +527,164 @@
   if (b1c) b1c.addEventListener('click', function () { copy(cfg.launchFullCmd, 'Komenda launch skopiowana', 'fb-launch'); });
   if (b2) b2.addEventListener('click', function () { copy(cfg.mcpBlock, 'Lista MCP skopiowana', 'fb-mcp'); });
   if (b3) b3.addEventListener('click', function () { copy(cfg.reloadChecklist, 'Checklista skopiowana', 'fb-hint'); });
+
+  var THEME_KEY = 'gravity-studio-theme';
+  var themeBtn = document.getElementById('btn-theme');
+  var themeOrder = ['', 'light', 'dark'];
+  function applyTheme(mode) {
+    if (mode === 'light' || mode === 'dark') {
+      document.documentElement.setAttribute('data-theme', mode);
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+    }
+    var labels = { '': 'Motyw: auto', light: 'Motyw: jasny', dark: 'Motyw: ciemny' };
+    if (themeBtn) themeBtn.textContent = labels[mode] || labels[''];
+    try { localStorage.setItem(THEME_KEY, mode); } catch (e) {}
+  }
+  function loadTheme() {
+    var saved = '';
+    try { saved = localStorage.getItem(THEME_KEY) || ''; } catch (e) {}
+    if (saved === 'light' || saved === 'dark') applyTheme(saved);
+    else applyTheme('');
+  }
+  loadTheme();
+  if (themeBtn) {
+    themeBtn.addEventListener('click', function () {
+      var cur = document.documentElement.getAttribute('data-theme') || '';
+      var idx = themeOrder.indexOf(cur);
+      var next = themeOrder[(idx + 1) % themeOrder.length];
+      applyTheme(next);
+ flash(next ? ('Motyw: ' + (next === 'light' ? 'jasny' : 'ciemny')) : 'Motyw: system');
+    });
+  }
+
+  var cpBackdrop = document.getElementById('cp-backdrop');
+  var cpInput = document.getElementById('cp-input');
+  var cpList = document.getElementById('cp-list');
+  var paletteBtn = document.getElementById('btn-palette');
+  var cpOpen = false;
+  var cpFiltered = [];
+  var cpSel = 0;
+  function buildCommands() {
+    return [
+      { id: 'c1', title: 'Kopiuj komendę Studio', hint: 'setup -NoBrowser', run: function () { copy(cfg.studioCmd, 'Komenda Studio skopiowana', 'fb-studio'); } },
+      { id: 'c2', title: 'Kopiuj localhost serve (-Open)', hint: 'Clipboard na http', run: function () { copy(cfg.serveCmd, 'Komenda serve skopiowana', 'fb-serve'); } },
+      { id: 'c3', title: 'Kopiuj pełny launch', hint: 'setup + serve', run: function () { copy(cfg.launchFullCmd, 'Komenda launch skopiowana', 'fb-launch'); } },
+      { id: 'c4', title: 'Kopiuj listę MCP', hint: 'github, boost, qdrant…', run: function () { copy(cfg.mcpBlock, 'Lista MCP skopiowana', 'fb-mcp'); } },
+      { id: 'c5', title: 'Kopiuj checklistę Reload', hint: 'Cursor MCP', run: function () { copy(cfg.reloadChecklist, 'Checklista skopiowana', 'fb-hint'); } },
+      { id: 'o1', title: 'Otwórz deck GitHub', hint: 'sub-runtime', run: function () { window.location.href = '../github-mcp-runtime/wow.html'; } },
+      { id: 'o2', title: 'Otwórz deck Laravel Boost', hint: 'sub-runtime', run: function () { window.location.href = '../laravel-boost-mcp-runtime/wow.html'; } },
+      { id: 'o3', title: 'Otwórz deck Qdrant', hint: 'sub-runtime', run: function () { window.location.href = '../qdrant-local-runtime/wow.html'; } },
+      { id: 'f1', title: 'Pokaż pola ręcznej kopii', hint: 'gdy Clipboard zablokowany', run: function () { openFallback('fb-studio'); } }
+    ];
+  }
+  var cpAll = buildCommands();
+  function closePalette() {
+    cpOpen = false;
+    if (cpBackdrop) {
+      cpBackdrop.classList.remove('is-on');
+      cpBackdrop.hidden = true;
+      cpBackdrop.setAttribute('aria-hidden', 'true');
+    }
+    if (cpInput) cpInput.value = '';
+  }
+  function renderPalette() {
+    if (!cpList) return;
+    var q = (cpInput && cpInput.value || '').trim().toLowerCase();
+    cpFiltered = cpAll.filter(function (c) {
+      if (!q) return true;
+      return (c.title + ' ' + c.hint).toLowerCase().indexOf(q) >= 0;
+    });
+    cpSel = Math.min(cpSel, Math.max(0, cpFiltered.length - 1));
+    cpList.innerHTML = '';
+    cpFiltered.forEach(function (c, i) {
+      var li = document.createElement('li');
+      li.className = 'cp-item';
+      li.setAttribute('role', 'option');
+      li.setAttribute('aria-selected', i === cpSel ? 'true' : 'false');
+      li.dataset.idx = String(i);
+      var t = document.createElement('span');
+      t.textContent = c.title;
+      var h = document.createElement('span');
+      h.textContent = c.hint;
+      li.appendChild(t);
+      li.appendChild(h);
+      cpList.appendChild(li);
+    });
+    var active = cpList.querySelector('[aria-selected="true"]');
+    if (active) active.scrollIntoView({ block: 'nearest' });
+  }
+  function openPalette() {
+    if (!cpBackdrop) return;
+    cpOpen = true;
+    cpBackdrop.hidden = false;
+    cpBackdrop.classList.add('is-on');
+    cpBackdrop.setAttribute('aria-hidden', 'false');
+    cpSel = 0;
+    renderPalette();
+    requestAnimationFrame(function () { if (cpInput) { cpInput.focus(); cpInput.select(); } });
+  }
+  function runPaletteIndex(i) {
+    var c = cpFiltered[i];
+    if (!c) return;
+    closePalette();
+    c.run();
+  }
+  if (cpList) {
+    cpList.addEventListener('click', function (ev) {
+      var li = ev.target.closest('.cp-item');
+      if (!li) return;
+      runPaletteIndex(parseInt(li.dataset.idx, 10));
+    });
+  }
+  if (cpInput) {
+    cpInput.addEventListener('input', function () { cpSel = 0; renderPalette(); });
+  }
+  if (cpBackdrop) {
+    cpBackdrop.addEventListener('click', function (ev) {
+      if (ev.target === cpBackdrop) closePalette();
+    });
+  }
+  if (paletteBtn) paletteBtn.addEventListener('click', openPalette);
+  document.addEventListener('keydown', function (ev) {
+    var mod = ev.ctrlKey || ev.metaKey;
+    if (mod && String(ev.key).toLowerCase() === 'k') {
+      ev.preventDefault();
+      if (cpOpen) closePalette();
+      else openPalette();
+      return;
+    }
+    if (!cpOpen) return;
+    if (ev.key === 'Escape') {
+      ev.preventDefault();
+      closePalette();
+      return;
+    }
+    if (ev.key === 'ArrowDown') {
+      ev.preventDefault();
+      cpSel = Math.min(cpSel + 1, Math.max(0, cpFiltered.length - 1));
+      renderPalette();
+      return;
+    }
+    if (ev.key === 'ArrowUp') {
+      ev.preventDefault();
+      cpSel = Math.max(cpSel - 1, 0);
+      renderPalette();
+      return;
+    }
+    if (ev.key === 'Enter' && cpFiltered.length) {
+      ev.preventDefault();
+      runPaletteIndex(cpSel);
+    }
+  });
+
+  var lead = document.querySelector('.lead');
+  if (lead) {
+    var k = document.createElement('span');
+    k.style.cssText = 'display:block;margin-top:0.5rem;font-size:0.82rem;color:var(--muted)';
+    k.textContent = 'Tip 2026: Ctrl+K — paleta poleceń (kopiuj, decki, fallback). Motyw — przycisk obok.';
+    lead.appendChild(k);
+  }
 })();
   </script>
 </body>

@@ -11,7 +11,7 @@
 - **Next:** Reload MCP w Cursorze; RAG: `tools/qdrant-local-runtime/verify-rag-ready.ps1` po starcie Dockera.
 - **Studio WOW (2026-04-12 wieczór):** `setup-gravity-studio-wow.ps1` robi teraz **PHP gate + RAG readyz** w jednym przebiegu; `-NoBrowser` dla agentów.
 - **Studio hub UI:** `wow.html` — quick actions (schowek), toasty, JSON-LD; przy `file://` clipboard moze byc zablokowany (README).
-- **Studio localhost:** `serve-wow-hub.ps1 -Open` — hub `http://127.0.0.1:18765/wow.html` + auto-karta; **`launch-gravity-studio-wow.ps1`** = setup + serve; komendy w hubie z **Resolve-Path** (portable); UI: light/dark, Speculation Rules, względne decki.
+- **Studio localhost:** `serve-wow-hub.ps1 -Open` — hub `http://127.0.0.1:18765/wow.html` + auto-karta; **`launch-gravity-studio-wow.ps1`** = setup + serve; hub UI: **Ctrl+K** paleta, motyw + `localStorage`, OG, Speculation Rules, względne decki.
 
 ## 2026-04-12 ~03:00 CET - VPS n8n: jeden aktywny Bot Invitation Hub (F6uos canonical)
 
