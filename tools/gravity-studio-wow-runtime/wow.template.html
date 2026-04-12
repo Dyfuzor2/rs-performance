@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#120808" />
+  <title>Gravity Studio WOW · RS · 2026</title>
+  <style>
+    @property --hub-hue { syntax: "<angle>"; inherits: false; initial-value: 45deg; }
+    :root {
+      --bg: oklch(0.09 0.02 25);
+      --glass: color-mix(in oklch, oklch(0.5 0.12 55) 22%, transparent);
+      --border: color-mix(in oklch, oklch(0.85 0.16 55) 26%, transparent);
+      --gold: oklch(0.82 0.17 75);
+      --violet: oklch(0.62 0.22 290);
+      --text: oklch(0.97 0.01 280);
+      --muted: oklch(0.62 0.03 280);
+      --font: "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      * { animation-duration: 0.01ms !important; }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      font-family: var(--font);
+      color: var(--text);
+      background: var(--bg);
+    }
+    .mesh {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background:
+        radial-gradient(ellipse 100% 70% at 15% 10%, color-mix(in oklch, var(--gold) 45%, transparent), transparent 52%),
+        radial-gradient(ellipse 80% 55% at 95% 90%, color-mix(in oklch, var(--violet) 38%, transparent), transparent 48%),
+        conic-gradient(from var(--hub-hue) at 50% 40%, oklch(0.28 0.1 40 / 0.5), transparent 42%, oklch(0.22 0.08 300 / 0.4) 68%);
+      animation: hue 48s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes hue {
+      0%, 100% { --hub-hue: 35deg; }
+      50% { --hub-hue: 300deg; }
+    }
+    .grain {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      opacity: 0.038;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      mix-blend-mode: overlay;
+    }
+    .wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 54rem;
+      margin: 0 auto;
+      padding: clamp(1.5rem, 4vw, 3rem);
+    }
+    .badge {
+      display: inline-block;
+      font-size: 0.62rem;
+      font-weight: 750;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--glass);
+      backdrop-filter: blur(14px);
+      margin-bottom: 0.75rem;
+    }
+    h1 {
+      font-size: clamp(1.55rem, 3.4vw, 2.1rem);
+      font-weight: 800;
+      letter-spacing: -0.038em;
+      margin: 0 0 0.45rem;
+      background: linear-gradient(115deg, var(--text), color-mix(in oklch, var(--gold) 75%, var(--text)));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    p.lead { margin: 0 0 1.35rem; color: var(--muted); line-height: 1.55; font-size: 0.98rem; max-width: 44rem; }
+    .grid2 {
+      display: grid;
+      gap: 0.85rem;
+      grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    }
+    .card {
+      border: 1px solid var(--border);
+      border-radius: 1.05rem;
+      padding: 1rem 1.1rem;
+      background: var(--glass);
+      backdrop-filter: blur(16px);
+    }
+    .card h2 {
+      margin: 0 0 0.55rem;
+      font-size: 0.72rem;
+      font-weight: 750;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+    .card a {
+      color: color-mix(in oklch, var(--gold) 85%, white);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      display: inline-block;
+      margin-top: 0.35rem;
+    }
+    .card a:hover { text-decoration: underline; }
+    ul.status {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      font-size: 0.88rem;
+    }
+    ul.status li {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.45rem;
+      color: var(--muted);
+    }
+    .pill {
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      padding: 0.2rem 0.45rem;
+      border-radius: 0.3rem;
+      min-width: 2.4rem;
+      text-align: center;
+    }
+    .pill.ok { background: color-mix(in oklch, oklch(0.72 0.18 145) 35%, transparent); color: oklch(0.92 0.08 145); }
+    .pill.bad { background: color-mix(in oklch, oklch(0.55 0.2 25) 30%, transparent); color: oklch(0.88 0.06 25); }
+    p.ts { font-size: 0.72rem; color: var(--muted); margin: 0.65rem 0 0; opacity: 0.85; }
+    code { font-family: ui-monospace, Consolas, monospace; font-size: 0.8rem; color: color-mix(in oklch, var(--gold) 60%, var(--text)); }
+  </style>
+</head>
+<body>
+  <div class="mesh" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+  <main class="wrap">
+    <div class="badge">April 2026+ · Gravity Studio · single entry</div>
+    <h1>Gravity Studio WOW</h1>
+    <p class="lead">
+      Jedna komenda zbiera stan: <strong>GitHub MCP</strong>, <strong>Laravel Boost</strong>, opcjonalnie <strong>Qdrant</strong> lokalnie (Docker).
+      Cursor: przeładuj MCP po sprawdzeniu zielonych statusów.
+    </p>
+
+    <div class="card" style="margin-bottom:1rem">
+      <h2>Live status (ostatnie uruchomienie)</h2>
+      <!--STUDIO_STATUS-->
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <h2>GitHub MCP</h2>
+        <p style="margin:0;color:var(--muted);font-size:0.85rem">Binarka + test tokenu.</p>
+        <a href="file:///G:/gravity/tools/github-mcp-runtime/wow.html">Otwórz deck GitHub</a>
+      </div>
+      <div class="card">
+        <h2>Laravel Boost</h2>
+        <p style="margin:0;color:var(--muted);font-size:0.85rem">PHP 8.5 + boost:mcp.</p>
+        <a href="file:///G:/gravity/tools/laravel-boost-mcp-runtime/wow.html">Otwórz deck Boost</a>
+      </div>
+      <div class="card">
+        <h2>Qdrant local</h2>
+        <p style="margin:0;color:var(--muted);font-size:0.85rem">Wymaga Docker Desktop.</p>
+        <a href="file:///G:/gravity/tools/qdrant-local-runtime/wow.html">Otwórz deck Qdrant</a>
+      </div>
+    </div>
+
+    <p class="ts" style="margin-top:1.25rem">
+      Uruchom ponownie: <code>powershell -ExecutionPolicy Bypass -File G:\gravity\tools\gravity-studio-wow-runtime\setup-gravity-studio-wow.ps1</code>
+    </p>
+  </main>
+</body>
+</html>
