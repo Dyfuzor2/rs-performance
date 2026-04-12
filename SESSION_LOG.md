@@ -4,6 +4,13 @@ Format relay: jeden blok na sesję, bez kasowania cudzych wpisów. Starsze wpisy
 
 ---
 
+## [2026-04-12] Cursor — n8n: domyślny URL = auto.rs3d.pl (nie SOCmid)
+
+- Ujednolicono szablony: `.cursor/mcp.env.example`, `n8n.env.example`, `merge_n8n_env_hosting.py` (DEFAULT_BASE), `HANDOFF.md`, `RELAY.md`, `activeContext.md`, skill `rs-n8n-wow-2026`.
+- **Produkcyjna instancja RS:** `https://auto.rs3d.pl`. SOCmid pozostaje opcjonalną drugą instancją (osobny klucz).
+
+---
+
 ## [2026-04-12] Cursor — checklist: migracja instancji hostingu vs n8n
 
 - Dokumentacja: `HANDOFF.md`, `.cursor/mcp.env.example` (RS_CANONICAL_BASE_URL + kroki), skill `rs-n8n-wow-2026`, docstring `vps_n8n_run_repairs_on_vps.py`.

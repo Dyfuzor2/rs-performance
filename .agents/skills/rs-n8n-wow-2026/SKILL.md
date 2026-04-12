@@ -13,7 +13,7 @@ Project coordination skill for `n8n` work in `G:\gravity`.
 
 ## Primary sources
 
-- local MCP runtime (Cursor): `run-n8n-mcp.ps1` loads `.cursor/mcp.env` → pinned `n8n-mcp@2.47.5` stdio; verify with `verify-n8n-api.ps1`; webhook matrix: `smoke-critical-webhooks.ps1`. Python: `scripts/gravity_cursor_env` — `require_n8n_api` plus OpenRouter / Telegram / Meta / `RS_X_API_TOKEN` / `RS_BLOG_PIPELINE_KEY` (see `mcp.env.example`); no literals in `deploy_*.py`.
+- local MCP runtime (Cursor): `run-n8n-mcp.ps1` loads `.cursor/mcp.env` → pinned `n8n-mcp@2.47.5` stdio; verify with `verify-n8n-api.ps1`; webhook matrix: `smoke-critical-webhooks.ps1`. **`N8N_API_URL` domyślnie:** `https://auto.rs3d.pl` (produkcyjny n8n na VPS), nie SOCmid — patrz `mcp.env.example`. Python: `scripts/gravity_cursor_env` — `require_n8n_api` plus OpenRouter / Telegram / Meta / `RS_X_API_TOKEN` / `RS_BLOG_PIPELINE_KEY` (see `mcp.env.example`); no literals in `deploy_*.py`.
 - local MCP runtime:
     - `G:\gravity\tools\n8n-mcp-runtime`
 - local source repo:

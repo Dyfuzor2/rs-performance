@@ -2,7 +2,7 @@
 
 ### Agent: Cursor
 
-- **Hosting canonical** (Laravel, `APP_URL`, API pod `/api/...`) to **osobna** warstwa od **instancji n8n** (VPS `auto.rs3d.pl`, ewentualnie SOCmid w `mcp.env`).
+- **Hosting canonical** (Laravel, `APP_URL`, API pod `/api/...`) to **osobna** warstwa od **n8n**: produkcyjna instancja RS to **`https://auto.rs3d.pl`** (VPS). SOCmid (`n8n-s2.socmid.cloud`) to opcjonalna **druga** instancja — inna baza workflowów, osobny klucz.
 - Przy **migracji hostingu / nowej domenie:** zaktualizować wszystkie HttpRequest w n8n wskazujące na stary host, rotować klucze nagłówków jeśli trzeba, przelecieć skrypty w `scripts/` z literałem `rsperformance.online` (smoke, fleet jsonfix). Szablon zmiennych: **`.cursor/mcp.env.example`** (`RS_CANONICAL_BASE_URL`, checklista). Skill: **`rs-n8n-wow-2026`** § instancja hostingu.
 
 ## 2026-04-12 — n8n v4.2 JSON body: Preview Blog Pipeline + Google ping 404 + Monitor object body

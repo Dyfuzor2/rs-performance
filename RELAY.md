@@ -71,6 +71,8 @@ Na hostingu zostaje:
 
 ### VPS support plane
 
+**VPS jest głównym hubem wsparcia** dla hostingu canonical (ten sam sens co w `vps.md`: realne wsparcie operacyjne, nie konkurencja publicznego URL).
+
 Na VPS sa tylko rzeczy wspierajace:
 
 - async jobs
@@ -183,6 +185,7 @@ W `RELAY.md` trzymamy tylko lokalizacje i opis. Nie kopiujemy tu samych hasel i 
 - **Tylko env:** `pwsh -File G:\gravity\scripts\sync-operator-env-wow.ps1` — merge + `--check`.
 - **Recznie:** `python scripts/hydrate_mcp_env_from_workspace.py` potem `python scripts/hydrate_mcp_env_from_workspace.py --check` (opcja `--json` dla agentow).
 - **Walidacja n8n po sync:** `python -c "import sys; sys.path.insert(0,'scripts'); from gravity_cursor_env import require_n8n_api; require_n8n_api(); print('n8n OK')"`
+- **n8n Public API (2026-04+):** ten sam kontrakt (`/api/v1/*`, `X-N8N-API-KEY`) dla **Filament** (hosting `.env`), **skryptów** (`mcp.env` / `n8n.txt`) oraz **n8n-mcp** — ale **serwer MCP n8n dziala na VPS** (`vps.md`), nie na laptopie; lokalny `run-n8n-mcp.ps1` to opcjonalny dev. **Domyslna instancja RS:** `https://auto.rs3d.pl` (VPS, flota WOW). **SOCmid** (`n8n-s2.socmid.cloud`) to osobna baza workflowow — osobny URL + klucz, tylko gdy celowo. Szczegoly: `n8n.md`.
 
 ### Google Cloud CLI lokalnie (kwiecien 2026+) + MCP statusu
 
@@ -193,27 +196,27 @@ W `RELAY.md` trzymamy tylko lokalizacje i opis. Nie kopiujemy tu samych hasel i 
 
 ## 6. Narzedzia i Punkty Wejscia
 
-| Narzedzie                      | Lokalizacja / wejscie                          | Rola                                                                                                                       |
-| ------------------------------ | ---------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| SSH hosting helper             | `G:\gravity\ssh_exec.py`                       | zdalne komendy na hostingu                                                                                                 |
-| SSH VPS helper                 | `G:\gravity\vps_exec.py`                       | zdalne komendy na VPS                                                                                                      |
-| AGENTS directives              | `G:\gravity\AGENTS.md`                         | operacyjne zasady agentow                                                                                                  |
-| CLAUDE directives              | `G:\gravity\CLAUDE.md`                         | wariant dyrektyw                                                                                                           |
-| Master plan                    | `G:\gravity\plan.md`                           | architektura i priorytety                                                                                                  |
-| Current handoff                | `G:\gravity\HANDOFF.md`                        | stan biezacy                                                                                                               |
-| Production log history         | `G:\gravity\handoff-log.md`                    | historia zmian                                                                                                             |
-| Session log                    | `G:\gravity\SESSION_LOG.md`                    | historia sesji                                                                                                             |
-| Cursor MCP config              | `G:\gravity\.cursor\mcp.json`                  | Laravel Boost, filesystem workspace, fetch, n8n-mcp (env z OS)                                                             |
-| MCP env template               | `G:\gravity\.cursor\mcp.env.example`           | nazwy zmiennych dla n8n / opcjonalnie Qdrant / MySQL RO                                                                    |
-| n8n MCP zrodlo (repo)          | `G:\gravity\mcp-servers\n8n-mcp`               | pelny kod + docs; wersja npm pin w runtime                                                                                 |
-| n8n MCP runtime (pin)          | `G:\gravity\tools\n8n-mcp-runtime`             | `n8n-mcp@^2.47.5` dla spojnosci z `npx`                                                                                    |
-| Telegram MCP (operator)       | `G:\gravity\tools\telegram-mcp-runtime`        | Bot API stdio MCP; `install-telegram-mcp.ps1`, `run-telegram-mcp.ps1`, env z `.cursor/mcp.env`                             |
-| gcloud WOW (CLI + status MCP) | `G:\gravity\tools\gcp-gcloud-wow-runtime`      | `install-gcloud-wow.ps1` (winget), read-only MCP `gcloud_wow_*`; pelny GCP nadal VPS/SSH                                   |
-| Operator bootstrap WOW        | `G:\gravity\tools\bootstrap-operator-wow-stack.ps1` | jeden strzal: gcloud + env + check + MCP foldery; `-InstallDeps` = pelny npm |
-| Instalacja deps MCP (Windows)  | `G:\gravity\tools\install-cursor-mcp-deps.ps1` | `npm install` w repo n8n-mcp + runtime                                                                                     |
-| n8n docs mirror                | `G:\gravity\research\docs-sources\n8n-docs`    | lokalna dokumentacja workflow                                                                                              |
-| n8n skill pack                 | `G:\gravity\n8n-skills`                        | workflow patterns, validation, MCP tools expert                                                                            |
-| Qdrant MCP (oficjalny, zrodlo) | `G:\gravity\mcp-servers\qdrant-mcp-official`   | https://github.com/qdrant/mcp-server-qdrant — uruchomienie wg README (Python/uv); nie wlaczaj w Cursor bez tunelu i klucza |
+| Narzedzie                      | Lokalizacja / wejscie                               | Rola                                                                                                                       |
+| ------------------------------ | --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| SSH hosting helper             | `G:\gravity\ssh_exec.py`                            | zdalne komendy na hostingu                                                                                                 |
+| SSH VPS helper                 | `G:\gravity\vps_exec.py`                            | zdalne komendy na VPS                                                                                                      |
+| AGENTS directives              | `G:\gravity\AGENTS.md`                              | operacyjne zasady agentow                                                                                                  |
+| CLAUDE directives              | `G:\gravity\CLAUDE.md`                              | wariant dyrektyw                                                                                                           |
+| Master plan                    | `G:\gravity\plan.md`                                | architektura i priorytety                                                                                                  |
+| Current handoff                | `G:\gravity\HANDOFF.md`                             | stan biezacy                                                                                                               |
+| Production log history         | `G:\gravity\handoff-log.md`                         | historia zmian                                                                                                             |
+| Session log                    | `G:\gravity\SESSION_LOG.md`                         | historia sesji                                                                                                             |
+| Cursor MCP config              | `G:\gravity\.cursor\mcp.json`                       | Laravel Boost, filesystem workspace, fetch, n8n-mcp (env z OS)                                                             |
+| MCP env template               | `G:\gravity\.cursor\mcp.env.example`                | nazwy zmiennych dla n8n / opcjonalnie Qdrant / MySQL RO                                                                    |
+| n8n MCP zrodlo (repo)          | `G:\gravity\mcp-servers\n8n-mcp`                    | pelny kod + docs; wersja npm pin w runtime                                                                                 |
+| n8n MCP runtime (pin)          | `G:\gravity\tools\n8n-mcp-runtime`                  | `n8n-mcp@^2.47.5` dla spojnosci z `npx`                                                                                    |
+| Telegram MCP (operator)        | `G:\gravity\tools\telegram-mcp-runtime`             | Bot API stdio MCP; `install-telegram-mcp.ps1`, `run-telegram-mcp.ps1`, env z `.cursor/mcp.env`                             |
+| gcloud WOW (CLI + status MCP)  | `G:\gravity\tools\gcp-gcloud-wow-runtime`           | `install-gcloud-wow.ps1` (winget), read-only MCP `gcloud_wow_*`; pelny GCP nadal VPS/SSH                                   |
+| Operator bootstrap WOW         | `G:\gravity\tools\bootstrap-operator-wow-stack.ps1` | jeden strzal: gcloud + env + check + MCP foldery; `-InstallDeps` = pelny npm                                               |
+| Instalacja deps MCP (Windows)  | `G:\gravity\tools\install-cursor-mcp-deps.ps1`      | `npm install` w repo n8n-mcp + runtime                                                                                     |
+| n8n docs mirror                | `G:\gravity\research\docs-sources\n8n-docs`         | lokalna dokumentacja workflow                                                                                              |
+| n8n skill pack                 | `G:\gravity\n8n-skills`                             | workflow patterns, validation, MCP tools expert                                                                            |
+| Qdrant MCP (oficjalny, zrodlo) | `G:\gravity\mcp-servers\qdrant-mcp-official`        | https://github.com/qdrant/mcp-server-qdrant — uruchomienie wg README (Python/uv); nie wlaczaj w Cursor bez tunelu i klucza |
 
 ## 7. Skills i Workflowy
 

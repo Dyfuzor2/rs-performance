@@ -5,11 +5,11 @@ Uses ssh_exec.py (SFTP) — no secrets in repo commits.
 
 Usage (from G:\\gravity):
   python scripts/merge_n8n_env_hosting.py n8n.txt
-  python scripts/merge_n8n_env_hosting.py n8n.txt https://n8n-s2.socmid.cloud
+  python scripts/merge_n8n_env_hosting.py n8n.txt https://auto.rs3d.pl
 
 Arg2 (optional): public base URL of the **same** n8n instance where the JWT was created (must match or API returns 401).
 
-Default URL: https://n8n-s2.socmid.cloud (canonical Public API + editor links for RS; override if you use another host).
+Default URL: https://auto.rs3d.pl (główny n8n RS na VPS). Dla SOCmid podaj explicite: https://n8n-s2.socmid.cloud
 
 Credential file formats (April 2026+):
   • Legacy: single line, JWT only.
@@ -23,7 +23,7 @@ import sys
 from pathlib import Path
 
 REMOTE_ENV = "domains/rsperformance.online/laravel/.env"
-DEFAULT_BASE = "https://n8n-s2.socmid.cloud"
+DEFAULT_BASE = "https://auto.rs3d.pl"
 
 # Public API JWT: three dot-separated segments (n8n-issued).
 _JWT_RE = re.compile(r"\b(eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+)\b")
