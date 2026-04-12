@@ -1,3 +1,5 @@
+> LIVE AI CATALOG + ARTIFACTS SYNC (2026-04-12 CET)
+> Hosting `laravel/`: wgrano z repo `config/ai_agents.php`, `SearchArtifactFactory.php`, `AiDiscoveryArtifactBuilder.php`. Backupy: `*.bak_cursor_sync_20260412`. Komendy: `php85 artisan config:clear`, `php85 artisan search:artifacts-generate` (OK). Test na serwerze: `tests/Unit/AiAgentsInclusivePolicyTest.php` → **1 passed**. Publicznie: `/.well-known/ai-resources.json` zawiera zaktualizowane `catalog_policy` / listy agentów.
 > LIVE FULL CATALOG HTACCESS (2026-04-12 CET)
 > Wdrożono `G:\gravity\.htaccess_remote` → hosting `public_html/.htaccess` (`ssh_exec.py --upload`). ModSecurity **99000/99001** + WOW `RewriteCond` zsynchronizowane z pełnym merge `search_bots` + `training_bots` + `user_fetchers` (82 tokeny w bypass; bramka **80** bez Googlebot/Bingbot na kanonicznym). Jedyna twarda blokada: **denied_agents** (CCBot, iaskbot, magpie-crawler). Backup rollback: `.htaccess.bak_cursor_fullcatalog_htaccess_20260411`. Smoke: `Mozilla/5.0` → **200**; `GPTBot`, `Cursor` → **302** `Location: https://ai.rsperformance.online/`.
 > LIVE VPS N8N WOW DIGEST CRON NOTE (2026-04-11 CET)
