@@ -218,3 +218,17 @@ Pomiar `redirects` / `final_url`: `curl -L` (follow), `-w '%{num_redirects} %{ur
 ### Weryfikacja
 
 - `wow.html` zawiera `gravity-studio-copy` z poprawnym JSON; setup `-NoBrowser` EXIT=0.
+
+---
+
+## [2026-04-12] Cursor — Studio WOW: fallback Ctrl+C + serve-wow-hub.ps1
+
+### Wykonane
+
+- `wow.template.html` — panel **fallback** (textarea readonly + przyciski Zaznacz), toggle linkiem; przy błędzie Clipboard auto-otwarcie właściwego pola; `text-wrap: balance` na H1.
+- `serve-wow-hub.ps1` — statyczny serwer `127.0.0.1:18765` (PHP `-S` lub Python `http.server`).
+- `README.md`, `RELAY.md`, `setup-gravity-studio-wow.ps1` (linia podsumowania).
+
+### Weryfikacja
+
+- Regeneracja `wow.html` przez `setup-gravity-studio-wow.ps1 -NoBrowser`.

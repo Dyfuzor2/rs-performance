@@ -75,6 +75,7 @@
       margin-bottom: 0.75rem;
     }
     h1 {
+      text-wrap: balance;
       font-size: clamp(1.55rem, 3.4vw, 2.1rem);
       font-weight: 800;
       letter-spacing: -0.038em;
@@ -197,6 +198,54 @@
       transition: opacity 0.25s ease, translate 0.25s ease;
     }
     #hub-toast.show { opacity: 1; translate: 0 0; }
+    .fallback-panel {
+      margin-top: 0.85rem;
+      padding: 0.85rem;
+      border-radius: 0.75rem;
+      border: 1px dashed color-mix(in oklch, var(--gold) 35%, var(--border));
+      background: color-mix(in oklch, oklch(0.18 0.06 290) 40%, transparent);
+      display: none;
+      interpolate-size: allow-keywords;
+    }
+    .fallback-panel.is-open { display: block; animation: rise 0.4s cubic-bezier(0.22, 1, 0.36, 1) backwards; }
+    .fallback-panel label {
+      display: block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin: 0.5rem 0 0.25rem;
+    }
+    .fallback-panel textarea {
+      width: 100%;
+      min-height: 3.2rem;
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: 0.78rem;
+      padding: 0.45rem;
+      border-radius: 0.45rem;
+      border: 1px solid var(--border);
+      background: color-mix(in oklch, var(--bg) 70%, transparent);
+      color: var(--text);
+      resize: vertical;
+    }
+    .fallback-panel .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      align-items: center;
+      margin-top: 0.5rem;
+    }
+    .link-quiet {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: color-mix(in oklch, var(--gold) 75%, var(--muted));
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-decoration: underline;
+      padding: 0;
+    }
   </style>
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"WebApplication","name":"Gravity Studio WOW","applicationCategory":"DeveloperApplication","description":"Single-entry health hub for GitHub MCP, Laravel Boost, and local Qdrant RAG on RS Performance Gravity (April 2026+).","operatingSystem":"Windows","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
@@ -224,6 +273,21 @@
         <button type="button" class="btn-wow" id="btn-copy-mcp">Kopiuj listę MCP (włącz w Cursorze)</button>
         <button type="button" class="btn-wow" id="btn-copy-hint">Kopiuj checklistę Reload</button>
       </div>
+      <p style="margin:0.45rem 0 0"><button type="button" class="link-quiet" id="btn-toggle-fallback" aria-expanded="false">Tryb bez Clipboard API: pokaż pola tekstowe</button></p>
+      <div class="fallback-panel" id="fallback-panel" aria-label="Ręczna kopia tekstów">
+        <p style="margin:0;font-size:0.8rem;color:var(--muted)">Zaznacz w polu i Ctrl+C. Albo uruchom <code>serve-wow-hub.ps1</code> i otwórz hub z <code>http://127.0.0.1</code> (Clipboard odblokowany).</p>
+        <label for="fb-studio">Komenda Studio</label>
+        <textarea id="fb-studio" readonly rows="2" spellcheck="false"></textarea>
+        <label for="fb-mcp">Lista MCP</label>
+        <textarea id="fb-mcp" readonly rows="5" spellcheck="false"></textarea>
+        <label for="fb-hint">Checklista Reload</label>
+        <textarea id="fb-hint" readonly rows="5" spellcheck="false"></textarea>
+        <div class="row">
+          <button type="button" class="btn-wow" id="btn-fallback-select-studio">Zaznacz komendę</button>
+          <button type="button" class="btn-wow" id="btn-fallback-select-mcp">Zaznacz listę MCP</button>
+          <button type="button" class="btn-wow" id="btn-fallback-select-hint">Zaznacz checklistę</button>
+        </div>
+      </div>
       <!--GRAVITY_STUDIO_COPY_JSON-->
     </div>
 
@@ -248,12 +312,15 @@
     <p class="ts" style="margin-top:1.25rem">
       Uruchom ponownie: <code>powershell -ExecutionPolicy Bypass -File G:\gravity\tools\gravity-studio-wow-runtime\setup-gravity-studio-wow.ps1</code>
       · <a href="file:///G:/gravity/.mcp.json" style="color:inherit;font-weight:600">Otwórz .mcp.json</a>
+      · localhost hub: <code>powershell -ExecutionPolicy Bypass -File G:\gravity\tools\gravity-studio-wow-runtime\serve-wow-hub.ps1</code>
     </p>
   </main>
   <script>
 (function () {
   var el = document.getElementById('gravity-studio-copy');
   var toast = document.getElementById('hub-toast');
+  var panel = document.getElementById('fallback-panel');
+  var toggleFb = document.getElementById('btn-toggle-fallback');
   var cfg = {};
   try { cfg = JSON.parse(el && el.textContent || '{}'); } catch (e) { cfg = {}; }
   function flash(msg) {
@@ -263,16 +330,48 @@
     clearTimeout(flash._t);
     flash._t = setTimeout(function () { toast.classList.remove('show'); }, 2200);
   }
-  function copy(text, okMsg) {
-    if (!text) { flash('Brak danych - uruchom setup ponownie'); return; }
-    navigator.clipboard.writeText(text).then(function () { flash(okMsg || 'Skopiowano'); }).catch(function () { flash('Clipboard zablokowany (file://) - Ctrl+C z pola lub uruchom z serwera lokalnego'); });
+  function openFallback(selectId) {
+    if (!panel) return;
+    panel.classList.add('is-open');
+    if (toggleFb) toggleFb.setAttribute('aria-expanded', 'true');
+    var ta = selectId && document.getElementById(selectId);
+    if (ta) {
+      ta.focus();
+      ta.select();
+    }
   }
+  function copy(text, okMsg, fallbackFieldId) {
+    if (!text) { flash('Brak danych - uruchom setup ponownie'); return; }
+    navigator.clipboard.writeText(text).then(function () { flash(okMsg || 'Skopiowano'); }).catch(function () {
+      flash('Otwieram pola do Ctrl+C');
+      openFallback(fallbackFieldId);
+    });
+  }
+  var fs = document.getElementById('fb-studio');
+  var fm = document.getElementById('fb-mcp');
+  var fh = document.getElementById('fb-hint');
+  if (fs) fs.value = cfg.studioCmd || '';
+  if (fm) fm.value = cfg.mcpBlock || '';
+  if (fh) fh.value = cfg.reloadChecklist || '';
+  if (toggleFb && panel) {
+    toggleFb.addEventListener('click', function () {
+      var on = panel.classList.toggle('is-open');
+      toggleFb.setAttribute('aria-expanded', on ? 'true' : 'false');
+    });
+  }
+  function wireSelect(btnId, taId) {
+    var b = document.getElementById(btnId);
+    if (b) b.addEventListener('click', function () { openFallback(taId); });
+  }
+  wireSelect('btn-fallback-select-studio', 'fb-studio');
+  wireSelect('btn-fallback-select-mcp', 'fb-mcp');
+  wireSelect('btn-fallback-select-hint', 'fb-hint');
   var b1 = document.getElementById('btn-copy-studio');
   var b2 = document.getElementById('btn-copy-mcp');
   var b3 = document.getElementById('btn-copy-hint');
-  if (b1) b1.addEventListener('click', function () { copy(cfg.studioCmd, 'Komenda Studio skopiowana'); });
-  if (b2) b2.addEventListener('click', function () { copy(cfg.mcpBlock, 'Lista MCP skopiowana'); });
-  if (b3) b3.addEventListener('click', function () { copy(cfg.reloadChecklist, 'Checklista skopiowana'); });
+  if (b1) b1.addEventListener('click', function () { copy(cfg.studioCmd, 'Komenda Studio skopiowana', 'fb-studio'); });
+  if (b2) b2.addEventListener('click', function () { copy(cfg.mcpBlock, 'Lista MCP skopiowana', 'fb-mcp'); });
+  if (b3) b3.addEventListener('click', function () { copy(cfg.reloadChecklist, 'Checklista skopiowana', 'fb-hint'); });
 })();
   </script>
 </body>

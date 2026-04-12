@@ -200,6 +200,7 @@ $ragS = if (-not $results.dockerRunning) { 'N/A (Docker)' } elseif (-not $result
 $ragC = if ($results.ragReadyzOk) { 'Green' } elseif ($ragS -like 'N/A*') { 'DarkGray' } else { 'Red' }
 Write-Host "  RAG readyz:         $ragS" -ForegroundColor $ragC
 Write-Host ""
+Write-Host "  Local hub (Clipboard unlock): serve-wow-hub.ps1 -> http://127.0.0.1:18765/wow.html" -ForegroundColor DarkGray
 Write-Host "  Next: Cursor - Reload MCP. Enable github, laravel-boost, qdrant-rs-*-local as needed." -ForegroundColor Green
 Write-Host ""
 exit 0
