@@ -35,6 +35,8 @@ def load_cursor_env(*, overwrite: bool = False) -> int:
         key, val = key.strip(), val.strip()
         if not key:
             continue
+        if not val and not overwrite:
+            continue
         if not overwrite and os.environ.get(key):
             continue
         os.environ[key] = val

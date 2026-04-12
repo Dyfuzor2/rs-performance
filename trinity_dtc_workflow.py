@@ -205,16 +205,16 @@ wf = {
     "settings": {"executionOrder": "v1"}
 }
 
-r = requests.post(f"{base}/api/v1/workflows", headers=headers, json=wf)
-print(f"Create Trinity workflow: {r.status_code}")
-if r.status_code in [200, 201]:
-    data = r.json()
-    wf_id = data.get("id")
-    print(f"ID: {wf_id}")
-    print(f"Nodes: {[n['name'] for n in data.get('nodes', [])]}")
+if __name__ == "__main__":
+    r = requests.post(f"{base}/api/v1/workflows", headers=headers, json=wf)
+    print(f"Create Trinity workflow: {r.status_code}")
+    if r.status_code in [200, 201]:
+        data = r.json()
+        wf_id = data.get("id")
+        print(f"ID: {wf_id}")
+        print(f"Nodes: {[n['name'] for n in data.get('nodes', [])]}")
 
-    # Activate
-    r2 = requests.patch(f"{base}/api/v1/workflows/{wf_id}", headers=headers, json={"active": True})
-    print(f"Activate: {r2.status_code}")
-else:
-    print(r.text[:500])
+        r2 = requests.patch(f"{base}/api/v1/workflows/{wf_id}", headers=headers, json={"active": True})
+        print(f"Activate: {r2.status_code}")
+    else:
+        print(r.text[:500])

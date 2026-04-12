@@ -4,7 +4,22 @@ Format relay: jeden blok na sesję, bez kasowania cudzych wpisów. Starsze wpisy
 
 ---
 
-## [2026-04-12] Cursor — operator secrets: deploy_*.py + execution/* → mcp.env only
+## [2026-04-12] Cursor — hydrate_mcp_env z cursor.md + JSON; deploy tylko pod __main__
+
+### Wykonane
+
+- `scripts/hydrate_mcp_env_from_workspace.py` — import z `cursor.md` + skan JSON (OpenRouter, Meta); merge do `.cursor/mcp.env` bez printu wartosci.
+- `load_cursor_env`: puste `KEY=` nie nadpisuje istniejacego `os.environ`.
+- `deploy_telegram_blog`, `deploy_trending_faults`, `deploy_trinity_crew`, `trinity_dtc_workflow`: deploy wylacznie w `if __name__ == "__main__"`.
+- `fix_all_telegram_tokens`: `main()` + `__main__`.
+
+### Uwaga
+
+- Pierwszy `import deploy_telegram_blog` przed poprawka mogl utworzyc duplikat workflow w n8n — sprawdz liste w UI.
+
+---
+
+## [2026-04-12] Cursor — operator secrets: deploy\__.py + execution/_ → mcp.env only
 
 ### Wykonane
 

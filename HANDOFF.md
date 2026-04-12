@@ -1,3 +1,13 @@
+## 2026-04-12 — Hydrate `mcp.env` z `cursor.md` + JSON; deploy tylko `__main__`
+
+### Agent: Cursor
+
+### STATUS: REPO + lokalny `mcp.env`
+
+- **`python scripts/hydrate_mcp_env_from_workspace.py`** — scala klucze operatora (bez printu wartosci); uzupelnia OpenRouter/Meta ze skanow JSON w korzeniu / `storage/app`.
+- **Deploy:** `deploy_telegram_blog` / `deploy_trending_faults` / `deploy_trinity_crew` / `trinity_dtc_workflow` — **import bez efektow ubocznych** (`if __name__ == "__main__"`).
+- **Uwaga:** wczesniejszy przypadkowy `import deploy_telegram_blog` mogl utworzyc duplikat workflow w n8n — sprawdz liste workflow i ewentualnie usun testowy.
+
 ## 2026-04-12 — Sekrety operatora: OpenRouter / Telegram / Meta / RS — tylko `.cursor/mcp.env`
 
 ### Agent: Cursor

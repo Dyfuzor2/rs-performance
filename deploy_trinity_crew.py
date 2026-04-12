@@ -372,43 +372,43 @@ return [{
     "staticData": None
 }
 
-# Deploy to n8n
-print("Creating Trinity DTC Commentator workflow...")
-resp = requests.post(
-    f"{N8N_URL}/api/v1/workflows",
-    headers=headers,
-    json=workflow,
-    verify=False,
-    timeout=30
-)
-
-if resp.status_code in (200, 201):
-    data = resp.json()
-    wf_id = data.get("id", "unknown")
-    print(f"✅ Workflow created: {wf_id}")
-    print(f"   Name: {data.get('name')}")
-    print(f"   Nodes: {len(data.get('nodes', []))}")
-
-    # Activate it
-    print("Activating workflow...")
-    activate_resp = requests.patch(
-        f"{N8N_URL}/api/v1/workflows/{wf_id}",
+if __name__ == "__main__":
+    print("Creating Trinity DTC Commentator workflow...")
+    resp = requests.post(
+        f"{N8N_URL}/api/v1/workflows",
         headers=headers,
-        json={"active": True},
+        json=workflow,
         verify=False,
-        timeout=15
+        timeout=30
     )
-    if activate_resp.status_code == 200:
-        print(f"✅ Workflow activated!")
+
+    if resp.status_code in (200, 201):
+        data = resp.json()
+        wf_id = data.get("id", "unknown")
+        print(f"✅ Workflow created: {wf_id}")
+        print(f"   Name: {data.get('name')}")
+        print(f"   Nodes: {len(data.get('nodes', []))}")
+
+        # Activate it
+        print("Activating workflow...")
+        activate_resp = requests.patch(
+            f"{N8N_URL}/api/v1/workflows/{wf_id}",
+            headers=headers,
+            json={"active": True},
+            verify=False,
+            timeout=15
+        )
+        if activate_resp.status_code == 200:
+            print(f"✅ Workflow activated!")
+        else:
+            print(f"⚠️ Activation: {activate_resp.status_code} - {activate_resp.text[:200]}")
+
+        # Trigger first execution manually
+        print("Triggering first execution...")
+        # We can't trigger schedule directly, but we can test via manual execution
+        # For now, the hourly schedule will pick it up
+        print(f"🔗 URL: {N8N_URL}/workflow/{wf_id}")
+
     else:
-        print(f"⚠️ Activation: {activate_resp.status_code} - {activate_resp.text[:200]}")
-
-    # Trigger first execution manually
-    print("Triggering first execution...")
-    # We can't trigger schedule directly, but we can test via manual execution
-    # For now, the hourly schedule will pick it up
-    print(f"🔗 URL: {N8N_URL}/workflow/{wf_id}")
-
-else:
-    print(f"❌ Error: {resp.status_code}")
-    print(resp.text[:500])
+        print(f"❌ Error: {resp.status_code}")
+        print(resp.text[:500])

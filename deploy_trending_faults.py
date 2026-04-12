@@ -354,32 +354,32 @@ return [{
     "staticData": None
 }
 
-# Deploy
-print("Creating Trending Faults Daily workflow...")
-resp = requests.post(
-    f"{N8N_URL}/api/v1/workflows",
-    headers=headers,
-    json=workflow,
-    verify=False,
-    timeout=30
-)
-
-if resp.status_code in (200, 201):
-    data = resp.json()
-    wf_id = data.get("id", "unknown")
-    print(f"✅ Workflow created: {wf_id}")
-    print(f"   Name: {data.get('name')}")
-    print(f"   Nodes: {len(data.get('nodes', []))}")
-
-    # Activate
-    act = requests.post(
-        f"{N8N_URL}/api/v1/workflows/{wf_id}/activate",
+if __name__ == "__main__":
+    print("Creating Trending Faults Daily workflow...")
+    resp = requests.post(
+        f"{N8N_URL}/api/v1/workflows",
         headers=headers,
+        json=workflow,
         verify=False,
-        timeout=15
+        timeout=30
     )
-    print(f"   Activated: {act.status_code == 200}")
-    print(f"🔗 URL: {N8N_URL}/workflow/{wf_id}")
-else:
-    print(f"❌ Error: {resp.status_code}")
-    print(resp.text[:500])
+
+    if resp.status_code in (200, 201):
+        data = resp.json()
+        wf_id = data.get("id", "unknown")
+        print(f"✅ Workflow created: {wf_id}")
+        print(f"   Name: {data.get('name')}")
+        print(f"   Nodes: {len(data.get('nodes', []))}")
+
+        # Activate
+        act = requests.post(
+            f"{N8N_URL}/api/v1/workflows/{wf_id}/activate",
+            headers=headers,
+            verify=False,
+            timeout=15
+        )
+        print(f"   Activated: {act.status_code == 200}")
+        print(f"🔗 URL: {N8N_URL}/workflow/{wf_id}")
+    else:
+        print(f"❌ Error: {resp.status_code}")
+        print(resp.text[:500])

@@ -334,44 +334,44 @@ workflow = {
     "staticData": None
 }
 
-print("Creating Telegram Blog on Demand workflow...")
-resp = requests.post(
-    f"{N8N_URL}/api/v1/workflows",
-    headers=headers,
-    json=workflow,
-    verify=False,
-    timeout=30
-)
-
-if resp.status_code in (200, 201):
-    data = resp.json()
-    wf_id = data.get("id")
-    print(f"Created: {wf_id} ({len(data.get('nodes', []))} nodes)")
-
-    act = requests.post(
-        f"{N8N_URL}/api/v1/workflows/{wf_id}/activate",
+if __name__ == "__main__":
+    print("Creating Telegram Blog on Demand workflow...")
+    resp = requests.post(
+        f"{N8N_URL}/api/v1/workflows",
         headers=headers,
+        json=workflow,
         verify=False,
-        timeout=15
+        timeout=30,
     )
-    print(f"Activated: {act.status_code == 200}")
 
-    webhook_url = f"{N8N_URL}/webhook/telegram-blog"
-    print(f"\nWebhook URL: {webhook_url}")
+    if resp.status_code in (200, 201):
+        data = resp.json()
+        wf_id = data.get("id")
+        print(f"Created: {wf_id} ({len(data.get('nodes', []))} nodes)")
 
-    # Register webhook with Telegram Bot API
-    print("\nRegistering Telegram webhook...")
-    tg_resp = requests.post(
-        f"https://api.telegram.org/bot{TELEGRAM_BOT}/setWebhook",
-        json={
-            "url": webhook_url,
-            "allowed_updates": ["message"],
-        },
-        timeout=15
-    )
-    tg_data = tg_resp.json()
-    print(f"Telegram setWebhook: {tg_data.get('ok')} - {tg_data.get('description')}")
+        act = requests.post(
+            f"{N8N_URL}/api/v1/workflows/{wf_id}/activate",
+            headers=headers,
+            verify=False,
+            timeout=15,
+        )
+        print(f"Activated: {act.status_code == 200}")
 
-else:
-    print(f"Error: {resp.status_code}")
-    print(resp.text[:500])
+        webhook_url = f"{N8N_URL}/webhook/telegram-blog"
+        print(f"\nWebhook URL: {webhook_url}")
+
+        print("\nRegistering Telegram webhook...")
+        tg_resp = requests.post(
+            f"https://api.telegram.org/bot{TELEGRAM_BOT}/setWebhook",
+            json={
+                "url": webhook_url,
+                "allowed_updates": ["message"],
+            },
+            timeout=15,
+        )
+        tg_data = tg_resp.json()
+        print(f"Telegram setWebhook: {tg_data.get('ok')} - {tg_data.get('description')}")
+
+    else:
+        print(f"Error: {resp.status_code}")
+        print(resp.text[:500])
