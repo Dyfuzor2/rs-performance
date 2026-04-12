@@ -13,6 +13,8 @@ diagnosta-489719-96def3352c52.json
 git.md
 # Official GitHub MCP Windows binary (run tools/github-mcp-runtime/install-github-mcp.ps1)
 tools/github-mcp-runtime/bin/
+# Local path to php.exe for Laravel Boost MCP launcher (optional)
+tools/laravel-boost-mcp-runtime/php.path
 node_modules
 node_modules
 node_modules

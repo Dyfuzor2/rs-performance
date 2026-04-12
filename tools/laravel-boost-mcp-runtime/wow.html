@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#1a0a0f" />
+  <title>Laravel Boost MCP · RS Gravity · 2026</title>
+  <style>
+    @property --boost-hue { syntax: "<angle>"; inherits: false; initial-value: 12deg; }
+    :root {
+      --bg: oklch(0.11 0.02 15);
+      --glass: color-mix(in oklch, oklch(0.4 0.08 25) 28%, transparent);
+      --border: color-mix(in oklch, oklch(0.85 0.18 25) 28%, transparent);
+      --accent: oklch(0.72 0.22 25);
+      --accent2: oklch(0.55 0.2 280);
+      --text: oklch(0.96 0.01 280);
+      --muted: oklch(0.62 0.02 280);
+      --font: "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      * { animation-duration: 0.01ms !important; }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      font-family: var(--font);
+      color: var(--text);
+      background: var(--bg);
+    }
+    .mesh {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background:
+        radial-gradient(ellipse 100% 80% at 0% 0%, color-mix(in oklch, var(--accent) 42%, transparent), transparent 55%),
+        radial-gradient(ellipse 80% 60% at 100% 100%, color-mix(in oklch, var(--accent2) 35%, transparent), transparent 50%),
+        conic-gradient(from var(--boost-hue) at 50% 50%, oklch(0.25 0.1 25 / 0.4), transparent 40%, oklch(0.2 0.08 300 / 0.35) 70%);
+      animation: hue 36s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes hue {
+      0%, 100% { --boost-hue: 8deg; }
+      50% { --boost-hue: 320deg; }
+    }
+    .grain {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      opacity: 0.04;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      mix-blend-mode: overlay;
+    }
+    .wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 52rem;
+      margin: 0 auto;
+      padding: clamp(1.5rem, 4vw, 3rem);
+    }
+    .badge {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-weight: 750;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 0.35rem 0.7rem;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--glass);
+      backdrop-filter: blur(12px);
+      margin-bottom: 0.75rem;
+    }
+    h1 {
+      font-size: clamp(1.5rem, 3.2vw, 2rem);
+      font-weight: 800;
+      letter-spacing: -0.035em;
+      margin: 0 0 0.5rem;
+      background: linear-gradient(105deg, var(--text), color-mix(in oklch, var(--accent) 65%, var(--text)));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .sub { color: var(--muted); line-height: 1.55; margin-bottom: 1.75rem; max-width: 50ch; }
+    .card {
+      border-radius: 1.15rem;
+      padding: 1.35rem 1.5rem;
+      background: var(--glass);
+      backdrop-filter: blur(16px) saturate(1.4);
+      border: 1px solid var(--border);
+      margin-bottom: 1rem;
+      box-shadow: 0 24px 48px -28px oklch(0 0 0 / 0.55);
+    }
+    .card h2 {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--muted);
+      margin: 0 0 0.85rem;
+    }
+    ol { margin: 0; padding-left: 1.2rem; line-height: 1.65; }
+    code {
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: 0.84em;
+      padding: 0.12em 0.38em;
+      border-radius: 0.35rem;
+      background: oklch(0.18 0.03 280);
+      border: 1px solid oklch(0.32 0.03 280);
+    }
+    a { color: color-mix(in oklch, var(--accent) 85%, white); }
+    .foot { margin-top: 1.5rem; font-size: 0.8rem; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <div class="mesh" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="wrap">
+    <div class="badge">Laravel Boost v2 · MCP stdio</div>
+    <h1>Laravel Boost MCP</h1>
+    <p class="sub">Runtime w <code>G:\gravity\tools\laravel-boost-mcp-runtime</code> (jak GitHub MCP). Uruchamia <code>php artisan boost:mcp</code> w katalogu projektu <strong>G:\gravity</strong> - dokumentacja Laravel, search-docs, narzędzia Boost pod Cursor.</p>
+
+    <div class="card">
+      <h2>Checklist</h2>
+      <ol>
+        <li>Zainstaluj PHP 8.5+ albo ustaw <code>GRAVITY_PHP</code> / plik <code>php.path</code>.</li>
+        <li><code>composer install</code> w <code>G:\gravity</code> (pakiet <code>laravel/boost</code>).</li>
+        <li>Uruchom <code>setup-laravel-boost-wow.ps1</code> lub <code>install-laravel-boost-mcp.ps1</code>.</li>
+        <li>W Cursorze: przeładuj serwer MCP <code>laravel-boost</code>.</li>
+      </ol>
+    </div>
+
+    <div class="card">
+      <h2>Źródło</h2>
+      <p style="margin:0;line-height:1.6">
+        <a href="https://github.com/laravel/boost" target="_blank" rel="noopener">laravel/boost</a>
+        ·
+        <a href="https://laravel.com" target="_blank" rel="noopener">Laravel</a>
+      </p>
+    </div>
+
+    <p class="foot">RS Performance · lokalny MCP (nie VPS) · bez sekretów w tym folderze</p>
+  </div>
+</body>
+</html>

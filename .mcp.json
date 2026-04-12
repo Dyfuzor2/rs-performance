@@ -1,9 +1,15 @@
 {
   "mcpServers": {
     "laravel-boost": {
-      "command": "php",
-      "args": ["artisan", "boost:mcp"],
-      "description": "Laravel Boost MCP integration"
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "G:\\gravity\\tools\\laravel-boost-mcp-runtime\\run-laravel-boost-mcp.ps1"
+      ],
+      "description": "Laravel Boost MCP (local): php artisan boost:mcp from G:\\gravity via tools/laravel-boost-mcp-runtime. PHP: PATH, GRAVITY_PHP, or php.path. Run install-laravel-boost-mcp.ps1 once."
     },
     "qdrant-rs-knowledge": {
       "command": "G:\\gravity\\tools\\qdrant-mcp-runtime\\Scripts\\mcp-server-qdrant.exe",

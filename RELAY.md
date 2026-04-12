@@ -144,12 +144,13 @@ W `RELAY.md` trzymamy tylko lokalizacje i opis. Nie kopiujemy tu samych hasel i 
 
 ### Telegram / GitHub / inne API
 
-| Typ                         | Lokalizacja                                                                                                                                                                                                             |
-| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Telegram bot token / dane   | `G:\gravity\telegram.md`                                                                                                                                                                                                |
-| GitHub token / dane         | `G:\gravity\git.md` jesli istnieje; jesli nie, sprawdz aktualny sekret store poza repo                                                                                                                                  |
+| Typ                         | Lokalizacja                                                                                                                                                                                                                                   |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Telegram bot token / dane   | `G:\gravity\telegram.md`                                                                                                                                                                                                                      |
+| GitHub token / dane         | `G:\gravity\git.md` jesli istnieje; jesli nie, sprawdz aktualny sekret store poza repo                                                                                                                                                        |
 | GitHub MCP (public repos)   | `G:\gravity\tools\github-mcp-runtime\` — `setup-github-mcp-wow.ps1` (albo `install-github-mcp.ps1`) + `test-github-token.ps1`; MCP `github` w `.mcp.json` (read-only, token z env `GITHUB_PERSONAL_ACCESS_TOKEN` lub pierwsza linia `git.md`) |
-| Google Cloud API key / dane | `G:\gravity\cloud.md`                                                                                                                                                                                                   |
+| Laravel Boost MCP (lokalnie) | `G:\gravity\tools\laravel-boost-mcp-runtime\` — `run-laravel-boost-mcp.ps1` (PHP: PATH, `GRAVITY_PHP`, lub `php.path`); MCP `laravel-boost` w `.mcp.json`; projekt: `G:\gravity` (`php artisan boost:mcp`) |
+| Google Cloud API key / dane | `G:\gravity\cloud.md`                                                                                                                                                                                                                         |
 
 ### Runtime secrets na serwerach
 

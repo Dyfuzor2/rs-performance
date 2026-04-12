@@ -1,0 +1,4 @@
+# Copy this file to php.path (gitignored). One non-comment line: full path to php.exe
+# Examples (edit to match your PC):
+# C:\php\php.exe
+# C:\laragon\bin\php\php-8.3.4-Win32-vs16-x64\php.exe

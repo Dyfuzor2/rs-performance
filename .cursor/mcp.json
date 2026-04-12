@@ -1,9 +1,15 @@
 {
   "mcpServers": {
     "laravel-boost": {
-      "command": "php",
-      "args": ["artisan", "boost:mcp"],
-      "cwd": "G:\\gravity"
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "G:\\gravity\\tools\\laravel-boost-mcp-runtime\\run-laravel-boost-mcp.ps1"
+      ],
+      "description": "Laravel Boost MCP via pinned runtime (same pattern as github-mcp). PHP: GRAVITY_PHP or php.path."
     },
     "filesystem-gravity": {
       "command": "npx",
