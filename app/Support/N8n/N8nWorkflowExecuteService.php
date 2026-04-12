@@ -91,19 +91,28 @@ final class N8nWorkflowExecuteService
                 }
 
                 if ($this->shouldAutoResolveWebhookPath()) {
-                    $resolved = $this->webhookPathResolver->resolve($base, $key, $workflowId);
-                    if ($resolved !== null) {
+                    $analysis = $this->webhookPathResolver->analyzeWebhooks($base, $key, $workflowId);
+                    $lastFallback = null;
+
+                    foreach ($analysis['candidates'] as $candidate) {
                         $fallback = $this->postWebhook(
                             $base,
-                            $resolved['path'],
+                            $candidate['path'],
                             $manualWebhookUseTestUrl,
-                            $resolved['http_method'],
+                            $candidate['http_method'],
                         );
                         if ($fallback['ok']) {
                             return $this->mergeWebhookSuccessNote($fallback, $apiResult, true);
                         }
+                        $lastFallback = $fallback;
+                    }
 
-                        return $this->mergeExecuteAndWebhookErrors($apiResult, $fallback);
+                    if ($lastFallback !== null) {
+                        return $this->mergeExecuteAndWebhookErrors($apiResult, $lastFallback);
+                    }
+
+                    if ($analysis['public_hint'] !== '') {
+                        return $this->appendHintToExecuteFailure($apiResult, $analysis['public_hint']);
                     }
                 }
             }
@@ -112,6 +121,17 @@ final class N8nWorkflowExecuteService
         }
 
         return $this->postWebhook($base, $webhookPath, $manualWebhookUseTestUrl, 'POST');
+    }
+
+    /**
+     * @param  array<string, mixed>  $apiResult
+     * @return array<string, mixed>
+     */
+    private function appendHintToExecuteFailure(array $apiResult, string $hint): array
+    {
+        $apiResult['message'] .= ' Auto-webhook: ' . $hint;
+
+        return $apiResult;
     }
 
     private function shouldAutoResolveWebhookPath(): bool
@@ -244,6 +264,49 @@ final class N8nWorkflowExecuteService
             $method = 'POST';
         }
 
+        $first = $this->sendSingleWebhookAttempt($url, $method);
+        if ($first['ok']) {
+            return $first;
+        }
+
+        if ($first['http_status'] === 405 && ($method === 'POST' || $method === 'GET')) {
+            $alternate = $method === 'POST' ? 'GET' : 'POST';
+            $second = $this->sendSingleWebhookAttempt($url, $alternate);
+            if ($second['ok']) {
+                $second['message'] .= sprintf(
+                    ' (najpierw %s → HTTP 405, zastosowano %s).',
+                    $method,
+                    $alternate,
+                );
+
+                return $second;
+            }
+
+            return [
+                'ok' => false,
+                'message' => $first['message'] . ' Druga próba (' . $alternate . '): ' . $second['message'],
+                'http_status' => $second['http_status'] ?? $first['http_status'],
+                'execution_id' => null,
+                'waiting_for_webhook' => null,
+                'api_message' => $second['api_message'] ?? $first['api_message'],
+            ];
+        }
+
+        return $first;
+    }
+
+    /**
+     * @return array{
+     *     ok: bool,
+     *     message: string,
+     *     http_status: ?int,
+     *     execution_id: string|int|null,
+     *     waiting_for_webhook: ?bool,
+     *     api_message: ?string
+     * }
+     */
+    private function sendSingleWebhookAttempt(string $url, string $method): array
+    {
         try {
             $response = $this->sendWebhookHttpRequest($url, $method);
 

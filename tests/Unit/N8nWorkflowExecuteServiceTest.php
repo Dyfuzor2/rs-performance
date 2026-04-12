@@ -131,7 +131,8 @@ final class N8nWorkflowExecuteServiceTest extends TestCase
         $this->assertFalse($r['ok']);
         $this->assertSame(405, $r['http_status']);
         $this->assertStringContainsString('405', $r['message']);
-        $this->assertStringContainsString('webhook', strtolower($r['message']));
+        $this->assertStringContainsString('Auto-webhook:', $r['message']);
+        $this->assertStringContainsString('harmonogram', strtolower($r['message']));
     }
 
     public function test_execute_405_auto_resolves_webhook_from_get_workflow(): void
@@ -186,6 +187,94 @@ final class N8nWorkflowExecuteServiceTest extends TestCase
         $this->assertFalse($r['ok']);
         $this->assertSame(405, $r['http_status']);
         $this->assertCount(1, Http::recorded(), 'Tylko POST execute — bez GET workflow gdy auto-resolve wyłączone.');
+    }
+
+    public function test_webhook_retries_get_when_post_returns_405(): void
+    {
+        Config::set('n8n.public_api.base_url', 'https://n8n.example.test');
+        Config::set('n8n.public_api.key', 'test-key');
+        Config::set('n8n.public_api.auto_resolve_webhook_path', true);
+
+        Http::fake([
+            'https://n8n.example.test/api/v1/workflows/wf-abc/execute' => Http::response([
+                'message' => 'POST method not allowed',
+            ], 405),
+            'https://n8n.example.test/api/v1/workflows/wf-abc' => Http::response([
+                'nodes' => [
+                    [
+                        'type' => 'n8n-nodes-base.webhook',
+                        'disabled' => false,
+                        'parameters' => [
+                            'path' => 'get-only',
+                            'httpMethod' => 'POST',
+                        ],
+                    ],
+                ],
+            ], 200),
+            'https://n8n.example.test/webhook/get-only' => Http::sequence()
+                ->push(['message' => 'Method Not Allowed'], 405)
+                ->push(['executionId' => 88], 200),
+        ]);
+
+        $r = app(N8nWorkflowExecuteService::class)->execute('wf-abc');
+
+        $this->assertTrue($r['ok']);
+        $this->assertSame(88, $r['execution_id']);
+        $this->assertStringContainsString('405', $r['message']);
+    }
+
+    public function test_execute_tries_second_webhook_when_first_fails(): void
+    {
+        Config::set('n8n.public_api.base_url', 'https://n8n.example.test');
+        Config::set('n8n.public_api.key', 'test-key');
+        Config::set('n8n.public_api.auto_resolve_webhook_path', true);
+
+        Http::fake([
+            'https://n8n.example.test/api/v1/workflows/wf-abc/execute' => Http::response([
+                'message' => 'POST method not allowed',
+            ], 405),
+            'https://n8n.example.test/api/v1/workflows/wf-abc' => Http::response([
+                'nodes' => [
+                    [
+                        'type' => 'n8n-nodes-base.webhook',
+                        'disabled' => false,
+                        'parameters' => ['path' => 'bad', 'httpMethod' => 'POST'],
+                    ],
+                    [
+                        'type' => 'n8n-nodes-base.webhook',
+                        'disabled' => false,
+                        'parameters' => ['path' => 'good', 'httpMethod' => 'POST'],
+                    ],
+                ],
+            ], 200),
+            'https://n8n.example.test/webhook/bad' => Http::response(['message' => 'gone'], 404),
+            'https://n8n.example.test/webhook/good' => Http::response(['executionId' => 55], 200),
+        ]);
+
+        $r = app(N8nWorkflowExecuteService::class)->execute('wf-abc');
+
+        $this->assertTrue($r['ok']);
+        $this->assertSame(55, $r['execution_id']);
+    }
+
+    public function test_execute_appends_hint_when_get_workflow_returns_403(): void
+    {
+        Config::set('n8n.public_api.base_url', 'https://n8n.example.test');
+        Config::set('n8n.public_api.key', 'test-key');
+        Config::set('n8n.public_api.auto_resolve_webhook_path', true);
+
+        Http::fake([
+            'https://n8n.example.test/api/v1/workflows/wf-abc/execute' => Http::response([
+                'message' => 'POST method not allowed',
+            ], 405),
+            'https://n8n.example.test/api/v1/workflows/wf-abc' => Http::response([], 403),
+        ]);
+
+        $r = app(N8nWorkflowExecuteService::class)->execute('wf-abc');
+
+        $this->assertFalse($r['ok']);
+        $this->assertStringContainsString('Auto-webhook:', $r['message']);
+        $this->assertStringContainsString('403', $r['message']);
     }
 
     public function test_webhook_only_does_not_require_api_key(): void

@@ -131,4 +131,35 @@ final class N8nWorkflowWebhookPathResolverTest extends TestCase
 
         $this->assertNull($r);
     }
+
+    public function test_analyze_webhooks_returns_all_candidates_in_order(): void
+    {
+        Http::fake([
+            'https://n8n.example.test/api/v1/workflows/wf-1' => Http::response([
+                'nodes' => [
+                    [
+                        'type' => 'n8n-nodes-base.webhook',
+                        'disabled' => false,
+                        'parameters' => ['path' => 'a', 'httpMethod' => 'POST'],
+                    ],
+                    [
+                        'type' => 'n8n-nodes-base.webhook',
+                        'disabled' => false,
+                        'parameters' => ['path' => 'b', 'httpMethod' => 'GET'],
+                    ],
+                ],
+            ], 200),
+        ]);
+
+        $a = app(N8nWorkflowWebhookPathResolver::class)->analyzeWebhooks(
+            'https://n8n.example.test',
+            'k',
+            'wf-1',
+        );
+
+        $this->assertSame('ok', $a['fetch_status']);
+        $this->assertCount(2, $a['candidates']);
+        $this->assertSame('a', $a['candidates'][0]['path']);
+        $this->assertSame('b', $a['candidates'][1]['path']);
+    }
 }

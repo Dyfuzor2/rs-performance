@@ -8,20 +8,27 @@ use Illuminate\Support\Facades\Http;
 use Throwable;
 
 /**
- * Reads workflow JSON from n8n Public API and finds the first active Webhook trigger path.
+ * Reads workflow JSON from n8n Public API and lists Webhook trigger paths.
  */
 final class N8nWorkflowWebhookPathResolver
 {
-    private const WEBHOOK_NODE_TYPE = 'n8n-nodes-base.webhook';
-
     /**
-     * @return array{path: string, http_method: string}|null
+     * @return array{
+     *     fetch_status: 'ok'|'http_error'|'exception'|'invalid_body',
+     *     fetch_http_status?: int,
+     *     candidates: list<array{path: string, http_method: string}>,
+     *     public_hint: string
+     * }
      */
-    public function resolve(string $base, string $key, string $workflowId): ?array
+    public function analyzeWebhooks(string $base, string $key, string $workflowId): array
     {
         $workflowId = trim($workflowId);
         if ($workflowId === '' || $key === '') {
-            return null;
+            return [
+                'fetch_status' => 'exception',
+                'candidates' => [],
+                'public_hint' => 'Brak ID workflow lub klucza API — nie można pobrać definicji z n8n.',
+            ];
         }
 
         $base = rtrim($base, '/');
@@ -35,24 +42,53 @@ final class N8nWorkflowWebhookPathResolver
                 ])
                 ->get($url);
         } catch (Throwable) {
-            return null;
+            return [
+                'fetch_status' => 'exception',
+                'candidates' => [],
+                'public_hint' => 'Błąd sieci przy GET definicji workflow z n8n.',
+            ];
         }
 
         if (! $response->successful()) {
-            return null;
+            return [
+                'fetch_status' => 'http_error',
+                'fetch_http_status' => $response->status(),
+                'candidates' => [],
+                'public_hint' => sprintf(
+                    'GET /api/v1/workflows/{id} zwróciło HTTP %d — sprawdź ID workflow, N8N_API_URL i uprawnienia klucza API (np. workflow:read).',
+                    $response->status(),
+                ),
+            ];
         }
 
         $payload = $response->json();
         if (! is_array($payload)) {
-            return null;
+            return [
+                'fetch_status' => 'invalid_body',
+                'candidates' => [],
+                'public_hint' => 'Odpowiedź n8n nie jest poprawnym JSON (definicja workflow).',
+            ];
         }
 
-        $nodes = $this->extractNodes($payload);
-        if ($nodes === null) {
-            return null;
+        $nodesResult = $this->extractNodesList($payload);
+        if ($nodesResult === null) {
+            return [
+                'fetch_status' => 'ok',
+                'candidates' => [],
+                'public_hint' => 'Odpowiedź API nie zawiera tablicy nodes (niektóre wersje n8n lub ograniczony klucz API) — uzupełnij „Ścieżkę ręcznego webhooka” albo zaktualizuj n8n / scope klucza.',
+            ];
         }
 
-        foreach ($nodes as $node) {
+        if ($nodesResult === []) {
+            return [
+                'fetch_status' => 'ok',
+                'candidates' => [],
+                'public_hint' => 'Workflow ma pustą listę węzłów (nodes) — nie da się wykryć webhooka.',
+            ];
+        }
+
+        $candidates = [];
+        foreach ($nodesResult as $node) {
             if (! is_array($node)) {
                 continue;
             }
@@ -62,7 +98,7 @@ final class N8nWorkflowWebhookPathResolver
             }
 
             $type = (string) ($node['type'] ?? '');
-            if ($type !== self::WEBHOOK_NODE_TYPE) {
+            if (! $this->isWebhookTriggerNode($type)) {
                 continue;
             }
 
@@ -75,36 +111,68 @@ final class N8nWorkflowWebhookPathResolver
                 continue;
             }
 
-            $httpMethod = $this->extractHttpMethod($node);
-
-            return [
+            $candidates[] = [
                 'path' => $path,
-                'http_method' => $httpMethod,
+                'http_method' => $this->extractHttpMethod($node),
             ];
         }
 
-        return null;
+        if ($candidates === []) {
+            return [
+                'fetch_status' => 'ok',
+                'candidates' => [],
+                'public_hint' => 'W grafie nie ma aktywnego węzła Webhook (tylko harmonogram, inne triggery lub wyłączony Webhook). Dodaj Webhook do ręcznego startu, wpisz ścieżkę w rekordzie albo uruchom workflow w edytorze n8n.',
+            ];
+        }
+
+        return [
+            'fetch_status' => 'ok',
+            'candidates' => $candidates,
+            'public_hint' => '',
+        ];
+    }
+
+    /**
+     * @return array{path: string, http_method: string}|null
+     */
+    public function resolve(string $base, string $key, string $workflowId): ?array
+    {
+        $analysis = $this->analyzeWebhooks($base, $key, $workflowId);
+        $first = $analysis['candidates'][0] ?? null;
+
+        return $first;
+    }
+
+    private function isWebhookTriggerNode(string $type): bool
+    {
+        if ($type === 'n8n-nodes-base.webhook' || $type === '@n8n/n8n-nodes-base.webhook') {
+            return true;
+        }
+
+        return str_ends_with($type, 'nodes-base.webhook');
     }
 
     /**
      * @param  array<string, mixed>  $payload
-     * @return list<mixed>|null
+     * @return list<mixed>|null null = brak / nieprawidłowa struktura nodes
      */
-    private function extractNodes(array $payload): ?array
+    private function extractNodesList(array $payload): ?array
     {
-        if (isset($payload['nodes']) && is_array($payload['nodes'])) {
-            /** @var list<mixed> $nodes */
-            $nodes = $payload['nodes'];
+        if (array_key_exists('nodes', $payload)) {
+            if (! is_array($payload['nodes'])) {
+                return null;
+            }
 
-            return $nodes;
+            return array_values($payload['nodes']);
         }
 
         $data = $payload['data'] ?? null;
-        if (is_array($data) && isset($data['nodes']) && is_array($data['nodes'])) {
-            /** @var list<mixed> $nodes */
-            $nodes = $data['nodes'];
+        if (is_array($data) && array_key_exists('nodes', $data)) {
+            if (! is_array($data['nodes'])) {
+                return null;
+            }
 
-            return $nodes;
+            return array_values($data['nodes']);
         }
 
         return null;
@@ -175,6 +243,6 @@ final class N8nWorkflowWebhookPathResolver
             return false;
         }
 
-        return preg_match('#^[a-zA-Z0-9/_\-.]+$#', $path) === 1;
+        return preg_match('#^[a-zA-Z0-9/_\-.+]+$#', $path) === 1;
     }
 }

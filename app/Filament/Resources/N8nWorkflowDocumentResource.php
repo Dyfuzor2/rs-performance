@@ -105,10 +105,18 @@ final class N8nWorkflowDocumentResource extends Resource
             return;
         }
 
+        $failTitle = 'Nie udało się wyzwolić workflow';
+        $failBody = $result['message'];
+        if (str_contains($failBody, 'Auto-webhook:')) {
+            $failTitle = 'n8n: brak działającego webhooka lub błąd GET workflow';
+        } elseif (str_contains($failBody, 'Próba webhooka:')) {
+            $failTitle = 'n8n: webhook odrzuł żądanie (execute w API niedostępny)';
+        }
+
         Notification::make()
             ->id('n8n-trigger-fail-' . $nid)
-            ->title('Nie udało się wyzwolić workflow')
-            ->body($result['message'])
+            ->title($failTitle)
+            ->body($failBody)
             ->danger()
             ->persistent()
             ->send();
