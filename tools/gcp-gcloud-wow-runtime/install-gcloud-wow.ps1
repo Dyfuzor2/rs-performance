@@ -15,8 +15,8 @@ $hasGcloud = $null -ne (Get-Command gcloud.cmd -ErrorAction SilentlyContinue) -o
 
 if ($hasGcloud) {
     Write-Host 'gcloud already on PATH:'
-    & gcloud.cmd version 2>$null
-    if ($LASTEXITCODE -ne 0) { gcloud version }
+    # gcloud prints "updates available" on stderr — merge streams so $ErrorActionPreference Stop does not abort.
+    & gcloud.cmd version 2>&1 | ForEach-Object { Write-Host $_ }
     exit 0
 }
 
