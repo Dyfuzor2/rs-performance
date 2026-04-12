@@ -65,6 +65,21 @@ return [
     'public_api' => [
         'base_url' => $normalizeN8nBaseUrl(env('N8N_API_URL')),
         'key' => $normalizeN8nApiKey(env('N8N_API_KEY')),
+        /*
+        | Operator links — Public API workflow execute (upstream PR #20234, docs.n8n.io/api).
+        | Used in Filament WOW hub + `php artisan n8n:probe-public-api` hints only (no runtime deps).
+        */
+        'execute_docs_url' => env('N8N_PUBLIC_API_EXECUTE_DOCS_URL', 'https://docs.n8n.io/api/'),
+        'execute_upstream_pr_url' => env('N8N_EXECUTE_UPSTREAM_PR_URL', 'https://github.com/n8n-io/n8n/pull/20234'),
+        /*
+        | Po 404/405 na POST …/workflows/{id}/execute: odczytaj pierwszy aktywny węzeł Webhook
+        | przez GET /api/v1/workflows/{id} i wywołaj /webhook/{path} (bez ręcznego pola w Filament).
+        | Wyłącz: N8N_AUTO_RESOLVE_WEBHOOK_PATH=false
+        */
+        'auto_resolve_webhook_path' => filter_var(
+            env('N8N_AUTO_RESOLVE_WEBHOOK_PATH', 'true'),
+            FILTER_VALIDATE_BOOLEAN
+        ),
     ],
 
     /*

@@ -73,15 +73,30 @@ final class N8nWorkflowDocumentResource extends Resource
         return $user instanceof User && $user->isRoot();
     }
 
+    public static function recordCanTrigger(N8nWorkflowDocument $r): bool
+    {
+        $hasId = $r->n8n_workflow_id !== null && $r->n8n_workflow_id !== '';
+        $path = $r->manual_webhook_path !== null ? trim((string) $r->manual_webhook_path) : '';
+
+        return $hasId || $path !== '';
+    }
+
     /**
-     * Wyzwala workflow przez Public API (POST /api/v1/workflows/{id}/execute) i pokazuje toast.
+     * Wyzwala workflow: najpierw Public API execute, przy 404/405 — opcjonalnie POST na webhook (ścieżka z węzła Webhook).
      */
     public static function notifyTriggerWorkflowExecution(N8nWorkflowDocument $record): void
     {
-        $result = app(N8nWorkflowExecuteService::class)->execute((string) ($record->n8n_workflow_id ?? ''));
+        $result = app(N8nWorkflowExecuteService::class)->execute(
+            (string) ($record->n8n_workflow_id ?? ''),
+            $record->manual_webhook_path,
+            (bool) $record->manual_webhook_use_test_url,
+        );
+
+        $nid = (string) $record->getKey();
 
         if ($result['ok']) {
             Notification::make()
+                ->id('n8n-trigger-ok-' . $nid)
                 ->title('Workflow wyzwolony')
                 ->body($result['message'])
                 ->success()
@@ -91,6 +106,7 @@ final class N8nWorkflowDocumentResource extends Resource
         }
 
         Notification::make()
+            ->id('n8n-trigger-fail-' . $nid)
             ->title('Nie udało się wyzwolić workflow')
             ->body($result['message'])
             ->danger()
@@ -109,14 +125,14 @@ final class N8nWorkflowDocumentResource extends Resource
             ->color('warning')
             ->requiresConfirmation()
             ->modalHeading('Wyzwolenie workflow w n8n')
-            ->modalDescription('Wyśle POST do Public API: /api/v1/workflows/{id}/execute (nagłówek X-N8N-API-KEY). Upewnij się, że klucz API ma uprawnienie workflow:execute.')
+            ->modalDescription('Najpierw: POST /api/v1/workflows/{id}/execute (X-N8N-API-KEY). Przy 404/405 wywołanie idzie na /webhook/… (ścieżka z pola „Ścieżka ręcznego webhooka” lub automatycznie z pierwszego aktywnego węzła Webhook — GET /api/v1/workflows/{id}). Pełny https://… z węzła też obsługiwany.')
             ->modalSubmitActionLabel('Wyzwól');
     }
 
     public static function triggerWorkflowTableAction(): Action
     {
         return self::makeTriggerWorkflowAction()
-            ->visible(fn (N8nWorkflowDocument $r): bool => $r->n8n_workflow_id !== null && $r->n8n_workflow_id !== '')
+            ->visible(fn (N8nWorkflowDocument $r): bool => self::recordCanTrigger($r))
             ->action(function (N8nWorkflowDocument $record): void {
                 self::notifyTriggerWorkflowExecution($record);
             });
@@ -155,6 +171,16 @@ final class N8nWorkflowDocumentResource extends Resource
                         ->label('ID workflow w n8n')
                         ->maxLength(64)
                         ->placeholder('np. W1xRg73xFDUXYrRI'),
+                    Forms\Components\TextInput::make('manual_webhook_path')
+                        ->label('Ścieżka ręcznego webhooka')
+                        ->maxLength(512)
+                        ->placeholder('np. rs-daily-news lub pełny https://…/webhook/…')
+                        ->helperText('Z węzła Webhook (Production URL — część po /webhook/). Gdy Public API nie ma POST …/execute (np. HTTP 405), „Wyzwól” użyje tego pola jako fallback.')
+                        ->columnSpanFull(),
+                    Forms\Components\Toggle::make('manual_webhook_use_test_url')
+                        ->label('Użyj ścieżki testowej (/webhook-test/)')
+                        ->helperText('Tylko do testów z edytora — produkcja zwykle wymaga aktywnego workflow i /webhook/.')
+                        ->default(false),
                     Forms\Components\Select::make('category')
                         ->label('Kategoria')
                         ->options(collect(N8nWorkflowCategory::cases())->mapWithKeys(
@@ -215,6 +241,7 @@ final class N8nWorkflowDocumentResource extends Resource
                         . '<p class="relative mt-3 max-w-4xl text-[13px] leading-relaxed text-slate-200">Dokumentacja operacyjna: <strong class="text-white">co robi workflow</strong>, API, harmonogram, Telegram. <strong class="text-white">Public REST API</strong> (sync, „Graf n8n”, execute) = docker <strong class="text-white">n8n na VPS</strong> — <code class="rounded-md bg-black/40 px-1 font-mono text-cyan-200">N8N_API_URL</code> + <code class="rounded-md bg-black/40 px-1 font-mono text-cyan-200">N8N_API_KEY</code> w <code class="rounded-md bg-black/40 px-1 font-mono text-cyan-200">.env</code> hostingu. Osobno: <strong class="text-white">n8n-mcp</strong> (HTTP + <code class="rounded-md bg-black/40 px-1 font-mono text-fuchsia-200">AUTH_TOKEN</code>) — narzędzia dla Cursora; status w kafelku „MCP HTTP (VPS)”.</p>'
                         . '<p class="relative mt-2 text-xs text-slate-300">Aktywny host Public API: <code class="rounded-md bg-black/50 px-1.5 py-0.5 font-mono text-emerald-200">' . e(N8nConfigPresenter::publicApiHostLabel()) . '</code></p>'
                         . '<p class="relative mt-2 text-xs text-slate-400">Most hosting ↔ wywołania HTTP z n8n: <code class="rounded-md bg-black/40 px-1.5 py-0.5 font-mono text-rose-200">php artisan ops:verify-n8n-hosting-bridge</code> — spójność <code class="rounded-md bg-black/40 px-1 font-mono">N8N_API_TOKEN</code> z nagłówkami w workflowach.</p>'
+                        . '<p class="relative mt-2 text-xs text-slate-400">Kwiecień 2026+ — sonda execute API + upgrade path: <code class="rounded-md bg-black/40 px-1.5 py-0.5 font-mono text-cyan-200">php artisan n8n:probe-public-api --fresh</code> (CLI = ten sam snapshot co kafelek „WOW · Public API execute”).</p>'
                         . '</div>'
                 )
             )
