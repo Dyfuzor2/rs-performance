@@ -133,14 +133,14 @@ final class N8nWorkflowDocumentResource extends Resource
             ->color('warning')
             ->requiresConfirmation()
             ->modalHeading('Wyzwolenie workflow w n8n')
-            ->modalDescription('Najpierw: POST /api/v1/workflows/{id}/execute (X-N8N-API-KEY). Przy 404/405 wywołanie idzie na /webhook/… (ścieżka z pola „Ścieżka ręcznego webhooka” lub automatycznie z pierwszego aktywnego węzła Webhook — GET /api/v1/workflows/{id}). Pełny https://… z węzła też obsługiwany.')
+            ->modalDescription('Najpierw: POST …/execute. Przy 404/405 — POST/GET na /webhook/… (pole „Ścieżka ręcznego webhooka” lub auto z GET workflow). Ścieżki z :param (np. orders/:id) są OK; dynamiczne {{ }} w n8n wymagają ręcznej ścieżki. Same cron/harmonogram = dodaj Webhook w n8n lub wpisz ścieżkę.')
             ->modalSubmitActionLabel('Wyzwól');
     }
 
     public static function triggerWorkflowTableAction(): Action
     {
         return self::makeTriggerWorkflowAction()
-            ->visible(fn (N8nWorkflowDocument $r): bool => self::recordCanTrigger($r))
+            ->visible(fn(N8nWorkflowDocument $r): bool => self::recordCanTrigger($r))
             ->action(function (N8nWorkflowDocument $record): void {
                 self::notifyTriggerWorkflowExecution($record);
             });
@@ -183,7 +183,7 @@ final class N8nWorkflowDocumentResource extends Resource
                         ->label('Ścieżka ręcznego webhooka')
                         ->maxLength(512)
                         ->placeholder('np. rs-daily-news lub pełny https://…/webhook/…')
-                        ->helperText('Z węzła Webhook (Production URL — część po /webhook/). Gdy Public API nie ma POST …/execute (np. HTTP 405), „Wyzwól” użyje tego pola jako fallback.')
+                        ->helperText('Z węzła Webhook: część ścieżki po /webhook/ (albo pełny https://…/webhook/…). Przy HTTP 405 na execute API (typowe n8n 2.14–2.15) to pole jest wymagane, jeśli workflow ma tylko harmonogram — dodaj w grafie węzeł Webhook z **stałą** ścieżką (bez {{ }}), albo wklej ścieżkę tutaj.')
                         ->columnSpanFull(),
                     Forms\Components\Toggle::make('manual_webhook_use_test_url')
                         ->label('Użyj ścieżki testowej (/webhook-test/)')
@@ -192,7 +192,7 @@ final class N8nWorkflowDocumentResource extends Resource
                     Forms\Components\Select::make('category')
                         ->label('Kategoria')
                         ->options(collect(N8nWorkflowCategory::cases())->mapWithKeys(
-                            fn (N8nWorkflowCategory $c): array => [$c->value => $c->label()]
+                            fn(N8nWorkflowCategory $c): array => [$c->value => $c->label()]
                         ))
                         ->required()
                         ->native(false),
@@ -263,12 +263,12 @@ final class N8nWorkflowDocumentResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->weight('bold')
-                    ->description(fn (N8nWorkflowDocument $r): ?string => $r->summary),
+                    ->description(fn(N8nWorkflowDocument $r): ?string => $r->summary),
                 Tables\Columns\TextColumn::make('category')
                     ->label('Kategoria')
                     ->badge()
-                    ->formatStateUsing(fn (?N8nWorkflowCategory $state): string => $state?->label() ?? '—')
-                    ->color(fn (?N8nWorkflowCategory $state): string => $state?->filamentBadgeColor() ?? 'gray'),
+                    ->formatStateUsing(fn(?N8nWorkflowCategory $state): string => $state?->label() ?? '—')
+                    ->color(fn(?N8nWorkflowCategory $state): string => $state?->filamentBadgeColor() ?? 'gray'),
                 Tables\Columns\TextColumn::make('n8n_workflow_id')
                     ->label('n8n ID')
                     ->fontFamily('mono')
@@ -293,7 +293,7 @@ final class N8nWorkflowDocumentResource extends Resource
                 Tables\Filters\SelectFilter::make('category')
                     ->label('Kategoria')
                     ->options(collect(N8nWorkflowCategory::cases())->mapWithKeys(
-                        fn (N8nWorkflowCategory $c): array => [$c->value => $c->label()]
+                        fn(N8nWorkflowCategory $c): array => [$c->value => $c->label()]
                     )),
                 Tables\Filters\TernaryFilter::make('is_visible')
                     ->label('Widoczny'),
@@ -305,9 +305,9 @@ final class N8nWorkflowDocumentResource extends Resource
                     ->label('Graf n8n')
                     ->icon('heroicon-o-arrow-top-right-on-square')
                     ->color('info')
-                    ->url(fn (N8nWorkflowDocument $r): ?string => $r->editorUrl())
+                    ->url(fn(N8nWorkflowDocument $r): ?string => $r->editorUrl())
                     ->openUrlInNewTab()
-                    ->visible(fn (N8nWorkflowDocument $r): bool => $r->editorUrl() !== null),
+                    ->visible(fn(N8nWorkflowDocument $r): bool => $r->editorUrl() !== null),
             ])
             ->bulkActions([
                 BulkActionGroup::make([

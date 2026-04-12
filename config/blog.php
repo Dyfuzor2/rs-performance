@@ -3,6 +3,11 @@
 declare(strict_types=1);
 
 return [
+    /**
+     * PHP CLI used by web-triggered background `artisan` (Telegram webhook, API dispatch).
+     * On shared hosting, FPM often lacks `php85` in PATH for non-interactive bash — set full path, e.g. /usr/local/bin/php85.
+     */
+    'php_cli_binary' => env('BLOG_PHP_CLI', 'php85'),
     'webhook_key' => env('BLOG_DRAFT_WEBHOOK_KEY', ''),
     'pipeline_key' => env('BLOG_PIPELINE_WEBHOOK_KEY', env('BLOG_DRAFT_WEBHOOK_KEY', '')),
     'telegram_bot_token' => env('BLOG_TELEGRAM_BOT_TOKEN', ''),

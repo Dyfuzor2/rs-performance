@@ -88,6 +88,7 @@ final class N8nWorkflowWebhookPathResolver
         }
 
         $candidates = [];
+        $activeWebhookNodes = 0;
         foreach ($nodesResult as $node) {
             if (! is_array($node)) {
                 continue;
@@ -102,6 +103,8 @@ final class N8nWorkflowWebhookPathResolver
                 continue;
             }
 
+            $activeWebhookNodes++;
+
             $path = $this->extractWebhookPath($node);
             if ($path === null || $path === '') {
                 continue;
@@ -114,6 +117,14 @@ final class N8nWorkflowWebhookPathResolver
             $candidates[] = [
                 'path' => $path,
                 'http_method' => $this->extractHttpMethod($node),
+            ];
+        }
+
+        if ($candidates === [] && $activeWebhookNodes > 0) {
+            return [
+                'fetch_status' => 'ok',
+                'candidates' => [],
+                'public_hint' => 'Jest aktywny węzeł Webhook, ale ścieżka jest pusta, wyrażeniem ({{…}}) albo zawiera niedozwolone znaki — w n8n ustaw stałą ścieżkę (np. rs-moj-flow) albo wklej pełny Production URL / fragment po /webhook/ w polu „Ścieżka ręcznego webhooka”.',
             ];
         }
 
@@ -173,6 +184,15 @@ final class N8nWorkflowWebhookPathResolver
             }
 
             return array_values($data['nodes']);
+        }
+
+        $workflow = $payload['workflow'] ?? null;
+        if (is_array($workflow) && array_key_exists('nodes', $workflow)) {
+            if (! is_array($workflow['nodes'])) {
+                return null;
+            }
+
+            return array_values($workflow['nodes']);
         }
 
         return null;
@@ -243,6 +263,7 @@ final class N8nWorkflowWebhookPathResolver
             return false;
         }
 
-        return preg_match('#^[a-zA-Z0-9/_\-.+]+$#', $path) === 1;
+        /** Colon allowed — n8n route params, e.g. orders/:id */
+        return preg_match('#^[a-zA-Z0-9/_\-.:+]+$#', $path) === 1;
     }
 }

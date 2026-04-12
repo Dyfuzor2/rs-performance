@@ -11,13 +11,19 @@ use Throwable;
 /**
  * Live probe for n8n Public REST API (Settings → API key, header X-N8N-API-KEY).
  *
+ * April 2026+ — dodatkowo wykrywa, czy instancja obsługuje POST /api/v1/workflows/{id}/execute
+ * (hybrid z webhook fallback w N8nWorkflowExecuteService przy HTTP 405).
+ *
  * @see https://docs.n8n.io/api/authentication/
  */
 final class N8nPublicApiHealthService
 {
     private const CACHE_TTL_SECONDS = 20;
 
-    private const CACHE_KEY = 'n8n_public_api_health_snapshot_v2';
+    private const CACHE_KEY = 'n8n_public_api_health_snapshot_v3';
+
+    /** Fikcyjny UUID — nie istniejący workflow; 404 oznacza „trasa execute jest”, 405 „brak endpointu”. */
+    private const EXECUTE_PROBE_WORKFLOW_ID = '00000000-0000-4000-8000-000000000001';
 
     /**
      * @return array{
@@ -34,6 +40,9 @@ final class N8nPublicApiHealthService
      *     mcp_health_ok: ?bool,
      *     mcp_latency_ms: ?float,
      *     mcp_label: string,
+     *     execute_post_supported: ?bool,
+     *     execute_probe_http_status: ?int,
+     *     execute_probe_detail: ?string,
      * }
      */
     public function snapshot(): array
@@ -43,7 +52,7 @@ final class N8nPublicApiHealthService
         $envConfigured = $base !== '' && $key !== '';
 
         if (! $envConfigured) {
-            return [
+            return array_merge([
                 'ok' => false,
                 'message' => 'Uzupełnij N8N_API_URL i N8N_API_KEY w .env (Settings → API w n8n).',
                 'latency_ms' => null,
@@ -57,7 +66,7 @@ final class N8nPublicApiHealthService
                 'mcp_health_ok' => null,
                 'mcp_latency_ms' => null,
                 'mcp_label' => (string) config('n8n.mcp_http.public_label'),
-            ];
+            ], $this->executeProbeDefaults());
         }
 
         return Cache::remember(
@@ -78,7 +87,13 @@ final class N8nPublicApiHealthService
      *     base_url: string,
      *     env_configured: bool,
      *     api_message: ?string,
-     *     hints: list<string>
+     *     hints: list<string>,
+     *     mcp_health_ok: ?bool,
+     *     mcp_latency_ms: ?float,
+     *     mcp_label: string,
+     *     execute_post_supported: ?bool,
+     *     execute_probe_http_status: ?int,
+     *     execute_probe_detail: ?string,
      * }
      */
     public function probeFresh(): array
@@ -97,6 +112,22 @@ final class N8nPublicApiHealthService
 
     /**
      * @return array{
+     *     execute_post_supported: ?bool,
+     *     execute_probe_http_status: ?int,
+     *     execute_probe_detail: ?string,
+     * }
+     */
+    private function executeProbeDefaults(): array
+    {
+        return [
+            'execute_post_supported' => null,
+            'execute_probe_http_status' => null,
+            'execute_probe_detail' => null,
+        ];
+    }
+
+    /**
+     * @return array{
      *     ok: bool,
      *     message: string,
      *     latency_ms: ?float,
@@ -110,6 +141,9 @@ final class N8nPublicApiHealthService
      *     mcp_health_ok: ?bool,
      *     mcp_latency_ms: ?float,
      *     mcp_label: string,
+     *     execute_post_supported: ?bool,
+     *     execute_probe_http_status: ?int,
+     *     execute_probe_detail: ?string,
      * }
      */
     private function probeUncached(string $base, string $key): array
@@ -148,6 +182,8 @@ final class N8nPublicApiHealthService
             $apiMessage = $this->extractApiMessage($payload);
 
             if ($response->successful()) {
+                $executeProbe = $this->probeWorkflowExecuteEndpoint($base, $key);
+
                 return [
                     'ok' => true,
                     'message' => sprintf('REST API v1 OK · próbka %d workflowów', $sampleCount ?? 0),
@@ -162,6 +198,7 @@ final class N8nPublicApiHealthService
                     'mcp_health_ok' => $mcpProbe['ok'],
                     'mcp_latency_ms' => $mcpProbe['latency_ms'],
                     'mcp_label' => $mcpLabel,
+                    ...$executeProbe,
                 ];
             }
 
@@ -186,6 +223,7 @@ final class N8nPublicApiHealthService
                 'mcp_health_ok' => $mcpProbe['ok'],
                 'mcp_latency_ms' => $mcpProbe['latency_ms'],
                 'mcp_label' => $mcpLabel,
+                ...$this->executeProbeDefaults(),
             ];
         } catch (Throwable $e) {
             return [
@@ -202,6 +240,80 @@ final class N8nPublicApiHealthService
                 'mcp_health_ok' => $mcpProbe['ok'],
                 'mcp_latency_ms' => $mcpProbe['latency_ms'],
                 'mcp_label' => $mcpLabel,
+                ...$this->executeProbeDefaults(),
+            ];
+        }
+    }
+
+    /**
+     * @return array{
+     *     execute_post_supported: ?bool,
+     *     execute_probe_http_status: ?int,
+     *     execute_probe_detail: ?string,
+     * }
+     */
+    private function probeWorkflowExecuteEndpoint(string $base, string $key): array
+    {
+        $url = $base . '/api/v1/workflows/' . self::EXECUTE_PROBE_WORKFLOW_ID . '/execute';
+
+        try {
+            $r = Http::timeout(12)
+                ->withHeaders([
+                    'X-N8N-API-KEY' => $key,
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json',
+                ])
+                ->withBody('{}', 'application/json')
+                ->post($url);
+            $st = $r->status();
+            $json = $r->json();
+            $payload = is_array($json) ? $json : null;
+            $msg = $this->extractApiMessage($payload);
+
+            if ($st === 405) {
+                return [
+                    'execute_post_supported' => false,
+                    'execute_probe_http_status' => 405,
+                    'execute_probe_detail' => 'POST …/workflows/{id}/execute niedozwolony — obraz n8n bez tego endpointu w Public API. Na VPS: docker compose pull n8n && docker compose up -d n8n. Do tego czasu: webhook fallback w rekordzie Filament + hybryda Kwiecień 2026+.',
+                ];
+            }
+
+            if ($st === 404) {
+                return [
+                    'execute_post_supported' => true,
+                    'execute_probe_http_status' => 404,
+                    'execute_probe_detail' => 'Endpoint execute jest aktywny (404 = brak workflow dla fikcyjnego UUID). Klucz API musi mieć scope workflow:execute.',
+                ];
+            }
+
+            if ($st === 403) {
+                return [
+                    'execute_post_supported' => true,
+                    'execute_probe_http_status' => 403,
+                    'execute_probe_detail' => 'Trasa execute istnieje, ale brak uprawnienia — w n8n utwórz nowy klucz API z workflow:execute.',
+                ];
+            }
+
+            if ($r->successful()) {
+                return [
+                    'execute_post_supported' => true,
+                    'execute_probe_http_status' => $st,
+                    'execute_probe_detail' => 'Execute zwrócił HTTP 2xx (nietypowe dla probe — sprawdź instancję).',
+                ];
+            }
+
+            return [
+                'execute_post_supported' => null,
+                'execute_probe_http_status' => $st,
+                'execute_probe_detail' => $msg !== null && $msg !== ''
+                    ? $msg
+                    : sprintf('Nieoczekiwany HTTP %d przy probe execute.', $st),
+            ];
+        } catch (Throwable $e) {
+            return [
+                'execute_post_supported' => null,
+                'execute_probe_http_status' => null,
+                'execute_probe_detail' => 'Probe execute: ' . $e->getMessage(),
             ];
         }
     }

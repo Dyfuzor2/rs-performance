@@ -32,6 +32,7 @@ final class N8nWorkflowHubOverview extends StatsOverviewWidget
 
         $health = app(N8nPublicApiHealthService::class)->snapshot();
         $apiLine = $this->formatApiStatLine($health);
+        $executeLine = $this->formatExecuteCapabilityStatLine($health);
         $mcpLine = $this->formatMcpStatLine($health);
 
         return [
@@ -39,6 +40,10 @@ final class N8nWorkflowHubOverview extends StatsOverviewWidget
                 ->description($apiLine['description'])
                 ->descriptionIcon($apiLine['icon'])
                 ->color($apiLine['color']),
+            Stat::make('WOW · Public API execute', $executeLine['title'])
+                ->description($executeLine['description'])
+                ->descriptionIcon($executeLine['icon'])
+                ->color($executeLine['color']),
             Stat::make('MCP HTTP (VPS)', $mcpLine['title'])
                 ->description($mcpLine['description'])
                 ->descriptionIcon($mcpLine['icon'])
@@ -60,6 +65,57 @@ final class N8nWorkflowHubOverview extends StatsOverviewWidget
                 ->description('Świeża synchronizacja nazw z API')
                 ->descriptionIcon('heroicon-o-arrow-path')
                 ->color('warning'),
+        ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $health
+     * @return array{title: string, description: string, icon: string, color: string}
+     */
+    /**
+     * @param  array<string, mixed>  $health
+     * @return array{title: string, description: string, icon: string, color: string}
+     */
+    private function formatExecuteCapabilityStatLine(array $health): array
+    {
+        if (! ($health['env_configured'] ?? false) || ! ($health['ok'] ?? false)) {
+            return [
+                'title' => '—',
+                'description' => 'Najpierw musi być OK: GET /api/v1/workflows (lewy kafelek).',
+                'icon' => 'heroicon-o-question-mark-circle',
+                'color' => 'gray',
+            ];
+        }
+
+        $supported = $health['execute_post_supported'] ?? null;
+        $st = $health['execute_probe_http_status'] ?? null;
+        $detail = (string) ($health['execute_probe_detail'] ?? '');
+
+        if ($supported === true) {
+            $code = $st !== null ? sprintf(' · probe HTTP %d', $st) : '';
+
+            return [
+                'title' => 'Natywny POST ✓',
+                'description' => 'Kwiecień 2026+ — „Wyzwól” z panelu idzie w execute API (404/403 na probe = trasa żywa).' . $code,
+                'icon' => 'heroicon-o-bolt',
+                'color' => 'success',
+            ];
+        }
+
+        if ($supported === false) {
+            return [
+                'title' => 'Hybrid webhook WOW',
+                'description' => $detail !== '' ? $detail : 'HTTP 405 — instancja bez POST …/execute. Użyj ścieżki webhook w rekordzie + `docker compose pull n8n` na VPS.',
+                'icon' => 'heroicon-o-sparkles',
+                'color' => 'warning',
+            ];
+        }
+
+        return [
+            'title' => 'Nieznany',
+            'description' => $detail !== '' ? $detail : 'Probe execute nie ustalił trybu — „Test API n8n” odświeży.',
+            'icon' => 'heroicon-o-exclamation-triangle',
+            'color' => 'gray',
         ];
     }
 

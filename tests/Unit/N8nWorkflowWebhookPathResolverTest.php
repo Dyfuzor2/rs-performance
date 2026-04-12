@@ -132,6 +132,84 @@ final class N8nWorkflowWebhookPathResolverTest extends TestCase
         $this->assertNull($r);
     }
 
+    public function test_accepts_webhook_path_with_n8n_route_colon(): void
+    {
+        Http::fake([
+            'https://n8n.example.test/api/v1/workflows/wf-1' => Http::response([
+                'nodes' => [
+                    [
+                        'type' => 'n8n-nodes-base.webhook',
+                        'disabled' => false,
+                        'parameters' => [
+                            'path' => 'orders/:orderId',
+                            'httpMethod' => 'POST',
+                        ],
+                    ],
+                ],
+            ], 200),
+        ]);
+
+        $r = app(N8nWorkflowWebhookPathResolver::class)->resolve(
+            'https://n8n.example.test',
+            'k',
+            'wf-1',
+        );
+
+        $this->assertSame('orders/:orderId', $r['path'] ?? null);
+    }
+
+    public function test_reads_nodes_under_workflow_key(): void
+    {
+        Http::fake([
+            'https://n8n.example.test/api/v1/workflows/wf-1' => Http::response([
+                'workflow' => [
+                    'nodes' => [
+                        [
+                            'type' => 'n8n-nodes-base.webhook',
+                            'disabled' => false,
+                            'parameters' => ['path' => 'under-workflow-key', 'httpMethod' => 'POST'],
+                        ],
+                    ],
+                ],
+            ], 200),
+        ]);
+
+        $r = app(N8nWorkflowWebhookPathResolver::class)->resolve(
+            'https://n8n.example.test',
+            'k',
+            'wf-1',
+        );
+
+        $this->assertSame('under-workflow-key', $r['path'] ?? null);
+    }
+
+    public function test_hint_when_webhook_node_exists_but_path_is_expression(): void
+    {
+        Http::fake([
+            'https://n8n.example.test/api/v1/workflows/wf-1' => Http::response([
+                'nodes' => [
+                    [
+                        'type' => 'n8n-nodes-base.webhook',
+                        'disabled' => false,
+                        'parameters' => [
+                            'path' => '={{ $json.slug }}',
+                            'httpMethod' => 'POST',
+                        ],
+                    ],
+                ],
+            ], 200),
+        ]);
+
+        $a = app(N8nWorkflowWebhookPathResolver::class)->analyzeWebhooks(
+            'https://n8n.example.test',
+            'k',
+            'wf-1',
+        );
+
+        $this->assertSame([], $a['candidates']);
+        $this->assertStringContainsString('Jest aktywny węzeł Webhook', $a['public_hint']);
+    }
+
     public function test_analyze_webhooks_returns_all_candidates_in_order(): void
     {
         Http::fake([

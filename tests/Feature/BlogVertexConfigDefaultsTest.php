@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 test('blog vertex defaults balance cost and quality (apr 2026 routing)', function (): void {
+    expect(config('blog.php_cli_binary'))->toBe('php85');
     expect(config('blog.prefer_imagen_hero_first'))->toBeTrue();
     expect(config('blog.telegram_vision_model'))->toBe('gemini-2.5-flash');
     expect(config('blog.vertex_models.researcher'))->toBe('gemini-2.5-flash');

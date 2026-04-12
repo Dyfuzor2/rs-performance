@@ -35,11 +35,22 @@ final class ListN8nWorkflowDocuments extends ListRecords
             ->where('n8n_workflow_id', '!=', '')
             ->count();
 
+        $cap = app(N8nPublicApiHealthService::class)->snapshot();
+        $execHint = '';
+        if (($cap['env_configured'] ?? false) && ($cap['ok'] ?? false)) {
+            $execHint = match ($cap['execute_post_supported'] ?? null) {
+                true => ' · Execute API: natywny POST (WOW)',
+                false => ' · Execute API: hybrid webhook (do czasu upgrade n8n)',
+                default => '',
+            };
+        }
+
         return sprintf(
-            'Kwiecień 2026+ — VPS: Public API n8n (N8N_API_URL — edytor „Graf n8n” + sync) oraz n8n-mcp HTTP (narzędzia agentów). Instancja API: %s · Katalog: %d wpisów · powiązanych z n8n: %d.',
+            'Kwiecień 2026+ — VPS: Public API n8n (N8N_API_URL — edytor „Graf n8n” + sync) oraz n8n-mcp HTTP (narzędzia agentów). Instancja API: %s · Katalog: %d wpisów · powiązanych z n8n: %d%s.',
             N8nConfigPresenter::publicApiHostLabel(),
             $n,
-            $linked
+            $linked,
+            $execHint
         );
     }
 
@@ -63,9 +74,15 @@ final class ListN8nWorkflowDocuments extends ListRecords
                     $h = app(N8nPublicApiHealthService::class)->probeFresh();
 
                     if ($h['ok']) {
+                        $body = $h['message'] . ($h['latency_ms'] !== null ? sprintf(' · %.0f ms', $h['latency_ms']) : '');
+                        $xd = $h['execute_probe_detail'] ?? null;
+                        if (is_string($xd) && $xd !== '') {
+                            $body .= "\n\n" . $xd;
+                        }
+
                         Notification::make()
                             ->title('API n8n: OK')
-                            ->body($h['message'] . ($h['latency_ms'] !== null ? sprintf(' · %.0f ms', $h['latency_ms']) : ''))
+                            ->body($body)
                             ->success()
                             ->send();
 
