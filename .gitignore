@@ -5,6 +5,8 @@ __pycache__/
 # Local operator secret dumps — never commit
 cursor.md
 n8n.md
+# Operator API key dump (never commit JWT)
+n8n.txt
 venv/
 .DS_Store
 *.zip
