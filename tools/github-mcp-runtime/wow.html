@@ -4,23 +4,44 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#0c0e14" />
   <title>GitHub MCP · RS Gravity · 2026</title>
   <style>
+    /* April 2026+ surface: oklch, @property, scroll-driven view(), grain, glass */
+    @property --mesh-hue {
+      syntax: "<angle>";
+      inherits: false;
+      initial-value: 265deg;
+    }
+    @property --glow {
+      syntax: "<number>";
+      inherits: false;
+      initial-value: 0.42;
+    }
     :root {
-      --bg0: oklch(0.14 0.02 260);
-      --bg1: oklch(0.18 0.03 265);
-      --glass: color-mix(in oklch, oklch(0.35 0.02 260) 35%, transparent);
-      --border: color-mix(in oklch, oklch(0.75 0.12 25) 35%, transparent);
-      --accent: oklch(0.72 0.2 25);
-      --accent2: oklch(0.65 0.15 250);
-      --text: oklch(0.95 0.01 260);
-      --muted: oklch(0.65 0.02 260);
+      --bg0: oklch(0.12 0.025 265);
+      --bg1: oklch(0.16 0.03 268);
+      --glass: color-mix(in oklch, oklch(0.38 0.025 265) 38%, transparent);
+      --border: color-mix(in oklch, oklch(0.78 0.14 25) 32%, transparent);
+      --accent: oklch(0.74 0.21 25);
+      --accent2: oklch(0.62 0.18 250);
+      --text: oklch(0.96 0.012 265);
+      --muted: oklch(0.62 0.02 265);
       --font: "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
     }
     @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+      .mesh-anim { animation: none !important; }
+      .card-reveal { animation: none !important; opacity: 1 !important; }
     }
     * { box-sizing: border-box; }
+    html {
+      scroll-behavior: smooth;
+    }
     body {
       margin: 0;
       min-height: 100dvh;
@@ -28,16 +49,43 @@
       color: var(--text);
       background: var(--bg0);
       overflow-x: hidden;
+      font-feature-settings: "ss01" 1, "cv02" 1;
     }
     .mesh {
       position: fixed;
       inset: 0;
       z-index: 0;
       background:
-        radial-gradient(ellipse 90% 60% at 10% -10%, color-mix(in oklch, var(--accent) 45%, transparent), transparent 55%),
-        radial-gradient(ellipse 70% 50% at 100% 100%, color-mix(in oklch, var(--accent2) 35%, transparent), transparent 50%),
-        radial-gradient(ellipse 50% 40% at 50% 120%, oklch(0.3 0.08 150 / 0.25), transparent 45%);
+        radial-gradient(ellipse 100% 70% at 8% -5%,
+          color-mix(in oklch, oklch(0.7 0.22 25) calc(var(--glow) * 100%), transparent), transparent 58%),
+        radial-gradient(ellipse 75% 55% at 102% 98%,
+          color-mix(in oklch, oklch(0.55 0.16 250) 38%, transparent), transparent 52%),
+        radial-gradient(ellipse 55% 45% at 48% 125%,
+          oklch(0.32 0.09 155 / 0.22), transparent 48%),
+        conic-gradient(from var(--mesh-hue) at 50% 120%,
+          oklch(0.2 0.06 280 / 0.35), transparent 42%, oklch(0.18 0.05 200 / 0.25) 78%);
       pointer-events: none;
+    }
+    .mesh-anim {
+      animation: mesh-drift 22s ease-in-out infinite, hue-shift 48s linear infinite;
+    }
+    @keyframes mesh-drift {
+      0%, 100% { --glow: 0.38; filter: saturate(1.05); }
+      50% { --glow: 0.52; filter: saturate(1.2); }
+    }
+    @keyframes hue-shift {
+      0% { --mesh-hue: 250deg; }
+      50% { --mesh-hue: 285deg; }
+      100% { --mesh-hue: 250deg; }
+    }
+    .grain {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      opacity: 0.045;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      mix-blend-mode: overlay;
     }
     .wrap {
       position: relative;
@@ -45,97 +93,160 @@
       max-width: 52rem;
       margin: 0 auto;
       padding: clamp(1.5rem, 4vw, 3rem);
+      view-transition-name: deck;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.65rem;
+      padding: 0.35rem 0.65rem;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: color-mix(in oklch, var(--glass) 80%, transparent);
+      backdrop-filter: blur(10px);
     }
     h1 {
-      font-size: clamp(1.35rem, 3vw, 1.85rem);
-      font-weight: 700;
-      letter-spacing: -0.03em;
-      margin: 0 0 0.35rem;
+      font-size: clamp(1.45rem, 3.2vw, 2rem);
+      font-weight: 750;
+      letter-spacing: -0.035em;
+      line-height: 1.15;
+      margin: 0 0 0.4rem;
+      background: linear-gradient(120deg, var(--text) 0%, color-mix(in oklch, var(--accent) 55%, var(--text)) 55%, var(--text) 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: title-shine 8s ease-in-out infinite;
+    }
+    @keyframes title-shine {
+      0%, 100% { background-position: 0% center; }
+      50% { background-position: 100% center; }
     }
     .sub {
       color: var(--muted);
-      font-size: 0.95rem;
-      line-height: 1.5;
-      margin-bottom: 1.75rem;
+      font-size: 0.98rem;
+      line-height: 1.55;
+      margin-bottom: 1.85rem;
+      max-width: 46ch;
     }
     .card {
-      border-radius: 1.15rem;
-      padding: 1.35rem 1.5rem;
+      border-radius: 1.2rem;
+      padding: 1.4rem 1.55rem;
       background: var(--glass);
-      backdrop-filter: blur(14px) saturate(1.35);
+      backdrop-filter: blur(16px) saturate(1.45);
       border: 1px solid var(--border);
       box-shadow:
-        0 0 0 1px color-mix(in oklch, white 6%, transparent) inset,
-        0 24px 48px -28px oklch(0 0 0 / 0.55);
+        0 0 0 1px color-mix(in oklch, white 7%, transparent) inset,
+        0 28px 56px -32px oklch(0 0 0 / 0.6);
       margin-bottom: 1rem;
+      transition: transform 0.35s cubic-bezier(0.2, 0.85, 0.15, 1), box-shadow 0.35s ease;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow:
+        0 0 0 1px color-mix(in oklch, white 9%, transparent) inset,
+        0 32px 64px -28px oklch(0 0 0 / 0.55);
+    }
+    @supports (animation-timeline: view()) {
+      .card-reveal {
+        animation: card-enter linear both;
+        animation-timeline: view();
+        animation-range: entry 0% cover 35%;
+      }
+    }
+    @keyframes card-enter {
+      from {
+        opacity: 0;
+        transform: translateY(14px) scale(0.992);
+        filter: blur(4px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+      }
     }
     .card h2 {
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       text-transform: uppercase;
-      letter-spacing: 0.14em;
+      letter-spacing: 0.16em;
       color: var(--muted);
-      margin: 0 0 0.85rem;
-      font-weight: 700;
+      margin: 0 0 0.9rem;
+      font-weight: 750;
     }
     ol {
       margin: 0;
-      padding-left: 1.15rem;
-      line-height: 1.65;
+      padding-left: 1.2rem;
+      line-height: 1.68;
       color: var(--text);
     }
-    ol li { margin-bottom: 0.45rem; }
+    ol li { margin-bottom: 0.5rem; }
     code {
       font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
       font-size: 0.82em;
-      padding: 0.12em 0.35em;
-      border-radius: 0.35rem;
-      background: oklch(0.22 0.02 260);
-      border: 1px solid oklch(0.35 0.02 260);
+      padding: 0.14em 0.38em;
+      border-radius: 0.4rem;
+      background: oklch(0.2 0.022 265);
+      border: 1px solid oklch(0.34 0.02 265);
     }
     .pulse {
       display: inline-block;
-      width: 0.45rem;
-      height: 0.45rem;
+      width: 0.48rem;
+      height: 0.48rem;
       border-radius: 50%;
-      background: oklch(0.75 0.2 145);
-      box-shadow: 0 0 0 3px oklch(0.75 0.2 145 / 0.25);
-      animation: pulse 2.4s ease-in-out infinite;
-      margin-right: 0.4rem;
+      background: oklch(0.78 0.22 145);
+      box-shadow: 0 0 0 3px oklch(0.78 0.22 145 / 0.28);
+      animation: pulse 2.2s ease-in-out infinite;
+      margin-right: 0.35rem;
       vertical-align: middle;
     }
     @keyframes pulse {
       0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.65; transform: scale(1.1); }
+      50% { opacity: 0.55; transform: scale(1.12); }
     }
     a {
-      color: color-mix(in oklch, var(--accent) 90%, white);
+      color: color-mix(in oklch, var(--accent) 88%, white);
       text-underline-offset: 3px;
+      text-decoration-thickness: 1px;
+    }
+    a:focus-visible {
+      outline: 2px solid color-mix(in oklch, var(--accent) 70%, white);
+      outline-offset: 3px;
+      border-radius: 2px;
     }
     .foot {
-      margin-top: 1.5rem;
+      margin-top: 1.65rem;
       font-size: 0.8rem;
       color: var(--muted);
     }
   </style>
 </head>
 <body>
-  <div class="mesh" aria-hidden="true"></div>
+  <div class="mesh mesh-anim" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
   <div class="wrap">
-    <h1><span class="pulse" aria-hidden="true"></span>GitHub MCP — operator deck</h1>
+    <div class="hero-badge"><span class="pulse" aria-hidden="true"></span> Live · MCP stdio</div>
+    <h1>GitHub MCP - operator deck</h1>
     <p class="sub">Oficjalny <strong>github-mcp-server</strong> (stdio, read-only), stack kwiecień 2026+: supply-chain SHA256 na ZIP, token tylko lokalnie (<code>git.md</code> / env).</p>
 
-    <div class="card">
+    <div class="card card-reveal">
       <h2>Checklist</h2>
       <ol>
         <li>Uruchom <code>setup-github-mcp-wow.ps1</code> (instalacja + test API).</li>
         <li>W Cursorze: przeładuj serwery MCP i włącz <code>github</code>.</li>
-        <li>Agent może przeszukiwać <strong>publiczne</strong> repozytoria innych użytkowników przez narzędzia MCP (repozytoria, kontekst, użytkownicy).</li>
+        <li>Agent może przeszukiwać <strong>publiczne</strong> repozytoria innych użytkowników przez narzędzia MCP (repozytoria, kontekst, użytkownicy, stargazers).</li>
       </ol>
     </div>
 
-    <div class="card">
+    <div class="card card-reveal">
       <h2>Źródło</h2>
-      <p style="margin:0;line-height:1.6">
+      <p style="margin:0;line-height:1.65">
         <a href="https://github.com/github/github-mcp-server" target="_blank" rel="noopener">github/github-mcp-server</a>
         ·
         <a href="https://docs.github.com/en/rest" target="_blank" rel="noopener">GitHub REST API</a>
