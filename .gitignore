@@ -2,6 +2,9 @@ __pycache__/
 *.pyc
 .env
 .cursor/mcp.env
+# Local operator secret dumps — never commit
+cursor.md
+n8n.md
 venv/
 .DS_Store
 *.zip

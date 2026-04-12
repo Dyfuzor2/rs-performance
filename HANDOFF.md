@@ -1,3 +1,14 @@
+## 2026-04-12 — Operator WOW: `gravity_cursor_env.py` + smoke webhooków + gitignore na lokalne sekrety
+
+### Agent: Cursor
+
+### STATUS: REPO
+
+- **`scripts/gravity_cursor_env.py`** — `require_n8n_api()` z `.cursor/mcp.env`; skrypty w korzeniu (`deploy_*.py`, `fix_n8n_workflows.py`, `trinity_dtc_workflow.py`, `fix_all_telegram_tokens.py`) bez twardego JWT n8n.
+- **`tools/n8n-mcp-runtime/smoke-critical-webhooks.ps1`** + **`critical-webhooks.manifest.json`** — manifestowy POST smoke (np. `bot-invitation-test`); README + `agent-start-inventory.mdc` zaktualizowane.
+- **`.gitignore`:** `cursor.md`, `n8n.md` — żeby lokalne paczki sekretów nie wpadły w commit.
+- **`n8n.md`** — tylko wskaźniki (bez JWT).
+
 ## 2026-04-12 — n8n: `.cursor/mcp.env` zasilony + API OK + redakcja JWT w HANDOFF
 
 ### Agent: Cursor
@@ -6,7 +17,7 @@
 
 - **Wykonane:** utworzono `G:\gravity\.cursor\mcp.env` z `N8N_API_URL` / `N8N_API_KEY`; `npm install` w `tools/n8n-mcp-runtime`; `verify-n8n-api.ps1` → **OK** (workflows probe).
 - **Bezpieczeństwo:** usunięto plaintext JWT z sekcji „VPS n8n API KEY” i z listy CREDENTIALS (historyczny wpis) — wskazówka: tylko `mcp.env` + rotate jeśli kiedykolwiek leak.
-- **Next:** Reload MCP / okno Cursora. Rozważyć rotację klucza n8n i czyszczenie kopii JWT w lokalnych skryptach `??` (deploy_*.py itd.).
+- **Next:** Reload MCP / okno Cursora. Rozważyć rotację klucza n8n i czyszczenie kopii JWT w lokalnych skryptach `??` (deploy\_\*.py itd.).
 
 ## 2026-04-12 — n8n MCP: launcher `run-n8n-mcp.ps1` + `.cursor/mcp.env`
 

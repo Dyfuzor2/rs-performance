@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "description": "Public n8n webhooks to smoke from operator workstation (no secrets). Align with scripts/vps_n8n_wow_smoke.py.",
+  "webhooks": [
+    {
+      "name": "Bot Invitation Hub test",
+      "method": "POST",
+      "url": "https://auto.rs3d.pl/webhook/bot-invitation-test",
+      "body": {},
+      "expect_min_status": 200,
+      "expect_max_status": 299
+    }
+  ]
+}

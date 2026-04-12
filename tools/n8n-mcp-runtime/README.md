@@ -8,7 +8,12 @@ Pinned **`n8n-mcp@^2.47.5`** — no per-session `npx` resolution. Cursor talks t
 2. Copy `G:\gravity\.cursor\mcp.env.example` → `G:\gravity\.cursor\mcp.env` (file is gitignored).
 3. Set `N8N_API_URL` (e.g. `https://auto.rs3d.pl`) and `N8N_API_KEY` from n8n **Settings → API**.
 4. Optional: `powershell -File verify-n8n-api.ps1` — must print `OK`.
-5. **Cursor:** reload window (or restart MCP). Entry `n8n-mcp` must use `run-n8n-mcp.ps1` (see `.mcp.json` / `.cursor/mcp.json`).
+5. Optional: `powershell -File smoke-critical-webhooks.ps1` — manifest-driven POST smoke (`critical-webhooks.manifest.json`).
+6. **Cursor:** reload window (or restart MCP). Entry `n8n-mcp` must use `run-n8n-mcp.ps1` (see `.mcp.json` / `.cursor/mcp.json`).
+
+## Python scripts (repo root)
+
+Use `scripts/gravity_cursor_env.py` → `require_n8n_api()` so JWT never lives in `.py` files.
 
 ## Operations on VPS
 

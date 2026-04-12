@@ -13,7 +13,7 @@ Project coordination skill for `n8n` work in `G:\gravity`.
 
 ## Primary sources
 
-- local MCP runtime (Cursor): `run-n8n-mcp.ps1` loads `.cursor/mcp.env` → pinned `n8n-mcp@2.47.5` stdio; verify with `verify-n8n-api.ps1`. See `tools/n8n-mcp-runtime/README.md`.
+- local MCP runtime (Cursor): `run-n8n-mcp.ps1` loads `.cursor/mcp.env` → pinned `n8n-mcp@2.47.5` stdio; verify with `verify-n8n-api.ps1`; webhook matrix: `smoke-critical-webhooks.ps1`. Python: `scripts/gravity_cursor_env.require_n8n_api()`.
 - local MCP runtime:
     - `G:\gravity\tools\n8n-mcp-runtime`
 - local source repo:

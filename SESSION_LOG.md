@@ -4,6 +4,21 @@ Format relay: jeden blok na sesję, bez kasowania cudzych wpisów. Starsze wpisy
 
 ---
 
+## [2026-04-12] Cursor — gravity_cursor_env + smoke manifest + gitignore cursor.md/n8n.md
+
+### Wykonane
+
+- `scripts/gravity_cursor_env.py` (`load_cursor_env`, `require_n8n_api`).
+- Lokalne skrypty `.py` w korzeniu: n8n JWT usunięty → `require_n8n_api()`.
+- `tools/n8n-mcp-runtime/smoke-critical-webhooks.ps1` + `critical-webhooks.manifest.json` (POST smoke; OK na `bot-invitation-test`).
+- `.gitignore`: `cursor.md`, `n8n.md`; `n8n.md` przepisany na bezpieczną notatkę.
+
+### Uwaga
+
+- `cursor.md` nadal może zawierać sekrety na dysku — plik gitignored; rozważyć rotację tego co kiedyś mogło wyciec.
+
+---
+
 ## [2026-04-12] Cursor — n8n: `mcp.env` zasilony, verify OK, redakcja sekretu w HANDOFF
 
 ### Wykonane (lokalnie)
