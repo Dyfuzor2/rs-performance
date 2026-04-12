@@ -183,6 +183,13 @@ W `RELAY.md` trzymamy tylko lokalizacje i opis. Nie kopiujemy tu samych hasel i 
 - **Recznie:** `python scripts/hydrate_mcp_env_from_workspace.py` potem `python scripts/hydrate_mcp_env_from_workspace.py --check` (opcja `--json` dla agentow).
 - **Walidacja n8n po sync:** `python -c "import sys; sys.path.insert(0,'scripts'); from gravity_cursor_env import require_n8n_api; require_n8n_api(); print('n8n OK')"`
 
+### Google Cloud CLI lokalnie (kwiecien 2026+) + MCP statusu
+
+- **Czy instalowac `gcloud` na laptopie?** Tak, jesli chcesz szybkie **ADC** (`gcloud auth application-default login`), testy Vertex / konfiguracja zgodnie z `vertex.md`. **Nie** zastepuje to VPS ani SSH — produkcyjne workloady support-plane zostaja na relay.
+- **Instalacja (Windows):** `pwsh -File G:\gravity\tools\gcp-gcloud-wow-runtime\install-gcloud-wow.ps1` (winget: `Google.CloudSDK`). Po instalacji **nowe okno** terminala: `gcloud version`.
+- **MCP (read-only, allowlist):** `G:\gravity\tools\gcp-gcloud-wow-runtime\` — `gcloud_wow_version`, `gcloud_wow_config_list`; `npm install` przez `install-gcloud-wow-runtime-deps.ps1`; launcher `run-gcloud-wow-mcp.ps1`. Pelny „GCP admin MCP” celowo **nie** jest tu promowany (wysoka powierzchnia ataku); dokumentacja API przez Context7 / oficjalne zrodla.
+- **Telegram MCP (operator):** `G:\gravity\tools\telegram-mcp-runtime\` — Bot API `getMe` + `sendMessage`, ten sam wzorzec co n8n (`run-telegram-mcp.ps1` wczytuje `.cursor/mcp.env`). Wpis serwera: `telegram-rs` w `.mcp.json`.
+
 ## 6. Narzedzia i Punkty Wejscia
 
 | Narzedzie                      | Lokalizacja / wejscie                          | Rola                                                                                                                       |
@@ -199,6 +206,8 @@ W `RELAY.md` trzymamy tylko lokalizacje i opis. Nie kopiujemy tu samych hasel i 
 | MCP env template               | `G:\gravity\.cursor\mcp.env.example`           | nazwy zmiennych dla n8n / opcjonalnie Qdrant / MySQL RO                                                                    |
 | n8n MCP zrodlo (repo)          | `G:\gravity\mcp-servers\n8n-mcp`               | pelny kod + docs; wersja npm pin w runtime                                                                                 |
 | n8n MCP runtime (pin)          | `G:\gravity\tools\n8n-mcp-runtime`             | `n8n-mcp@^2.47.5` dla spojnosci z `npx`                                                                                    |
+| Telegram MCP (operator)       | `G:\gravity\tools\telegram-mcp-runtime`        | Bot API stdio MCP; `install-telegram-mcp.ps1`, `run-telegram-mcp.ps1`, env z `.cursor/mcp.env`                             |
+| gcloud WOW (CLI + status MCP) | `G:\gravity\tools\gcp-gcloud-wow-runtime`      | `install-gcloud-wow.ps1` (winget), read-only MCP `gcloud_wow_*`; pelny GCP nadal VPS/SSH                                   |
 | Instalacja deps MCP (Windows)  | `G:\gravity\tools\install-cursor-mcp-deps.ps1` | `npm install` w repo n8n-mcp + runtime                                                                                     |
 | n8n docs mirror                | `G:\gravity\research\docs-sources\n8n-docs`    | lokalna dokumentacja workflow                                                                                              |
 | n8n skill pack                 | `G:\gravity\n8n-skills`                        | workflow patterns, validation, MCP tools expert                                                                            |

@@ -27,6 +27,12 @@ Source of truth runtime: Cyber-Folks production + VPS support stack
 - Current blocker: **VPS `n8n`** — reaktywacja po imporcie Vertex zrobiona masowo (`publish:workflow` + restart kontenera); **twardy dowód** kolejnego sukcesu `RS Daily Automotive News Drafts` + Telegram nadal do obserwacji. A2A/AEO discovery pozostaje zielone.
 - Current next step: smoke jednego cyklu daily news / monitorów; opcjonalnie test proxy `https://rsperformance.online/api/n8n/vertex/*`. **WOW digest Telegram** na hoście VPS: cron 08:00 Europe/Warsaw zweryfikowany (healthz OK, ręczny run digest → Telegram 200, fleet ~15 wf).
 
+### 2026-04-12 local operator stack WOW (Cursor + MCP)
+
+- **Done (WOW):** Operator env: `scripts/sync-operator-env-wow.ps1`, `hydrate_mcp_env_from_workspace.py --check` / `--json`, RELAY section 5 — jedna paczka `.cursor/mcp.env` bez wklejania sekretow do czatu.
+- **Done (WOW):** Telegram Bot API MCP — `tools/telegram-mcp-runtime` (`telegram_get_me`, `telegram_send_message`), sekrety wylacznie z `.cursor/mcp.env`; wpis w `.mcp.json` / `.cursor/mcp.json` jako `telegram-rs`.
+- **Done (WOW):** Google Cloud CLI — opcjonalna lokalna instalacja `gcloud` (`tools/gcp-gcloud-wow-runtime/install-gcloud-wow.ps1`, winget) na potrzeby ADC / eksperymentow Vertex; read-only MCP statusu `gcloud_wow_version` + `gcloud_wow_config_list` (`tools/gcp-gcloud-wow-runtime`). Pelna administracja projektem GCP nadal: VPS + procedury z `RELAY.md` / `vertex.md`, hosting canonical bez zmian.
+
 ### 2026-04-12 gateway chain + relay addendum
 
 - Live LiteSpeed `.htaccess` gateway is **verified** after the `ChatGPT\x20Atlas` / `mod_rewrite` structure fix: `GPTBot` on canonical `/` performs **exactly one** `302` to `https://ai.rsperformance.online/` then **200**; direct `https://ai.rsperformance.online/` returns **200** for both bot and browser UAs (**no redirect loop**). Deep paths (example `/uslugi`) redirect to the matching path on `ai.*`. Relay docs updated the same day: `SESSION_LOG.md`, `HANDOFF.md`, `handoff-log.md`.

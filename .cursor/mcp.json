@@ -30,6 +30,28 @@
       ],
       "description": "Same pinned runtime as repo .mcp.json; secrets from .cursor/mcp.env (not Process env)."
     },
+    "telegram-rs": {
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "G:\\gravity\\tools\\telegram-mcp-runtime\\run-telegram-mcp.ps1"
+      ],
+      "description": "Telegram Bot API: getMe + sendMessage; .cursor/mcp.env (TELEGRAM_*)."
+    },
+    "gcloud-wow": {
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "G:\\gravity\\tools\\gcp-gcloud-wow-runtime\\run-gcloud-wow-mcp.ps1"
+      ],
+      "description": "Read-only gcloud JSON (version, config list). gcloud on PATH."
+    },
     "github": {
       "command": "powershell",
       "args": [

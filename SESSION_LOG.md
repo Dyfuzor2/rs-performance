@@ -4,6 +4,21 @@ Format relay: jeden blok na sesję, bez kasowania cudzych wpisów. Starsze wpisy
 
 ---
 
+## [2026-04-12] Cursor — Telegram MCP + gcloud WOW (install + read-only MCP) + plan/RELAY
+
+### Wykonane
+
+- `tools/telegram-mcp-runtime` — MCP stdio: `telegram_get_me`, `telegram_send_message` (Bot API); `run-telegram-mcp.ps1` + `.cursor/mcp.env`; wpis `telegram-rs` w `.mcp.json` i `.cursor/mcp.json`.
+- `tools/gcp-gcloud-wow-runtime` — `install-gcloud-wow.ps1` (winget Google.CloudSDK); MCP `gcloud_wow_version`, `gcloud_wow_config_list` (allowlist); `gcloud-wow` w konfiguracji MCP.
+- `tools/install-cursor-mcp-deps.ps1` — `npm install` dla obu runtime.
+- `plan.md` (WOW stack), `RELAY.md` (GCP lokalnie + Telegram MCP), `agent-start-inventory.mdc`.
+
+### Uwaga
+
+- Pelny „GCP admin MCP” celowo odrzucony na rzecz read-only statusu + oficjalny CLI / Context7.
+
+---
+
 ## [2026-04-12] Cursor — Operator WOW: sync-operator-env-wow.ps1 + hydrate --check/--json
 
 ### Wykonane

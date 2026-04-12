@@ -1,0 +1,14 @@
+{
+  "name": "gcp-gcloud-wow-runtime",
+  "version": "1.0.0",
+  "private": true,
+  "description": "RS Gravity — read-only gcloud status MCP + installer (Apr 2026+).",
+  "type": "module",
+  "scripts": {
+    "start": "node gcloud-status-mcp.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "zod": "^3.25.0"
+  }
+}

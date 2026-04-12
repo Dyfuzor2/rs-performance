@@ -117,6 +117,28 @@
       ],
       "description": "n8n MCP (pinned v2.47.5): loads .cursor/mcp.env, requires N8N_API_URL + N8N_API_KEY, then stdio to n8n-mcp.cmd — no npx drift. See tools/n8n-mcp-runtime/README.md."
     },
+    "telegram-rs": {
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "G:\\gravity\\tools\\telegram-mcp-runtime\\run-telegram-mcp.ps1"
+      ],
+      "description": "Telegram Bot API MCP (Apr 2026+): getMe + sendMessage; TELEGRAM_BOT_TOKEN + TELEGRAM_CHAT_ID from .cursor/mcp.env. Install: tools/telegram-mcp-runtime/install-telegram-mcp.ps1"
+    },
+    "gcloud-wow": {
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "G:\\gravity\\tools\\gcp-gcloud-wow-runtime\\run-gcloud-wow-mcp.ps1"
+      ],
+      "description": "Read-only gcloud status MCP (version + config list JSON). Requires Google Cloud SDK on PATH. Install CLI: tools/gcp-gcloud-wow-runtime/install-gcloud-wow.ps1; npm: install-gcloud-wow-runtime-deps.ps1"
+    },
     "a2a-bridge-local": {
       "command": "G:\\gravity\\tools\\a2a-mcp-bridge-runtime\\node_modules\\.bin\\a2a-mcp-bridge.cmd",
       "args": [],
