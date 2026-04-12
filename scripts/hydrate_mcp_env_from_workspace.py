@@ -3,14 +3,36 @@
 April 2026+ operator flow: keep one canonical local pack (`cursor.md`, gitignored via
 project policy) and sync operator keys into `mcp.env` for `gravity_cursor_env`.
 
-Does not print secret values. Run: python scripts/hydrate_mcp_env_from_workspace.py
+Does not print raw secret values.
+
+Commands (from repo root)::
+
+    python scripts/hydrate_mcp_env_from_workspace.py
+    python scripts/hydrate_mcp_env_from_workspace.py --check
+    python scripts/hydrate_mcp_env_from_workspace.py --check --json
 """
 
 from __future__ import annotations
 
+import argparse
+import json
 import re
 import sys
 from pathlib import Path
+from urllib.parse import urlparse
+
+OPERATOR_ENV_KEYS: tuple[tuple[str, str], ...] = (
+    ("N8N_API_URL", "url"),
+    ("N8N_API_KEY", "secret"),
+    ("RS_X_API_TOKEN", "secret"),
+    ("TELEGRAM_BOT_TOKEN", "secret"),
+    ("TELEGRAM_CHAT_ID", "id"),
+    ("RS_BLOG_PIPELINE_KEY", "secret"),
+    ("FACEBOOK_PAGE_ID", "id"),
+    ("OPENROUTER_API_KEY", "secret"),
+    ("FACEBOOK_PAGE_ACCESS_TOKEN", "secret"),
+    ("FACEBOOK_GRAPH_USER_ACCESS_TOKEN", "secret"),
+)
 
 
 def repo_root() -> Path:
@@ -87,6 +109,75 @@ def harvest_meta_page_token(root: Path) -> str | None:
     return best
 
 
+def parse_mcp_env_file(env_path: Path) -> dict[str, str]:
+    out: dict[str, str] = {}
+    if not env_path.is_file():
+        return out
+    for raw in env_path.read_text(encoding="utf-8").splitlines():
+        line = raw.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, _, val = line.partition("=")
+        key = key.strip()
+        if key:
+            out[key] = val.strip()
+    return out
+
+
+def preview_value(kind: str, val: str) -> str:
+    """Human-readable preview; never dumps full secrets."""
+    v = (val or "").strip()
+    if not v:
+        return "(missing)"
+    if kind == "url":
+        try:
+            u = urlparse(v)
+            if u.scheme and u.netloc:
+                return f"{u.scheme}://{u.netloc}/"
+        except ValueError:
+            pass
+        return f"{v[:12]}..." if len(v) > 12 else "***"
+    if kind == "id":
+        safe = v.encode("ascii", "replace").decode("ascii")
+        return f"{safe[:3]}..{safe[-2:]}" if len(safe) > 5 else "***"
+    try:
+        v.encode("ascii")
+    except UnicodeEncodeError:
+        return f"(binary/unicode secret, {len(v)} chars)"
+    if len(v) <= 10:
+        return "***"
+    return f"{v[:4]}..{v[-2:]} ({len(v)} chars)"
+
+
+def run_check(env_path: Path, *, as_json: bool) -> int:
+    data = parse_mcp_env_file(env_path)
+    rows: list[dict[str, object]] = []
+    missing = 0
+    for key, kind in OPERATOR_ENV_KEYS:
+        raw = (data.get(key) or "").strip()
+        ok = bool(raw)
+        if not ok:
+            missing += 1
+        rows.append(
+            {
+                "key": key,
+                "kind": kind,
+                "present": ok,
+                "preview": preview_value(kind, raw) if ok else None,
+            }
+        )
+    if as_json:
+        print(json.dumps({"path": str(env_path), "keys": rows, "missing_count": missing}, indent=2))
+    else:
+        print(f"Operator env status: {env_path}")
+        for r in rows:
+            status = "OK " if r["present"] else "MISS"
+            prev = r["preview"] or "—"
+            print(f"  [{status}] {r['key']}: {prev}")
+        print(f"Summary: {len(rows) - missing}/{len(rows)} keys present.")
+    return 0 if missing == 0 else 2
+
+
 def merge_into_mcp_env(env_path: Path, updates: dict[str, str]) -> int:
     text = env_path.read_text(encoding="utf-8") if env_path.is_file() else ""
     written = 0
@@ -105,7 +196,7 @@ def merge_into_mcp_env(env_path: Path, updates: dict[str, str]) -> int:
     return written
 
 
-def main() -> int:
+def run_sync() -> int:
     root = repo_root()
     cursor = root / "cursor.md"
     handoff = root / "HANDOFF.md"
@@ -158,8 +249,33 @@ def main() -> int:
 
     n = merge_into_mcp_env(env_path, updates)
     print(f"Updated .cursor/mcp.env ({n} keys merged from workspace).")
-    print("Verify: python -c \"from pathlib import Path; import sys; sys.path.insert(0,'scripts'); from gravity_cursor_env import require_n8n_api; require_n8n_api(); print('n8n OK')\"")
+    print("Next: python scripts/hydrate_mcp_env_from_workspace.py --check")
+    print(
+        "Optional: python -c \"import sys; sys.path.insert(0,'scripts'); "
+        "from gravity_cursor_env import require_n8n_api; require_n8n_api(); print('n8n OK')\""
+    )
     return 0
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(
+        description="Sync operator secrets into .cursor/mcp.env (Apr 2026+ WOW flow).",
+    )
+    parser.add_argument(
+        "--check",
+        action="store_true",
+        help="Print masked status for operator keys (no sync).",
+    )
+    parser.add_argument(
+        "--json",
+        action="store_true",
+        help="With --check: machine-readable JSON.",
+    )
+    args = parser.parse_args()
+    env_path = repo_root() / ".cursor" / "mcp.env"
+    if args.check:
+        return run_check(env_path, as_json=args.json)
+    return run_sync()
 
 
 if __name__ == "__main__":

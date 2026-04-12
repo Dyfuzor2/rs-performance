@@ -175,6 +175,14 @@ W `RELAY.md` trzymamy tylko lokalizacje i opis. Nie kopiujemy tu samych hasel i 
 - Nie commituj sekretow.
 - `n8n` jest aktywna czesc architektury VPS (przywrocone 2026-03-31 decyzja usera). Kontener w docker-compose, UI: auto.rs3d.pl, workflow: AI Bot Invitation Hub (cron 1h, IndexNow, Telegram).
 
+### Operator env WOW (kwiecien 2026+) — jeden strzal
+
+- **Zrodlo prawdy lokalnie:** `G:\gravity\cursor.md` (gitignored) + `HANDOFF.md` + skan wybranych `*.json` (OpenRouter, Meta) w korzeniu / `storage/app`.
+- **Cel:** `G:\gravity\.cursor\mcp.env` (nigdy commitowac wartosci).
+- **Jeden przebieg (Windows, PowerShell):** `pwsh -File G:\gravity\scripts\sync-operator-env-wow.ps1` — najpierw merge, potem `--check` (tylko skroty / OK-MISS).
+- **Recznie:** `python scripts/hydrate_mcp_env_from_workspace.py` potem `python scripts/hydrate_mcp_env_from_workspace.py --check` (opcja `--json` dla agentow).
+- **Walidacja n8n po sync:** `python -c "import sys; sys.path.insert(0,'scripts'); from gravity_cursor_env import require_n8n_api; require_n8n_api(); print('n8n OK')"`
+
 ## 6. Narzedzia i Punkty Wejscia
 
 | Narzedzie                      | Lokalizacja / wejscie                          | Rola                                                                                                                       |

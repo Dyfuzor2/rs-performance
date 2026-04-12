@@ -4,7 +4,17 @@ Format relay: jeden blok na sesję, bez kasowania cudzych wpisów. Starsze wpisy
 
 ---
 
-## [2026-04-12] Cursor — hydrate_mcp_env z cursor.md + JSON; deploy tylko pod __main__
+## [2026-04-12] Cursor — Operator WOW: sync-operator-env-wow.ps1 + hydrate --check/--json
+
+### Wykonane
+
+- `scripts/hydrate_mcp_env_from_workspace.py`: `--check`, `--json` — status kluczy operatora z `.cursor/mcp.env` (preview zamaskowane, brak dumpu wartosci); exit 2 gdy cos brakuje.
+- `scripts/sync-operator-env-wow.ps1` — jeden strzal: sync + check z korzenia repo.
+- `RELAY.md` §5 — podsekcja „Operator env WOW” z pelna sciezka `pwsh -File`.
+
+---
+
+## [2026-04-12] Cursor — hydrate_mcp_env z cursor.md + JSON; deploy tylko pod **main**
 
 ### Wykonane
 
