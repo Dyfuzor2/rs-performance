@@ -1068,7 +1068,7 @@ class SearchArtifactFactory
     {
         return [
             'welcome' => 'AI agents, AI browsers and answer engines are welcome on RS Performance.',
-            'catalog_policy' => '2026-04+: Tokens in search_bots, training_bots and user_fetchers receive full canonical hospitality (X-Citation-Policy, gateway hints). denied_agents (e.g. CCBot, iaskbot, magpie-crawler) get robots Disallow /, no ModSecurity 99000 bypass, no WOW 302 — Googlebot and Bingbot stay on canonical; other gateway_routed agents may 302 to VPS.',
+            'catalog_policy' => '2026-04+: Every token in search_bots + training_bots + user_fetchers gets ModSecurity 99000/99001 bypass on canonical except denied_agents (CCBot, iaskbot, magpie-crawler). Gateway WOW 302 uses gateway_routed_agents (same merge minus Googlebot/Bingbot for SEO on canonical). denied_agents: robots Disallow /, no bypass, no WOW 302.',
             'canonical_truth' => RsUri::home(),
             'vps_fast_lane' => RsUri::aiGateway(),
             'for_agents' => RsUri::aiGateway() . '/for-agents',

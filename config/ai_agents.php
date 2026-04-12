@@ -9,8 +9,9 @@ declare(strict_types=1);
  * `denied_agents`: explicit operator deny (robots Disallow + no ModSec bypass / no gateway 302).
  * Other phishing/malware still handled at WAF (spoofed generic UAs).
  *
- * Gateway redirect (.htaccess) sends most AI families to the VPS fast lane. Classic
- * web search indexers (Googlebot, Bingbot) stay on canonical for SEO stability.
+ * Gateway redirect (.htaccess) sends gateway_routed agents to the VPS fast lane. Classic
+ * indexers (Googlebot, Bingbot) stay on canonical for SEO. ModSecurity99000/99001 + WOW
+ * RewriteCond use the same token set as here minus denied_agents — everything else is welcome.
  *
  * Operator map (product name → token): `references/ai_product_ua_map_2026.md`.
  *
