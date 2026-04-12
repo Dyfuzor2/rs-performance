@@ -35,8 +35,8 @@ return {
 };
 """
 
-# After Code node, body is a plain object — stringify for HttpRequest json field.
-NOTIFY_JSON_BODY = "={{ JSON.stringify($json) }}"
+# After Code node, body is a plain object — pass through as JSON (n8n v4.2+ serializes object).
+NOTIFY_JSON_BODY = "={{ $json }}"
 
 NOTIFY_RECEPCJA_JSON_BODY = (
     "={{ JSON.stringify({ "
