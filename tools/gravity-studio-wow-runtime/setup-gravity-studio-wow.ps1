@@ -123,3 +123,4 @@ Write-Host "  Qdrant local:       $(if ($results.qdrantLocal) { 'OK' } else { if
 Write-Host ""
 Write-Host "  Next: Cursor - Reload MCP. Enable github, laravel-boost, qdrant-*-local as needed." -ForegroundColor Green
 Write-Host ""
+exit 0
