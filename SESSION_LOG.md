@@ -448,3 +448,18 @@ Pomiar `redirects` / `final_url`: `curl -L` (follow), `-w '%{num_redirects} %{ur
 ### Weryfikacja
 
 - `setup-gravity-studio-wow.ps1 -NoBrowser` regeneruje `wow.html`.
+
+---
+
+## [2026-04-12] Cursor — N8n: hosting config cache + VPS n8n-mcp API key refresh
+
+### Wykonane
+
+- Hosting: `php85 artisan config:clear` + `config:cache` w `~/domains/rsperformance.online/laravel` (po wcześniejszym merge `N8N_*` w `.env`).
+- VPS: backup `n8n-mcp/.env` → `.env.bak_cursor_n8n_key_refresh`; skrypt `scripts/vps_n8n_mcp_refresh_n8n_api_key.py` (upload `/tmp`, `sudo python3`); `docker compose restart n8n-mcp`; `curl http://127.0.0.1:13000/health` → 200.
+- Usunięto lokalny plik tymczasowy z sekretem `.tmp_n8n_production_merge.txt`.
+
+### Weryfikacja
+
+- SSH hosting: komunikaty OK dla config clear/cache.
+- SSH VPS: `OK: N8N_API_KEY refreshed`; health 200.
