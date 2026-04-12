@@ -141,12 +141,72 @@
     .pill.warn { background: color-mix(in oklch, oklch(0.78 0.14 85) 32%, transparent); color: oklch(0.95 0.06 85); }
     p.ts { font-size: 0.72rem; color: var(--muted); margin: 0.65rem 0 0; opacity: 0.85; }
     code { font-family: ui-monospace, Consolas, monospace; font-size: 0.8rem; color: color-mix(in oklch, var(--gold) 60%, var(--text)); }
+    .quick-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.65rem;
+    }
+    .btn-wow {
+      font: inherit;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      padding: 0.45rem 0.75rem;
+      border-radius: 0.55rem;
+      border: 1px solid var(--border);
+      background: color-mix(in oklch, var(--glass) 88%, oklch(0.15 0.05 280));
+      color: color-mix(in oklch, var(--gold) 70%, var(--text));
+      backdrop-filter: blur(12px);
+      transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+    .btn-wow:hover { border-color: color-mix(in oklch, var(--gold) 40%, var(--border)); box-shadow: 0 0 0 1px color-mix(in oklch, var(--gold) 25%, transparent); }
+    .btn-wow:focus-visible {
+      outline: 2px solid color-mix(in oklch, var(--gold) 65%, transparent);
+      outline-offset: 2px;
+    }
+    @media (hover: hover) {
+      .btn-wow:active { transform: scale(0.98); }
+    }
+    .card.enter {
+      animation: rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    }
+    .grid2 .card:nth-child(1) { animation-delay: 0.06s; }
+    .grid2 .card:nth-child(2) { animation-delay: 0.12s; }
+    .grid2 .card:nth-child(3) { animation-delay: 0.18s; }
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(0.6rem); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    #hub-toast {
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      z-index: 10;
+      padding: 0.55rem 0.9rem;
+      font-size: 0.78rem;
+      font-weight: 650;
+      border-radius: 0.55rem;
+      border: 1px solid var(--border);
+      background: color-mix(in oklch, oklch(0.2 0.08 145) 55%, var(--glass));
+      color: oklch(0.95 0.04 145);
+      opacity: 0;
+      pointer-events: none;
+      translate: 0 0.5rem;
+      transition: opacity 0.25s ease, translate 0.25s ease;
+    }
+    #hub-toast.show { opacity: 1; translate: 0 0; }
   </style>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebApplication","name":"Gravity Studio WOW","applicationCategory":"DeveloperApplication","description":"Single-entry health hub for GitHub MCP, Laravel Boost, and local Qdrant RAG on RS Performance Gravity (April 2026+).","operatingSystem":"Windows","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
+  </script>
 </head>
 <body>
   <div class="mesh" aria-hidden="true"></div>
   <div class="grain" aria-hidden="true"></div>
-  <main class="wrap">
+  <div id="hub-toast" role="status" aria-live="polite"></div>
+  <main class="wrap" style="view-transition-name:hub-main">
     <div class="badge">April 2026+ · Gravity Studio · single entry</div>
     <h1>Gravity Studio WOW</h1>
     <p class="lead">
@@ -154,23 +214,31 @@
       <strong>Qdrant</strong> + <strong>RAG readyz</strong> (Docker). Cursor: przeładuj MCP po zielonych statusach.
     </p>
 
-    <div class="card" style="margin-bottom:1rem">
+    <div class="card enter" style="margin-bottom:1rem">
       <h2>Live status (ostatnie uruchomienie)</h2>
       <!--STUDIO_STATUS-->
+      <h2 style="margin-top:1rem">Szybkie akcje (schowek)</h2>
+      <p style="margin:0 0 0.35rem;color:var(--muted);font-size:0.82rem">Jedno kliknięcie = kopia do clipboard. Cursor: MCP → Reload po włączeniu serwerów.</p>
+      <div class="quick-actions">
+        <button type="button" class="btn-wow" id="btn-copy-studio">Kopiuj komendę Studio (-NoBrowser)</button>
+        <button type="button" class="btn-wow" id="btn-copy-mcp">Kopiuj listę MCP (włącz w Cursorze)</button>
+        <button type="button" class="btn-wow" id="btn-copy-hint">Kopiuj checklistę Reload</button>
+      </div>
+      <!--GRAVITY_STUDIO_COPY_JSON-->
     </div>
 
     <div class="grid2">
-      <div class="card">
+      <div class="card enter">
         <h2>GitHub MCP</h2>
         <p style="margin:0;color:var(--muted);font-size:0.85rem">Binarka + test tokenu.</p>
         <a href="file:///G:/gravity/tools/github-mcp-runtime/wow.html">Otwórz deck GitHub</a>
       </div>
-      <div class="card">
+      <div class="card enter">
         <h2>Laravel Boost</h2>
         <p style="margin:0;color:var(--muted);font-size:0.85rem">PHP 8.5 + boost:mcp.</p>
         <a href="file:///G:/gravity/tools/laravel-boost-mcp-runtime/wow.html">Otwórz deck Boost</a>
       </div>
-      <div class="card">
+      <div class="card enter">
         <h2>Qdrant local</h2>
         <p style="margin:0;color:var(--muted);font-size:0.85rem">Wymaga Docker Desktop.</p>
         <a href="file:///G:/gravity/tools/qdrant-local-runtime/wow.html">Otwórz deck Qdrant</a>
@@ -179,7 +247,33 @@
 
     <p class="ts" style="margin-top:1.25rem">
       Uruchom ponownie: <code>powershell -ExecutionPolicy Bypass -File G:\gravity\tools\gravity-studio-wow-runtime\setup-gravity-studio-wow.ps1</code>
+      · <a href="file:///G:/gravity/.mcp.json" style="color:inherit;font-weight:600">Otwórz .mcp.json</a>
     </p>
   </main>
+  <script>
+(function () {
+  var el = document.getElementById('gravity-studio-copy');
+  var toast = document.getElementById('hub-toast');
+  var cfg = {};
+  try { cfg = JSON.parse(el && el.textContent || '{}'); } catch (e) { cfg = {}; }
+  function flash(msg) {
+    if (!toast) return;
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(flash._t);
+    flash._t = setTimeout(function () { toast.classList.remove('show'); }, 2200);
+  }
+  function copy(text, okMsg) {
+    if (!text) { flash('Brak danych - uruchom setup ponownie'); return; }
+    navigator.clipboard.writeText(text).then(function () { flash(okMsg || 'Skopiowano'); }).catch(function () { flash('Clipboard zablokowany (file://) - Ctrl+C z pola lub uruchom z serwera lokalnego'); });
+  }
+  var b1 = document.getElementById('btn-copy-studio');
+  var b2 = document.getElementById('btn-copy-mcp');
+  var b3 = document.getElementById('btn-copy-hint');
+  if (b1) b1.addEventListener('click', function () { copy(cfg.studioCmd, 'Komenda Studio skopiowana'); });
+  if (b2) b2.addEventListener('click', function () { copy(cfg.mcpBlock, 'Lista MCP skopiowana'); });
+  if (b3) b3.addEventListener('click', function () { copy(cfg.reloadChecklist, 'Checklista skopiowana'); });
+})();
+  </script>
 </body>
 </html>

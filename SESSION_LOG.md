@@ -204,3 +204,17 @@ Pomiar `redirects` / `final_url`: `curl -L` (follow), `-w '%{num_redirects} %{ur
 ### Weryfikacja
 
 - `setup-gravity-studio-wow.ps1 -NoBrowser` → SUMMARY all OK (Docker + Qdrant + Boost + RAG).
+
+---
+
+## [2026-04-12] Cursor — Gravity Studio hub: clipboard WOW + JSON-LD + motion
+
+### Wykonane
+
+- `wow.template.html` — sekcja **Szybkie akcje** (3 przyciski), toast `#hub-toast`, animacja `rise` na kartach, link `file:///G:/gravity/.mcp.json`, **schema.org WebApplication** w `<head>`.
+- `setup-gravity-studio-wow.ps1` — wstrzykiwanie `<script type="application/json" id="gravity-studio-copy">` (studioCmd, mcpBlock, reloadChecklist); inline JS czyta JSON i kopiuje przez Clipboard API.
+- `README.md`, `RELAY.md` — opis + uwaga `file://` vs clipboard.
+
+### Weryfikacja
+
+- `wow.html` zawiera `gravity-studio-copy` z poprawnym JSON; setup `-NoBrowser` EXIT=0.

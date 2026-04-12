@@ -146,11 +146,31 @@ $ragLine
 <p class="ts">Last run (UTC): $($payload.generatedAtUtc)</p>
 "@
 
+$copyPayload = [ordered]@{
+    studioCmd = 'powershell -NoProfile -ExecutionPolicy Bypass -File G:\gravity\tools\gravity-studio-wow-runtime\setup-gravity-studio-wow.ps1 -NoBrowser'
+    mcpBlock = @(
+        'github',
+        'laravel-boost',
+        'qdrant-rs-knowledge-local',
+        'qdrant-rs-dynamic-local',
+        'qdrant-rs-answer-routing-local'
+    ) -join [Environment]::NewLine
+    reloadChecklist = @(
+        'Cursor: Settings > MCP - wlacz serwery, potem Reload.',
+        'Minimum: github, laravel-boost.',
+        'Lokalny RAG (Docker Qdrant): qdrant-rs-knowledge-local, qdrant-rs-dynamic-local, qdrant-rs-answer-routing-local.',
+        'Zrodlo nazw serwerow: G:\gravity\.mcp.json'
+    ) -join [Environment]::NewLine
+}
+$jsonRaw = $copyPayload | ConvertTo-Json -Compress -Depth 5
+$copyScriptTag = '<script type="application/json" id="gravity-studio-copy">' + $jsonRaw + '</script>'
+
 $Wow = Join-Path $Base "wow.html"
 $tpl = Join-Path $Base "wow.template.html"
 if (Test-Path $tpl) {
     $raw = Get-Content -LiteralPath $tpl -Raw -Encoding UTF8
     $out = $raw -replace "<!--STUDIO_STATUS-->", $statusHtml
+    $out = $out -replace "<!--GRAVITY_STUDIO_COPY_JSON-->", $copyScriptTag
     Set-Content -LiteralPath $Wow -Value $out -Encoding UTF8 -NoNewline
 }
 

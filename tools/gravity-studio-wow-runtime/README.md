@@ -8,7 +8,9 @@ Runs **one** health pass across:
 - **Qdrant local** (Docker) — only if Docker Desktop is running
 - **RAG readyz** — `verify-rag-ready.ps1` after Qdrant smoke passes (`/readyz` + collections)
 
-Opens **one** hub page (`wow.html`, generated from `wow.template.html`) with live status chips — no spam of multiple browser windows from sub-runtimes.
+Opens **one** hub page (`wow.html`, generated from `wow.template.html`) with live status chips, **clipboard quick actions** (komenda Studio, lista MCP, checklist Reload), toast UI, staggered card motion, and **JSON-LD** `WebApplication` (AEO-friendly). Brak spamu wielu okien z sub-runtime'ów.
+
+**Uwaga `file://`:** w niektórych przeglądarkach `navigator.clipboard` jest zablokowany dla lokalnych plików; wtedy skopiuj tekst ręcznie z wygenerowanego `last-run-status.json` / ponownie uruchom setup i użyj terminala.
 
 **Agent / CI:** `setup-gravity-studio-wow.ps1 -NoBrowser` — writes `wow.html` and JSON, does not open the default browser.
 
