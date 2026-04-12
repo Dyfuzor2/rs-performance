@@ -1,0 +1,17 @@
+# RS Gravity — local vector DB for RAG (April 2026+ stack)
+# Requires Docker Desktop (Windows). Data persists under ./data/
+#
+# Ports: REST 6333, gRPC 6334 (override via .env if you already bind 6333)
+services:
+  qdrant:
+    image: qdrant/qdrant:v1.13.5
+    container_name: gravity-qdrant-local
+    restart: unless-stopped
+    ports:
+      - "${QDRANT_LOCAL_HTTP:-6333}:6333"
+      - "${QDRANT_LOCAL_GRPC:-6334}:6334"
+    volumes:
+      - ./data/storage:/qdrant/storage
+    environment:
+      QDRANT__LOG_LEVEL: INFO
+    # Official image is minimal; health is verified by setup-qdrant-local-wow.ps1 (HTTP).

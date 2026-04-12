@@ -41,6 +41,36 @@
       },
       "description": "RS Performance exact-answer routing collection on VPS Qdrant."
     },
+    "qdrant-rs-knowledge-local": {
+      "command": "G:\\gravity\\tools\\qdrant-mcp-runtime\\Scripts\\mcp-server-qdrant.exe",
+      "args": [],
+      "env": {
+        "QDRANT_URL": "http://127.0.0.1:6333",
+        "COLLECTION_NAME": "rs_local_static_knowledge",
+        "EMBEDDING_MODEL": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+      },
+      "description": "Local Docker Qdrant — dev RAG mirror (rs_local_*). Run tools/qdrant-local-runtime/start-qdrant.ps1 first."
+    },
+    "qdrant-rs-dynamic-local": {
+      "command": "G:\\gravity\\tools\\qdrant-mcp-runtime\\Scripts\\mcp-server-qdrant.exe",
+      "args": [],
+      "env": {
+        "QDRANT_URL": "http://127.0.0.1:6333",
+        "COLLECTION_NAME": "rs_local_dynamic_knowledge",
+        "EMBEDDING_MODEL": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+      },
+      "description": "Local Docker Qdrant — dynamic/fresh vectors (dev). Same embedding model as VPS entries."
+    },
+    "qdrant-rs-answer-routing-local": {
+      "command": "G:\\gravity\\tools\\qdrant-mcp-runtime\\Scripts\\mcp-server-qdrant.exe",
+      "args": [],
+      "env": {
+        "QDRANT_URL": "http://127.0.0.1:6333",
+        "COLLECTION_NAME": "rs_local_answer_routing",
+        "EMBEDDING_MODEL": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+      },
+      "description": "Local Docker Qdrant — answer-routing experiments without touching VPS."
+    },
     "context7": {
       "command": "npx",
       "args": ["-y", "@upstash/context7-mcp@latest"],

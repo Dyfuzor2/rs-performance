@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#051018" />
+  <title>Qdrant Local RAG · RS Gravity · 2026</title>
+  <style>
+    @property --vec-hue { syntax: "<angle>"; inherits: false; initial-value: 200deg; }
+    :root {
+      --bg: oklch(0.1 0.03 240);
+      --glass: color-mix(in oklch, oklch(0.45 0.12 200) 22%, transparent);
+      --border: color-mix(in oklch, oklch(0.75 0.15 195) 30%, transparent);
+      --accent: oklch(0.78 0.16 195);
+      --accent2: oklch(0.62 0.22 310);
+      --text: oklch(0.97 0.01 240);
+      --muted: oklch(0.65 0.03 240);
+      --font: "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      * { animation-duration: 0.01ms !important; }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      font-family: var(--font);
+      color: var(--text);
+      background: var(--bg);
+    }
+    .mesh {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background:
+        radial-gradient(ellipse 90% 70% at 10% 20%, color-mix(in oklch, var(--accent) 38%, transparent), transparent 55%),
+        radial-gradient(ellipse 70% 60% at 90% 80%, color-mix(in oklch, var(--accent2) 32%, transparent), transparent 50%),
+        conic-gradient(from var(--vec-hue) at 50% 50%, oklch(0.22 0.08 220 / 0.45), transparent 45%, oklch(0.18 0.06 300 / 0.35) 72%);
+      animation: hue 42s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes hue {
+      0%, 100% { --vec-hue: 185deg; }
+      50% { --vec-hue: 285deg; }
+    }
+    .grid {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      opacity: 0.07;
+      background-image:
+        linear-gradient(color-mix(in oklch, var(--accent) 50%, transparent) 1px, transparent 1px),
+        linear-gradient(90deg, color-mix(in oklch, var(--accent) 50%, transparent) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, black, transparent);
+    }
+    .grain {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      opacity: 0.035;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      mix-blend-mode: overlay;
+    }
+    .wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 52rem;
+      margin: 0 auto;
+      padding: clamp(1.5rem, 4vw, 3rem);
+    }
+    .badge {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-weight: 750;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 0.35rem 0.7rem;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--glass);
+      backdrop-filter: blur(12px);
+      margin-bottom: 0.75rem;
+    }
+    h1 {
+      font-size: clamp(1.5rem, 3.2vw, 2rem);
+      font-weight: 800;
+      letter-spacing: -0.035em;
+      margin: 0 0 0.5rem;
+      background: linear-gradient(120deg, var(--text), color-mix(in oklch, var(--accent) 85%, var(--text)));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    p.lead { margin: 0 0 1.25rem; color: var(--muted); line-height: 1.55; font-size: 0.98rem; }
+    .card {
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 1rem 1.15rem;
+      background: var(--glass);
+      backdrop-filter: blur(14px);
+      margin-bottom: 0.75rem;
+    }
+    .card h2 {
+      margin: 0 0 0.5rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+    code {
+      font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+      font-size: 0.82rem;
+      color: color-mix(in oklch, var(--accent) 70%, var(--text));
+    }
+    ul { margin: 0; padding-left: 1.1rem; color: var(--muted); line-height: 1.6; font-size: 0.92rem; }
+    .pill {
+      display: inline-block;
+      margin-top: 0.35rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 0.35rem;
+      background: color-mix(in oklch, var(--accent2) 15%, transparent);
+      font-size: 0.75rem;
+      color: var(--text);
+    }
+  </style>
+</head>
+<body>
+  <div class="mesh" aria-hidden="true"></div>
+  <div class="grid" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+  <main class="wrap">
+    <div class="badge">April 2026+ · vector · local-only</div>
+    <h1>Qdrant lokalnie — RAG bez VPS</h1>
+    <p class="lead">
+      Docker trzyma embeddingi na dysku; MCP <code>mcp-server-qdrant</code> z
+      <code>tools/qdrant-mcp-runtime</code> gada z <code>127.0.0.1:6333</code>.
+      Kolekcje <code>rs_local_*</code> — zero ryzyka pomylenia z produkcją na VPS.
+    </p>
+    <div class="card">
+      <h2>Health</h2>
+      <ul>
+        <li><code>GET http://127.0.0.1:6333/readyz</code> — gotowość</li>
+        <li><code>docker logs gravity-qdrant-local</code> — diagnostyka</li>
+      </ul>
+      <span class="pill">sentence-transformers / paraphrase-multilingual-MiniLM-L12-v2</span>
+    </div>
+    <div class="card">
+      <h2>Cursor</h2>
+      <p class="lead" style="margin:0">Włącz serwery MCP <code>qdrant-rs-*-local</code> w <code>.mcp.json</code>, potem reload MCP.</p>
+    </div>
+  </main>
+</body>
+</html>

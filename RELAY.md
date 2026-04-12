@@ -84,6 +84,7 @@ Na VPS sa tylko rzeczy wspierajace:
 
 - **Canonical**: `rsperformance.online` na Cyber-Folks — **MySQL** to zrodlo prawdy dla zapisow operatora i stanu biznesowego publicznej aplikacji.
 - **VPS**: ten sam support plane co bramka `ai.rsperformance.online` — **Qdrant** (`rs_static_knowledge`, `rs_dynamic_knowledge` i pokrewne) przechowuje **embeddingi / wektorowa pamiec** zsynchronizowana z danymi produkcyjnymi (joby na VPS, nie bezposrednie crawlowanie MySQL przez boty).
+- **Lokalnie (Cursor / dev)**: `G:\gravity\tools\qdrant-local-runtime\` — Docker **Qdrant** na `127.0.0.1:6333`, kolekcje `rs_local_*`, MCP w `.mcp.json` jako `qdrant-rs-*-local` (ten sam `mcp-server-qdrant.exe` co `tools/qdrant-mcp-runtime`). Nie zastepuje VPS; sluzy eksperymentom RAG bez ryzyka dla wektorow produkcyjnych.
 - **Dla agentow AI**: do szerokiego RAG i semantyki uzywaj **gateway semantic search** i narzedzi MCP / Qdrant wskazanych w tym indeksie; **nie** obciazaj shared-host MySQL masowym odczytem. Fakty cytowalne dla uzytkownika koncowego nadal weryfikuj na **kanonicznych URL i eksportach JSON** (np. `ai-resources.json`, freshness, priority paths).
 - **Publiczny kontrakt** dla modeli: pole `knowledge_plane` w `/.well-known/ai-resources.json` (generowane przez `SearchArtifactFactory`).
 
@@ -144,13 +145,13 @@ W `RELAY.md` trzymamy tylko lokalizacje i opis. Nie kopiujemy tu samych hasel i 
 
 ### Telegram / GitHub / inne API
 
-| Typ                         | Lokalizacja                                                                                                                                                                                                                                   |
-| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Telegram bot token / dane   | `G:\gravity\telegram.md`                                                                                                                                                                                                                      |
-| GitHub token / dane         | `G:\gravity\git.md` jesli istnieje; jesli nie, sprawdz aktualny sekret store poza repo                                                                                                                                                        |
-| GitHub MCP (public repos)   | `G:\gravity\tools\github-mcp-runtime\` — `setup-github-mcp-wow.ps1` (albo `install-github-mcp.ps1`) + `test-github-token.ps1`; MCP `github` w `.mcp.json` (read-only, token z env `GITHUB_PERSONAL_ACCESS_TOKEN` lub pierwsza linia `git.md`) |
-| Laravel Boost MCP (lokalnie) | `G:\gravity\tools\laravel-boost-mcp-runtime\` — `run-laravel-boost-mcp.ps1` (PHP: PATH, `GRAVITY_PHP`, lub `php.path`); MCP `laravel-boost` w `.mcp.json`; projekt: `G:\gravity` (`php artisan boost:mcp`) |
-| Google Cloud API key / dane | `G:\gravity\cloud.md`                                                                                                                                                                                                                         |
+| Typ                          | Lokalizacja                                                                                                                                                                                                                                   |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Telegram bot token / dane    | `G:\gravity\telegram.md`                                                                                                                                                                                                                      |
+| GitHub token / dane          | `G:\gravity\git.md` jesli istnieje; jesli nie, sprawdz aktualny sekret store poza repo                                                                                                                                                        |
+| GitHub MCP (public repos)    | `G:\gravity\tools\github-mcp-runtime\` — `setup-github-mcp-wow.ps1` (albo `install-github-mcp.ps1`) + `test-github-token.ps1`; MCP `github` w `.mcp.json` (read-only, token z env `GITHUB_PERSONAL_ACCESS_TOKEN` lub pierwsza linia `git.md`) |
+| Laravel Boost MCP (lokalnie) | `G:\gravity\tools\laravel-boost-mcp-runtime\` — `run-laravel-boost-mcp.ps1` (PHP: PATH, `GRAVITY_PHP`, lub `php.path`); MCP `laravel-boost` w `.mcp.json`; projekt: `G:\gravity` (`php artisan boost:mcp`)                                    |
+| Google Cloud API key / dane  | `G:\gravity\cloud.md`                                                                                                                                                                                                                         |
 
 ### Runtime secrets na serwerach
 

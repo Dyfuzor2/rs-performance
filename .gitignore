@@ -15,6 +15,8 @@ git.md
 tools/github-mcp-runtime/bin/
 # Local path to php.exe for Laravel Boost MCP launcher (optional)
 tools/laravel-boost-mcp-runtime/php.path
+# Local Qdrant Docker volume (tools/qdrant-local-runtime)
+tools/qdrant-local-runtime/data/
 node_modules
 node_modules
 node_modules
