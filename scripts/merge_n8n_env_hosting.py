@@ -5,8 +5,15 @@ Uses ssh_exec.py (SFTP) — no secrets in repo commits.
 
 Usage (from G:\\gravity):
   python scripts/merge_n8n_env_hosting.py n8n.txt
+  python scripts/merge_n8n_env_hosting.py n8n.txt https://n8n-s2.socmid.cloud
 
-Default URL: https://auto.rs3d.pl (VPS n8n; adjust if your instance differs).
+Arg2 (optional): public base URL of the **same** n8n instance where the JWT was created (must match or API returns 401).
+
+Default URL: https://n8n-s2.socmid.cloud (canonical Public API + editor links for RS; override if you use another host).
+
+Credential file formats (April 2026+):
+  • Legacy: single line, JWT only.
+  • Capsule: commented header + ``N8N_API_URL=`` / ``N8N_API_KEY=`` lines (gitignored ``n8n.txt``).
 """
 from __future__ import annotations
 
@@ -16,7 +23,44 @@ import sys
 from pathlib import Path
 
 REMOTE_ENV = "domains/rsperformance.online/laravel/.env"
-DEFAULT_BASE = "https://auto.rs3d.pl"
+DEFAULT_BASE = "https://n8n-s2.socmid.cloud"
+
+# Public API JWT: three dot-separated segments (n8n-issued).
+_JWT_RE = re.compile(r"\b(eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+)\b")
+
+
+def _looks_like_n8n_jwt(s: str) -> bool:
+    parts = s.split(".")
+    if len(parts) != 3 or not parts[0].startswith("eyJ"):
+        return False
+    return all(len(p) > 0 for p in parts)
+
+
+def extract_n8n_api_key(text: str) -> str:
+    """Parse JWT from capsule (N8N_API_KEY=) or raw single-line token."""
+    for line in text.splitlines():
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#"):
+            continue
+        if stripped.upper().startswith("N8N_API_KEY="):
+            val = stripped.split("=", 1)[1].strip().strip('"').strip("'")
+            if val:
+                return val
+    m = _JWT_RE.search(text)
+    if m:
+        return m.group(1)
+    return text.strip()
+
+
+def extract_n8n_api_url_hint(text: str) -> str | None:
+    """If capsule defines N8N_API_URL=, use as default when CLI arg2 is omitted."""
+    for line in text.splitlines():
+        stripped = line.strip()
+        if stripped.upper().startswith("N8N_API_URL="):
+            val = stripped.split("=", 1)[1].strip().strip('"').strip("'")
+            if val.startswith("http"):
+                return val.rstrip("/")
+    return None
 
 
 def strip_n8n_lines(text: str) -> str:
@@ -31,13 +75,25 @@ def strip_n8n_lines(text: str) -> str:
 def main() -> int:
     root = Path(__file__).resolve().parents[1]
     key_path = Path(sys.argv[1]) if len(sys.argv) > 1 else root / "n8n.txt"
+    if len(sys.argv) > 2:
+        base_url = sys.argv[2].strip().rstrip("/")
+    else:
+        base_url = DEFAULT_BASE
     if not key_path.is_file():
         print(f"Missing key file: {key_path}", file=sys.stderr)
         return 1
 
-    raw = key_path.read_text(encoding="utf-8").strip()
-    if not raw or raw.startswith("#"):
+    full = key_path.read_text(encoding="utf-8")
+    raw = extract_n8n_api_key(full)
+    if len(sys.argv) <= 2:
+        hint = extract_n8n_api_url_hint(full)
+        if hint:
+            base_url = hint
+    if not raw:
         print("Key file empty or placeholder.", file=sys.stderr)
+        return 1
+    if not _looks_like_n8n_jwt(raw):
+        print("Could not parse n8n API JWT (expected N8N_API_KEY=... or raw token).", file=sys.stderr)
         return 1
 
     local_tmp = root / ".tmp_env_n8n_merge"
@@ -52,8 +108,8 @@ def main() -> int:
     body = strip_n8n_lines(local_tmp.read_text(encoding="utf-8"))
     block = (
         f"\n# n8n Public REST API (Filament WOW Ops Hub) — docs.n8n.io/api\n"
-        f"N8N_API_URL={DEFAULT_BASE}\n"
-        f"N8N_EDITOR_BASE_URL={DEFAULT_BASE}\n"
+        f"N8N_API_URL={base_url}\n"
+        f"N8N_EDITOR_BASE_URL={base_url}\n"
         f"N8N_API_KEY={raw}\n"
     )
     local_tmp.write_text(body + block, encoding="utf-8")
