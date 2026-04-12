@@ -1,3 +1,5 @@
+> LIVE FILAMENT N8N WOW OPS HUB (2026-04-12 CET)
+> Hosting `domains/rsperformance.online/laravel/`: wdrożono Filament **n8n WOW Ops Hub** (`N8nWorkflowDocumentResource` + widget `N8nWorkflowHubOverview`), migracja `2026_04_12_150000_create_n8n_workflow_documents_table`, seed `N8nWorkflowDocumentSeeder`, `config/n8n.php`, `OpsVerifyN8nHostingBridgeCommand`. Utworzono zdalne katalogi `.../N8nWorkflowDocumentResource/Pages|Widgets`, `app/Support/N8n`. Backupy: `database/seeders/DatabaseSeeder.php.bak_cursor_n8n_wow_20260412`, `config/n8n.php.bak_cursor_n8n_wow_20260412`. Komendy: `composer dump-autoload -o`, `php85 artisan migrate --force`, `php85 artisan db:seed --class=N8nWorkflowDocumentSeeder --force`, `php85 artisan optimize:clear`. Trasy: `GET admin/n8n-workflow-documents` (+ create/edit). Smoke z serwera: `curl` `https://rsperformance.online/` i `/admin/login` => **200**; `php85 artisan route:list --path=n8n` => **3** trasy.
 > LIVE AI CATALOG + ARTIFACTS SYNC (2026-04-12 CET)
 > Hosting `laravel/`: wgrano z repo `config/ai_agents.php`, `SearchArtifactFactory.php`, `AiDiscoveryArtifactBuilder.php`. Backupy: `*.bak_cursor_sync_20260412`. Komendy: `php85 artisan config:clear`, `php85 artisan search:artifacts-generate` (OK). Test na serwerze: `tests/Unit/AiAgentsInclusivePolicyTest.php` → **1 passed**. Publicznie: `/.well-known/ai-resources.json` zawiera zaktualizowane `catalog_policy` / listy agentów.
 > LIVE FULL CATALOG HTACCESS (2026-04-12 CET)
@@ -2180,4 +2182,11 @@ _Informacje o dostÄ™pie SSH, VPS i Google Cloud zostaĹ‚y przeniesione i zo
     - dla tego schedule-based workflow nie ma jeszcze sensownego manual-run proof po API; uczciwy finalny proof to najbli�szy scheduled run
     - w AEO residual nadal istnieje brak kana�u loga `ai-invitations`
 - Nowy lokalny plik operacyjny:
-    - `G:\gravity\cursor.md` zawiera pe�ny secret ops pack dla nowego agenta Cursor
+    - `G:\gravity\cursor.md` zawiera pelny secret ops pack dla nowego agenta Cursor
+
+## Operator: SSH, smoke zaproszonych AI, OpenRouter (2026-04-13)
+
+- **`ssh_exec.py`**: hasło wyłącznie w zmiennej środowiskowej **`CYBERFOLKS_SSH_PASSWORD`** (opcjonalnie `CYBERFOLKS_SSH_HOST`, `CYBERFOLKS_SSH_PORT`, `CYBERFOLKS_SSH_USER`). Nie commituj haseł. Długie komendy SSH: **`SSH_EXEC_TIMEOUT`** (sekundy, domyślnie 120).
+- **Smoke wszystkich `tracked_user_agents`**: `python scripts/live_ai_invited_smoke.py` z katalogu `G:\gravity` — cel `https://rsperformance.online/kody-usterek/p0299`, nagłówek `X-RS-Synthetic-Probe: 1`. Jeśli brzeg zwraca 403 dla fałszywego Googlebot: opcjonalnie **`SMOKE_ALLOW_GOOGLEBOT_403=1`** (patrz log smoke; realny Googlebot weryfikuj GSC).
+- **OpenRouter (`OPENROUTER_API_KEY`, format `sk-or-v1-…`)**: wyłącznie w **`.cursor/mcp.env`** (jest w `.gitignore`), ewentualnie hosting **`laravel/.env`** lub **n8n → Credentials** — nigdy w artifactach ani w repozytorium. Scala lokalnie: `python scripts/hydrate_mcp_env_from_workspace.py`. Po wycieku klucza: rotacja w panelu OpenRouter i aktualizacja n8n + `mcp.env`.
+- **AEO / discovery**: po zmianach w `SearchArtifactFactory` na produkcji: backup → `php85 artisan search:artifacts-generate` → w JSON **`/.well-known/ai-resources.json`** jest blok **`openrouter_operator_surface`** (jak laczyc fetch discovery z routerem modeli bez publikowania sekretow). **`llms.txt`** zawiera skrocona wersje tej polityki.
