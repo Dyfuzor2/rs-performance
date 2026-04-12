@@ -4,6 +4,19 @@ Format relay: jeden blok na sesję, bez kasowania cudzych wpisów. Starsze wpisy
 
 ---
 
+## [2026-04-12] Cursor — n8n: `mcp.env` zasilony, verify OK, redakcja sekretu w HANDOFF
+
+### Wykonane (lokalnie)
+
+- `.cursor/mcp.env` utworzony (gitignored): URL + klucz API; `verify-n8n-api.ps1` → OK wobec `https://auto.rs3d.pl`.
+- `HANDOFF.md`: usunięty plaintext JWT z sekcji API + poprawiona linia CREDENTIALS — kanonicznie tylko `mcp.env`.
+
+### Ryzyko
+
+- JWT kiedyś był w treści HANDOFF / innych plikach w workspace — **rotacja klucza w n8n** zalecana; przegląd lokalnych skryptów z hardcoded `N8N_API_KEY`.
+
+---
+
 ## [2026-04-12] Cursor — n8n MCP: `run-n8n-mcp.ps1` + `.cursor/mcp.env` (pinned runtime)
 
 ### Wykonane

@@ -1,3 +1,13 @@
+## 2026-04-12 — n8n: `.cursor/mcp.env` zasilony + API OK + redakcja JWT w HANDOFF
+
+### Agent: Cursor
+
+### STATUS: LOKALNY (gitignored `mcp.env` + commit tylko HANDOFF)
+
+- **Wykonane:** utworzono `G:\gravity\.cursor\mcp.env` z `N8N_API_URL` / `N8N_API_KEY`; `npm install` w `tools/n8n-mcp-runtime`; `verify-n8n-api.ps1` → **OK** (workflows probe).
+- **Bezpieczeństwo:** usunięto plaintext JWT z sekcji „VPS n8n API KEY” i z listy CREDENTIALS (historyczny wpis) — wskazówka: tylko `mcp.env` + rotate jeśli kiedykolwiek leak.
+- **Next:** Reload MCP / okno Cursora. Rozważyć rotację klucza n8n i czyszczenie kopii JWT w lokalnych skryptach `??` (deploy_*.py itd.).
+
 ## 2026-04-12 — n8n MCP: launcher `run-n8n-mcp.ps1` + `.cursor/mcp.env`
 
 ### Agent: Cursor
@@ -352,15 +362,11 @@
 4. Added `onError: continueRegularOutput` — no more workflow crashes
 5. Updated Parse & Validate to detect Gemini error responses and report via Telegram
 
-### VPS n8n API KEY (CORRECT, tested):
+### VPS n8n API KEY (operational)
 
-```
-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhNTIzYmM3ZC0wMjIwLTQ3NjktYjYyNC0yNzc5MGRkZmFiYWUiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwianRpIjoiMzFmOWRjZjQtOWZmMy00NTI1LTg5NjktZTgwZTY3MDUwMzg3IiwiaWF0IjoxNzc1NDg4MDQ0LCJleHAiOjE4MDcwMjQwNDQ1Nzl9.euLUzLFbG8Vii7NrbmxqBrCBMTwqLlIROYDt86AgFho
-```
-
-- Label: `crew-2026`, scopes: full (workflow CRUD, execution read/list, credential CRUD)
-- Expires: June 2027
-- The JWT from MEMORY.md (`DxZm3GSt7EkhL27B...`) was WRONG — was never the real key
+- **Canonical secret surface (2026-04+):** `G:\gravity\.cursor\mcp.env` — `N8N_API_URL`, `N8N_API_KEY` (gitignored). Uruchom `tools/n8n-mcp-runtime/verify-n8n-api.ps1` po zmianie klucza.
+- **Cursor MCP:** `n8n-mcp` ładuje ten plik przez `run-n8n-mcp.ps1`.
+- **Historycznie:** label `crew-2026`, scopes full; klucz **nie** powinien już występować w plaintext w repo — jeśli kiedykolwiek był w HANDOFF, **rotate w n8n (Settings → API)** i zaktualizuj wyłącznie `mcp.env` oraz lokalne skrypty deploy.
 
 ### n8n WORKFLOW UPDATE PROCEDURE:
 
@@ -441,7 +447,7 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhNTIzYmM3ZC0wMjIwLTQ3NjktYjYyNC0
 - **Hosting SSH upload:** `python G:/gravity/ssh_exec.py --upload <local> <remote>`
 - **VPS SSH:** `python G:/gravity/vps_exec.py "<command>"` — rsops@185.180.207.211, key auth
 - **VPS SFTP:** paramiko, key=C:/Users/oli22/.ssh/cyberfolks_rsa
-- **n8n API:** https://auto.rs3d.pl, key: eyJhbGciOiJIUzI1NiIs... (see MEMORY.md)
+- **n8n API:** `https://auto.rs3d.pl` — klucz wyłącznie w `.cursor/mcp.env` (`N8N_API_KEY`, gitignored); MCP: `run-n8n-mcp.ps1`.
 - **Blog pipeline key:** dad9f6e1563b97d0a0ab3250c67fc95513848e73b0926e62 (header: X-RS-Blog-Pipeline-Key)
 - **Telegram bot:** 8657034872:AAHNOek1HWJ-WtKKD3LXCm4l9AqTEezYey8, chat: 6534705697
 - **Gemini API:** AIzaSyCPCa22B-bPL1GyvgeKBiTr7eemL_8rqpU
