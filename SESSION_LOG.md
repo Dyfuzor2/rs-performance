@@ -4,6 +4,15 @@ Format relay: jeden blok na sesję, bez kasowania cudzych wpisów. Starsze wpisy
 
 ---
 
+## [2026-04-12] Cursor — bootstrap-operator-wow-stack.ps1 (mega jeden strzal)
+
+### Wykonane
+
+- `tools/bootstrap-operator-wow-stack.ps1` — kolejnosc: opcjonalny `-InstallDeps`, `install-gcloud-wow.ps1`, sync env lub sam `--check`, weryfikacja `node_modules` dla n8n/telegram/gcloud WOW MCP.
+- `RELAY.md` (Operator env WOW), `agent-start-inventory.mdc`.
+
+---
+
 ## [2026-04-12] Cursor — Telegram MCP + gcloud WOW (install + read-only MCP) + plan/RELAY
 
 ### Wykonane

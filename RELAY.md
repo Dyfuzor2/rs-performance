@@ -179,7 +179,8 @@ W `RELAY.md` trzymamy tylko lokalizacje i opis. Nie kopiujemy tu samych hasel i 
 
 - **Zrodlo prawdy lokalnie:** `G:\gravity\cursor.md` (gitignored) + `HANDOFF.md` + skan wybranych `*.json` (OpenRouter, Meta) w korzeniu / `storage/app`.
 - **Cel:** `G:\gravity\.cursor\mcp.env` (nigdy commitowac wartosci).
-- **Jeden przebieg (Windows, PowerShell):** `pwsh -File G:\gravity\scripts\sync-operator-env-wow.ps1` — najpierw merge, potem `--check` (tylko skroty / OK-MISS).
+- **Mega-bootstrap (wszystko naraz):** `pwsh -File G:\gravity\tools\bootstrap-operator-wow-stack.ps1` — gcloud installer, env (`cursor.md` lub sam `--check`), lista MCP runtime; opcjonalnie `-InstallDeps` (pelny `npm` jak `install-cursor-mcp-deps.ps1`).
+- **Tylko env:** `pwsh -File G:\gravity\scripts\sync-operator-env-wow.ps1` — merge + `--check`.
 - **Recznie:** `python scripts/hydrate_mcp_env_from_workspace.py` potem `python scripts/hydrate_mcp_env_from_workspace.py --check` (opcja `--json` dla agentow).
 - **Walidacja n8n po sync:** `python -c "import sys; sys.path.insert(0,'scripts'); from gravity_cursor_env import require_n8n_api; require_n8n_api(); print('n8n OK')"`
 
@@ -208,6 +209,7 @@ W `RELAY.md` trzymamy tylko lokalizacje i opis. Nie kopiujemy tu samych hasel i 
 | n8n MCP runtime (pin)          | `G:\gravity\tools\n8n-mcp-runtime`             | `n8n-mcp@^2.47.5` dla spojnosci z `npx`                                                                                    |
 | Telegram MCP (operator)       | `G:\gravity\tools\telegram-mcp-runtime`        | Bot API stdio MCP; `install-telegram-mcp.ps1`, `run-telegram-mcp.ps1`, env z `.cursor/mcp.env`                             |
 | gcloud WOW (CLI + status MCP) | `G:\gravity\tools\gcp-gcloud-wow-runtime`      | `install-gcloud-wow.ps1` (winget), read-only MCP `gcloud_wow_*`; pelny GCP nadal VPS/SSH                                   |
+| Operator bootstrap WOW        | `G:\gravity\tools\bootstrap-operator-wow-stack.ps1` | jeden strzal: gcloud + env + check + MCP foldery; `-InstallDeps` = pelny npm |
 | Instalacja deps MCP (Windows)  | `G:\gravity\tools\install-cursor-mcp-deps.ps1` | `npm install` w repo n8n-mcp + runtime                                                                                     |
 | n8n docs mirror                | `G:\gravity\research\docs-sources\n8n-docs`    | lokalna dokumentacja workflow                                                                                              |
 | n8n skill pack                 | `G:\gravity\n8n-skills`                        | workflow patterns, validation, MCP tools expert                                                                            |
