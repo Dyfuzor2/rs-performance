@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark" />
+  <title>GitHub MCP · RS Gravity · 2026</title>
+  <style>
+    :root {
+      --bg0: oklch(0.14 0.02 260);
+      --bg1: oklch(0.18 0.03 265);
+      --glass: color-mix(in oklch, oklch(0.35 0.02 260) 35%, transparent);
+      --border: color-mix(in oklch, oklch(0.75 0.12 25) 35%, transparent);
+      --accent: oklch(0.72 0.2 25);
+      --accent2: oklch(0.65 0.15 250);
+      --text: oklch(0.95 0.01 260);
+      --muted: oklch(0.65 0.02 260);
+      --font: "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      font-family: var(--font);
+      color: var(--text);
+      background: var(--bg0);
+      overflow-x: hidden;
+    }
+    .mesh {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background:
+        radial-gradient(ellipse 90% 60% at 10% -10%, color-mix(in oklch, var(--accent) 45%, transparent), transparent 55%),
+        radial-gradient(ellipse 70% 50% at 100% 100%, color-mix(in oklch, var(--accent2) 35%, transparent), transparent 50%),
+        radial-gradient(ellipse 50% 40% at 50% 120%, oklch(0.3 0.08 150 / 0.25), transparent 45%);
+      pointer-events: none;
+    }
+    .wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 52rem;
+      margin: 0 auto;
+      padding: clamp(1.5rem, 4vw, 3rem);
+    }
+    h1 {
+      font-size: clamp(1.35rem, 3vw, 1.85rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin: 0 0 0.35rem;
+    }
+    .sub {
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.5;
+      margin-bottom: 1.75rem;
+    }
+    .card {
+      border-radius: 1.15rem;
+      padding: 1.35rem 1.5rem;
+      background: var(--glass);
+      backdrop-filter: blur(14px) saturate(1.35);
+      border: 1px solid var(--border);
+      box-shadow:
+        0 0 0 1px color-mix(in oklch, white 6%, transparent) inset,
+        0 24px 48px -28px oklch(0 0 0 / 0.55);
+      margin-bottom: 1rem;
+    }
+    .card h2 {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--muted);
+      margin: 0 0 0.85rem;
+      font-weight: 700;
+    }
+    ol {
+      margin: 0;
+      padding-left: 1.15rem;
+      line-height: 1.65;
+      color: var(--text);
+    }
+    ol li { margin-bottom: 0.45rem; }
+    code {
+      font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+      font-size: 0.82em;
+      padding: 0.12em 0.35em;
+      border-radius: 0.35rem;
+      background: oklch(0.22 0.02 260);
+      border: 1px solid oklch(0.35 0.02 260);
+    }
+    .pulse {
+      display: inline-block;
+      width: 0.45rem;
+      height: 0.45rem;
+      border-radius: 50%;
+      background: oklch(0.75 0.2 145);
+      box-shadow: 0 0 0 3px oklch(0.75 0.2 145 / 0.25);
+      animation: pulse 2.4s ease-in-out infinite;
+      margin-right: 0.4rem;
+      vertical-align: middle;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.65; transform: scale(1.1); }
+    }
+    a {
+      color: color-mix(in oklch, var(--accent) 90%, white);
+      text-underline-offset: 3px;
+    }
+    .foot {
+      margin-top: 1.5rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="mesh" aria-hidden="true"></div>
+  <div class="wrap">
+    <h1><span class="pulse" aria-hidden="true"></span>GitHub MCP — operator deck</h1>
+    <p class="sub">Oficjalny <strong>github-mcp-server</strong> (stdio, read-only), stack kwiecień 2026+: supply-chain SHA256 na ZIP, token tylko lokalnie (<code>git.md</code> / env).</p>
+
+    <div class="card">
+      <h2>Checklist</h2>
+      <ol>
+        <li>Uruchom <code>setup-github-mcp-wow.ps1</code> (instalacja + test API).</li>
+        <li>W Cursorze: przeładuj serwery MCP i włącz <code>github</code>.</li>
+        <li>Agent może przeszukiwać <strong>publiczne</strong> repozytoria innych użytkowników przez narzędzia MCP (repozytoria, kontekst, użytkownicy).</li>
+      </ol>
+    </div>
+
+    <div class="card">
+      <h2>Źródło</h2>
+      <p style="margin:0;line-height:1.6">
+        <a href="https://github.com/github/github-mcp-server" target="_blank" rel="noopener">github/github-mcp-server</a>
+        ·
+        <a href="https://docs.github.com/en/rest" target="_blank" rel="noopener">GitHub REST API</a>
+      </p>
+    </div>
+
+    <p class="foot">RS Performance · G:\gravity\tools\github-mcp-runtime · bez zapisu sekretów w repo</p>
+  </div>
+</body>
+</html>

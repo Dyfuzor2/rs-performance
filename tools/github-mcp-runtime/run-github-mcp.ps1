@@ -21,7 +21,8 @@ if ([string]::IsNullOrWhiteSpace($token)) {
 
 $env:GITHUB_PERSONAL_ACCESS_TOKEN = $token
 if ([string]::IsNullOrWhiteSpace($env:GITHUB_TOOLSETS)) {
-    $env:GITHUB_TOOLSETS = "repos,users,context"
+    # repos + users + context + stargazers: richer discovery on public repos (April 2026 default)
+    $env:GITHUB_TOOLSETS = "repos,users,context,stargazers"
 }
 
 & $Exe @("stdio", "--read-only")
