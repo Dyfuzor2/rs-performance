@@ -1,3 +1,14 @@
+## 2026-04-12 — Sekrety operatora: OpenRouter / Telegram / Meta / RS — tylko `.cursor/mcp.env`
+
+### Agent: Cursor
+
+### STATUS: REPO + lokalny `mcp.env` (stuby dopisane)
+
+- **`gravity_cursor_env.py`** rozszerzone o `require_openrouter_api_key`, `require_rs_x_api_token`, `require_telegram_operator`, `require_facebook_*`, `require_rs_blog_pipeline_key`, `require_telegram_token_migration`.
+- **Bez twardych sekretów:** `deploy_trending_faults.py`, `deploy_trinity_crew.py`, `deploy_telegram_blog.py`, `trinity_dtc_workflow.py`, `fix_all_telegram_tokens.py`, `execution/update_email.py`, `execution/update_fb_metadata.py`.
+- **Dokumentacja:** `.cursor/mcp.env.example`, `tools/n8n-mcp-runtime/README.md`, `agent-start-inventory.mdc`.
+- **Ty:** uzupełnij nowe klucze w `.cursor/mcp.env` (po migracji z poprzednich wersji plików lub po rotacji). `fix_all_telegram_tokens.py` wymaga czterech `*_REPLACE_*`.
+
 ## 2026-04-12 — Operator WOW: `gravity_cursor_env.py` + smoke webhooków + gitignore na lokalne sekrety
 
 ### Agent: Cursor

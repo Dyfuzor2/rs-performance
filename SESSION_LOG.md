@@ -4,6 +4,21 @@ Format relay: jeden blok na sesję, bez kasowania cudzych wpisów. Starsze wpisy
 
 ---
 
+## [2026-04-12] Cursor — operator secrets: deploy_*.py + execution/* → mcp.env only
+
+### Wykonane
+
+- `scripts/gravity_cursor_env.py`: `require_openrouter_api_key`, `require_rs_x_api_token`, `require_telegram_operator`, Meta Graph helpers, `require_rs_blog_pipeline_key`, `require_telegram_token_migration`.
+- Usunięte twarde sekrety z: `deploy_trending_faults.py`, `deploy_trinity_crew.py`, `deploy_telegram_blog.py`, `trinity_dtc_workflow.py`, `fix_all_telegram_tokens.py`, `execution/update_email.py`, `execution/update_fb_metadata.py`.
+- `.cursor/mcp.env.example`, `tools/n8n-mcp-runtime/README.md`, `agent-start-inventory.mdc` — dokumentacja kluczy.
+- Lokalnie: dopisane puste stuby brakujących kluczy w `.cursor/mcp.env` (użytkownik uzupełnia wartości).
+
+### Rekomendacja
+
+- Rotacja wszystkich kluczy, które kiedykolwiek były w repozytorium lub czacie.
+
+---
+
 ## [2026-04-12] Cursor — gravity_cursor_env + smoke manifest + gitignore cursor.md/n8n.md
 
 ### Wykonane

@@ -11,9 +11,17 @@ Pinned **`n8n-mcp@^2.47.5`** — no per-session `npx` resolution. Cursor talks t
 5. Optional: `powershell -File smoke-critical-webhooks.ps1` — manifest-driven POST smoke (`critical-webhooks.manifest.json`).
 6. **Cursor:** reload window (or restart MCP). Entry `n8n-mcp` must use `run-n8n-mcp.ps1` (see `.mcp.json` / `.cursor/mcp.json`).
 
-## Python scripts (repo root)
+## Python scripts (repo root + `execution/`)
 
-Use `scripts/gravity_cursor_env.py` → `require_n8n_api()` so JWT never lives in `.py` files.
+`scripts/gravity_cursor_env.py` loads `.cursor/mcp.env` once per process:
+
+- `require_n8n_api()` — n8n REST
+- `require_openrouter_api_key()`, `require_rs_x_api_token()`, `require_rs_blog_pipeline_key()`
+- `require_telegram_operator()` — `(TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID)`
+- `require_facebook_page_access_token()`, `require_facebook_graph_user_token()`, `require_facebook_page_id()`, `require_facebook_page_update_token()`
+- `require_telegram_token_migration()` — cztery zmienne `*_REPLACE_*` dla `fix_all_telegram_tokens.py`
+
+Pełna lista kluczy: `.cursor/mcp.env.example`.
 
 ## Operations on VPS
 

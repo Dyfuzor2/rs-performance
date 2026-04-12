@@ -42,6 +42,20 @@ def load_cursor_env(*, overwrite: bool = False) -> int:
     return count
 
 
+def require_env_any(*names: str) -> str:
+    """First non-empty value among env keys (after load_cursor_env)."""
+    load_cursor_env()
+    for name in names:
+        v = (os.environ.get(name) or "").strip()
+        if v:
+            return v
+    joined = ", ".join(names)
+    raise RuntimeError(
+        f"Missing required environment variable (one of: {joined}). "
+        "Add it to .cursor/mcp.env — see .cursor/mcp.env.example."
+    )
+
+
 def require_n8n_api() -> tuple[str, str]:
     """Return (base_url without trailing slash, api_key). Raises RuntimeError if missing."""
     load_cursor_env()
@@ -54,3 +68,72 @@ def require_n8n_api() -> tuple[str, str]:
         )
         raise RuntimeError(msg)
     return url, key
+
+
+def require_openrouter_api_key() -> str:
+    return require_env_any("OPENROUTER_API_KEY")
+
+
+def require_rs_x_api_token() -> str:
+    """Shared X-API-Token for RS hosting / Diagnosta edge routes."""
+    return require_env_any("RS_X_API_TOKEN", "RS_DIAG_API_TOKEN")
+
+
+def require_telegram_bot_token() -> str:
+    return require_env_any("TELEGRAM_BOT_TOKEN")
+
+
+def require_telegram_chat_id() -> str:
+    return require_env_any("TELEGRAM_CHAT_ID")
+
+
+def require_telegram_operator() -> tuple[str, str]:
+    return require_telegram_bot_token(), require_telegram_chat_id()
+
+
+def require_facebook_page_access_token() -> str:
+    """Long-lived user or page token for Graph (publish, metadata)."""
+    return require_env_any(
+        "FACEBOOK_PAGE_ACCESS_TOKEN",
+        "META_PAGE_ACCESS_TOKEN",
+    )
+
+
+def require_facebook_page_update_token() -> str:
+    """POST/PATCH Page object (emails etc.): page token preferred, else user with admin."""
+    return require_env_any(
+        "FACEBOOK_PAGE_ACCESS_TOKEN",
+        "FACEBOOK_GRAPH_USER_ACCESS_TOKEN",
+    )
+
+
+def require_facebook_graph_user_token() -> str:
+    """User token with `pages_show_list` / manage_pages (me/accounts flow)."""
+    return require_env_any(
+        "FACEBOOK_GRAPH_USER_ACCESS_TOKEN",
+        "FACEBOOK_GRAPH_ACCESS_TOKEN",
+    )
+
+
+def require_facebook_page_id() -> str:
+    return require_env_any("FACEBOOK_PAGE_ID")
+
+
+def require_rs_blog_pipeline_key() -> str:
+    return require_env_any("RS_BLOG_PIPELINE_KEY", "X_RS_BLOG_PIPELINE_KEY")
+
+
+def require_telegram_token_migration() -> tuple[str, str, str, str]:
+    """(old_bot_token, new_bot_token, old_chat_id, new_chat_id) for bulk n8n replace."""
+    load_cursor_env()
+    ot = (os.environ.get("TELEGRAM_BOT_TOKEN_REPLACE_FROM") or "").strip()
+    nt = (os.environ.get("TELEGRAM_BOT_TOKEN_REPLACE_TO") or "").strip()
+    oc = (os.environ.get("TELEGRAM_CHAT_ID_REPLACE_FROM") or "").strip()
+    nc = (os.environ.get("TELEGRAM_CHAT_ID_REPLACE_TO") or "").strip()
+    if not all((ot, nt, oc, nc)):
+        raise RuntimeError(
+            "Telegram migration requires TELEGRAM_BOT_TOKEN_REPLACE_FROM, "
+            "TELEGRAM_BOT_TOKEN_REPLACE_TO, TELEGRAM_CHAT_ID_REPLACE_FROM, "
+            "TELEGRAM_CHAT_ID_REPLACE_TO in .cursor/mcp.env."
+        )
+    return ot, nt, oc, nc
