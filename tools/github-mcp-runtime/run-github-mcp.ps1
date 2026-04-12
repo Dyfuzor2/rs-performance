@@ -3,7 +3,7 @@ $ErrorActionPreference = "Stop"
 $Base = Split-Path -Parent $MyInvocation.MyCommand.Path
 $Exe = Join-Path $Base "bin\github-mcp-server.exe"
 if (-not (Test-Path $Exe)) {
-    Write-Error "Missing $Exe — run install-github-mcp.ps1 first."
+    Write-Error "Missing $Exe - run install-github-mcp.ps1 first."
     exit 1
 }
 

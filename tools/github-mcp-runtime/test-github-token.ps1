@@ -17,6 +17,6 @@ try {
     Write-Host "OK: authenticated as $($u.login) (id $($u.id))"
     exit 0
 } catch {
-    Write-Host "FAIL: GitHub API error — $($_.Exception.Message)"
+    Write-Host "FAIL: GitHub API error - $($_.Exception.Message)"
     exit 1
 }

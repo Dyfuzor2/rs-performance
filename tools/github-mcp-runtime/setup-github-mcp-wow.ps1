@@ -13,7 +13,7 @@ function Invoke-SetupScript {
 
 if (-not (Test-Path $Exe)) {
     Write-Host ""
-    Write-Host "  === GitHub MCP — installing official binary (v0.32.0) ===" -ForegroundColor Cyan
+    Write-Host "  === GitHub MCP - installing official binary (v0.32.0) ===" -ForegroundColor Cyan
     Write-Host ""
     $code = Invoke-SetupScript (Join-Path $Base "install-github-mcp.ps1")
     if ($code -ne 0) {
@@ -40,8 +40,8 @@ if (Test-Path $Wow) {
 
 Write-Host ""
 if ($tokenOk) {
-    Write-Host "  DONE — Reload MCP in Cursor (github server) and use agent tools to explore public repos." -ForegroundColor Green
+    Write-Host "  DONE - Reload MCP in Cursor (github server) and use agent tools to explore public repos." -ForegroundColor Green
 } else {
-    Write-Host "  Token check failed — fix git.md or GITHUB_PERSONAL_ACCESS_TOKEN, then re-run this script." -ForegroundColor Yellow
+    Write-Host "  Token check failed - set git.md (line 1) or GITHUB_PERSONAL_ACCESS_TOKEN, then re-run this script." -ForegroundColor Yellow
 }
 Write-Host ""
