@@ -1,3 +1,14 @@
+## 2026-04-12 — Cursor: `agent-start-inventory.mdc` (start sesji) + RELAY §1
+
+### Agent: Cursor
+
+### STATUS: REPO (tylko dokumentacja / Cursor rules)
+
+- **Cel:** jeden plik ładowany przy starcie Cursora z inventory narzędzi i skrótem użycia.
+- **Repo:** `.cursor/rules/agent-start-inventory.mdc` (`alwaysApply: true`); `RELAY.md` §1 — wskaźnik auto-ładowania obok `gravity-directives.mdc`.
+- **SESSION_LOG:** wpis `[2026-04-12] Cursor — agent-start-inventory.mdc`.
+- **Next:** Reload okna Cursora jeśli reguły nie weszły od razu; dalsza praca wg `plan.md` (smoke daily news / n8n obserwacja).
+
 ## 2026-04-12 (lokalnie) — Ensure-GravityPhpIni: WinGet PHP + mbstring auto dla Boost MCP / Pint
 
 ### Agent: Cursor

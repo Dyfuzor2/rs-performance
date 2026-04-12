@@ -1,0 +1,42 @@
+---
+description: Start sesji — co masz pod ręką i jak tego używać (inventory + skróty)
+alwaysApply: true
+---
+
+# Agent start — inventory i użycie
+
+Ten plik **ładuje się automatycznie** w Cursorze (`alwaysApply`). Traktuj go jako szybki indeks; pełne zasady są w `RELAY.md`, `gravity-directives.mdc`, `AGENTS.md`, `start.md`.
+
+## Co czytać dalej (kolejność)
+
+1. `RELAY.md` — mapa projektu, architektura, gdzie są sekrety (tylko ścieżki).
+2. `HANDOFF.md` — ostatni stan, **AKTUALNA OPERACJA**, zamrożone blockerki.
+3. `plan.md` — focus, blocker, next step.
+4. `GEO.md` — AEO/GEO, deduplikacja skilli.
+5. `start.md` — produkcja, SSH hosting, weryfikacja przed pracą na serwerze.
+
+## Architektura (jedna linia)
+
+- **Hosting** (`rsperformance.online`) = canonical runtime strony.
+- **VPS** = wsparcie (n8n, AI gateway, kolejki); backup przed każdą zmianą pliku.
+
+## Narzędzia w workspace (jak uruchamiać)
+
+| Cel | Jak |
+|-----|-----|
+| SSH hosting (Cyber-Folks) | `python ssh_exec.py "komenda"` — szczegóły i ścieżki w `start.md` |
+| SSH VPS | `python vps_exec.py "komenda"` — klucz i host w `vps.md` |
+| Backup na VPS przed edycją | `python vps_exec.py --backup /remote/path [suffix]` |
+| Laravel Boost / docs | serwer MCP `laravel-boost` w Cursorze — przed zmianami w Laravel sprawdź narzędzia (np. `search-docs`) |
+| Inne MCP | deskryptory: `mcps/<server>/tools/*.json` — **zawsze** odczytaj schema przed `call_mcp_tool` |
+| Gravity Studio WOW (lokalny hub) | `tools/gravity-studio-wow-runtime/launch-gravity-studio-wow.ps1` lub `serve-wow-hub.ps1 -Open` (szczegóły w `HANDOFF.md` / README w tym katalogu) |
+| Skille | `.claude/skills`, `.agents/skills` — czytaj `SKILL.md` gdy domena pasuje do zadania |
+
+## Multi-agent / git (przed kodem)
+
+- `git status` i `git diff` — brudne drzewo sprzątnij lub zapisz intencję; nie pracuj na niezrozumiałych zmianach poprzednika.
+- Kończąc pracę: `plan.md`, `HANDOFF.md`, ewentualnie `SESSION_LOG.md`, `handoff-log.md` (jeśli dotykasz produkcji) — wg `RELAY.md` i `gravity-directives.mdc`.
+
+## Sekrety
+
+- Nie wklejaj kluczy do czatu. Lokalizacje: `start.md`, `vertex.md`, pliki JSON service account — tylko według ścieżek z dokumentacji projektu.

@@ -4,6 +4,20 @@ Format relay: jeden blok na sesję, bez kasowania cudzych wpisów. Starsze wpisy
 
 ---
 
+## [2026-04-12] Cursor — `agent-start-inventory.mdc` (alwaysApply) + RELAY §1
+
+### Wykonane
+
+- Nowa reguła `.cursor/rules/agent-start-inventory.mdc` (`alwaysApply: true`): przy starcie sesji w Cursorze agent ma skondensowany opis **co jest w workspace** (SSH/VPS, MCP, Studio WOW, skille, kolejność czytania, git/hygiene) i **jak tego używać**.
+- `RELAY.md` §1 — akapit wskazujący auto-ładowanie tej reguły obok `gravity-directives.mdc`.
+
+### Uwagi
+
+- Pełne dyrektywy bez zmian; plik jest indeksem startowym, nie zastępuje `RELAY.md` / `start.md`.
+- Duży `git status` z historii multi-agent — nie sprzątany w tej turze; kolejne sesje: celować commity w małe zestawy plików.
+
+---
+
 ## [2026-04-11 wieczór CET] Cursor — Blog/newsroom PL + n8n „Select Fresh Story” + Vertex pipeline copy
 
 ### Kontekst

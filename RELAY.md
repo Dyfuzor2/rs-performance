@@ -7,6 +7,8 @@
 
 ## 1. Kolejnosc Ladowania Dyrektyw
 
+**Cursor IDE:** przy starcie sesji wczytywane są automatycznie m.in. `.cursor/rules/agent-start-inventory.mdc` oraz `gravity-directives.mdc` (`alwaysApply: true`) — krótki **inventory narzędzi** i sposób użycia; pełna mapa nadal zaczyna się od tego pliku.
+
 Kazdy agent ma ladowac projekt w tej kolejnosci:
 
 1. `G:\gravity\RELAY.md`
