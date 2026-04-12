@@ -4,6 +4,13 @@ Format relay: jeden blok na sesję, bez kasowania cudzych wpisów. Starsze wpisy
 
 ---
 
+## [2026-04-12] Cursor — checklist: migracja instancji hostingu vs n8n
+
+- Dokumentacja: `HANDOFF.md`, `.cursor/mcp.env.example` (RS_CANONICAL_BASE_URL + kroki), skill `rs-n8n-wow-2026`, docstring `vps_n8n_run_repairs_on_vps.py`.
+- Istota: po zmianie hostingu kanonicznego trzeba zaktualizować URL-e w workflowach n8n i literały w skryptach; instancja n8n może pozostać na VPS.
+
+---
+
 ## [2026-04-12] Cursor — n8n VPS: HttpRequest v4.2 object-literal bodies + Google ping 404
 
 ### Wykonane

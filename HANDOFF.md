@@ -1,3 +1,10 @@
+## 2026-04-12 — Przypomnienie: zmiana instancji hostingu vs n8n
+
+### Agent: Cursor
+
+- **Hosting canonical** (Laravel, `APP_URL`, API pod `/api/...`) to **osobna** warstwa od **instancji n8n** (VPS `auto.rs3d.pl`, ewentualnie SOCmid w `mcp.env`).
+- Przy **migracji hostingu / nowej domenie:** zaktualizować wszystkie HttpRequest w n8n wskazujące na stary host, rotować klucze nagłówków jeśli trzeba, przelecieć skrypty w `scripts/` z literałem `rsperformance.online` (smoke, fleet jsonfix). Szablon zmiennych: **`.cursor/mcp.env.example`** (`RS_CANONICAL_BASE_URL`, checklista). Skill: **`rs-n8n-wow-2026`** § instancja hostingu.
+
 ## 2026-04-12 — n8n v4.2 JSON body: Preview Blog Pipeline + Google ping 404 + Monitor object body
 
 ### Agent: Cursor

@@ -1,10 +1,10 @@
 ---
 name: rs-n8n-wow-2026
 description: Use when building, debugging, auditing, or hardening n8n workflows for RS Performance, especially when the task touches editorial automation, Telegram ops, IndexNow, invitation hub, workflow quality gates, or MCP-assisted workflow validation.
-version: 1.0.0
+version: 1.1.0
 updated: 2026-04-12
 author: codex
-tags: [n8n, workflow, automation, editorial, telegram, april-2026]
+tags: [n8n, workflow, automation, editorial, telegram, vertex-ai, april-2026]
 ---
 
 # RS n8n WOW 2026+
@@ -51,6 +51,13 @@ Project coordination skill for `n8n` work in `G:\gravity`.
 - treat `n8n` as orchestrator, not business-logic replacement
 - every editorial flow must have a quality gate and observable failure lane
 
+### Instancja hostingu się zmieni (migracja / nowa domena)
+
+- **n8n ≠ hosting:** URL `N8N_API_*` może zostawać na VPS/SOCmid; zmienia się **kanoniczny front** (`APP_URL`, domena publiczna).
+- Po zmianie instancji hostingu **obowiązkowo:** przeskanować workflowy pod hardcoded `https://…/` do API Laravel (blog pipeline, Diagnosta edge, trending, SEO), zaktualizować eksporty w repo, ponownie **PUT** przez API lub import w edytorze.
+- W repozytorium wiele skryptów smoke / `n8n_apr2026_fleet_http_jsonfix` nadal zawiera host — przy migracji: podmiana lub `RS_CANONICAL_BASE_URL` z `.cursor/mcp.env` (szablon: `mcp.env.example`).
+- Zsynchronizuj też **Laravel** (`config/n8n.php`, Filament hub) jeśli tam zapisano stary host n8n lub canonical.
+
 ## Quick checks
 
 - confirm the workflow is active
@@ -58,6 +65,19 @@ Project coordination skill for `n8n` work in `G:\gravity`.
 - confirm cron timezone assumptions
 - confirm Telegram / alert sinks are not silently failing
 - confirm the workflow writes only through stable hosting APIs or verified VPS stores
+
+## Vertex AI Studio × n8n (proxy na hostingu — kwiecień 2026+)
+
+**Nie** osadzaj service account JSON w node’ach n8n. Produkcja: **Laravel** trzyma OAuth do Vertex (`VertexAccessTokenFactory`) i udaje endpointy dla workflowów:
+
+- `POST /api/n8n/vertex/chat` — chat w stylu OpenAI (wygodne pod migrację z OpenRouter).
+- `POST /api/n8n/vertex/generate-content` — surowe `generateContent` (Gemini na Vertex).
+
+Autoryzacja: `X-RS-Blog-Pipeline-Key` lub `X-API-Token` / Bearer (`N8nInternalAuth`). Pełna mapa, modele i checklista: **`references/n8n_vertex_ai_studio_2026.md`**.
+
+Patch eksportów workflowów (stare URL-e → proxy): `scripts/patch_n8n_vertex_workflows.py`. Testy proxy: `tests/Feature/N8nVertexProxyTest.php`.
+
+**Blog (pełna redakcja + Imagen / Gemini image):** osobny tor — `BlogVertexPipelineService` przez `/api/blog/pipeline/*`, nie przez surowy chat proxy.
 
 ## Blog cadence workflow
 
