@@ -107,14 +107,15 @@
       "description": "Cloudflare official docs MCP via local mcp-remote wrapper. Safe, read-mostly documentation access for DNS, cache, WAF, bots, and edge config."
     },
     "n8n-mcp": {
-      "command": "G:\\gravity\\tools\\n8n-mcp-runtime\\node_modules\\.bin\\n8n-mcp.cmd",
-      "args": [],
-      "env": {
-        "MCP_MODE": "stdio",
-        "LOG_LEVEL": "error",
-        "DISABLE_CONSOLE_OUTPUT": "true"
-      },
-      "description": "Pinned local n8n MCP runtime in G:\\gravity (v2.47.5). Use for workflow authoring, validation, and automation debugging without relying on transient npx resolution."
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "G:\\gravity\\tools\\n8n-mcp-runtime\\run-n8n-mcp.ps1"
+      ],
+      "description": "n8n MCP (pinned v2.47.5): loads .cursor/mcp.env, requires N8N_API_URL + N8N_API_KEY, then stdio to n8n-mcp.cmd — no npx drift. See tools/n8n-mcp-runtime/README.md."
     },
     "a2a-bridge-local": {
       "command": "G:\\gravity\\tools\\a2a-mcp-bridge-runtime\\node_modules\\.bin\\a2a-mcp-bridge.cmd",

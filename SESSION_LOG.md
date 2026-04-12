@@ -4,6 +4,22 @@ Format relay: jeden blok na sesję, bez kasowania cudzych wpisów. Starsze wpisy
 
 ---
 
+## [2026-04-12] Cursor — n8n MCP: `run-n8n-mcp.ps1` + `.cursor/mcp.env` (pinned runtime)
+
+### Wykonane
+
+- `tools/n8n-mcp-runtime/run-n8n-mcp.ps1` — ładuje `.cursor/mcp.env`, waliduje `N8N_API_URL`/`N8N_API_KEY`, uruchamia przypięty `n8n-mcp.cmd` (bez `npx`).
+- `install-n8n-mcp.ps1`, `verify-n8n-api.ps1`, `README.md` w tym samym katalogu.
+- `.mcp.json` i `.cursor/mcp.json` — wpis `n8n-mcp` przez PowerShell launcher (spójnie z Boost/GitHub).
+- `.cursor/mcp.env.example` — instrukcja pod nowy przepływ; `.mcp.top-apr-2026.local.template.json` zsynchronizowany.
+- `agent-start-inventory.mdc`, `rs-n8n-wow-2026/SKILL.md` — krótkie odniesienia.
+
+### Operator
+
+- Jednorazowo: skopiować `mcp.env.example` → `mcp.env`, uzupełnić klucz, `install-n8n-mcp.ps1`, opcjonalnie `verify-n8n-api.ps1`, reload MCP.
+
+---
+
 ## [2026-04-12] Cursor — `agent-start-inventory.mdc` (alwaysApply) + RELAY §1
 
 ### Wykonane

@@ -1,0 +1,25 @@
+{
+  "mcpServers": {
+    "n8n-mcp": {
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "G:\\gravity\\tools\\n8n-mcp-runtime\\run-n8n-mcp.ps1"
+      ],
+      "description": "n8n MCP via run-n8n-mcp.ps1 + .cursor/mcp.env (v2.47.5 pinned)."
+    },
+    "a2a-bridge-local": {
+      "command": "G:\\gravity\\tools\\a2a-mcp-bridge-runtime\\node_modules\\.bin\\a2a-mcp-bridge.cmd",
+      "args": [],
+      "env": {
+        "A2A_AGENT_URLS": "https://rsperformance.online,https://ai.rsperformance.online",
+        "A2A_REFRESH_INTERVAL_MS": "300000"
+      },
+      "description": "Local A2A bridge runtime for RS agent cards and support-plane discovery."
+    }
+  }
+}
+

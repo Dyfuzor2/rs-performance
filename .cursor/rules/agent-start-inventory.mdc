@@ -22,15 +22,16 @@ Ten plik **ładuje się automatycznie** w Cursorze (`alwaysApply`). Traktuj go j
 
 ## Narzędzia w workspace (jak uruchamiać)
 
-| Cel | Jak |
-|-----|-----|
-| SSH hosting (Cyber-Folks) | `python ssh_exec.py "komenda"` — szczegóły i ścieżki w `start.md` |
-| SSH VPS | `python vps_exec.py "komenda"` — klucz i host w `vps.md` |
-| Backup na VPS przed edycją | `python vps_exec.py --backup /remote/path [suffix]` |
-| Laravel Boost / docs | serwer MCP `laravel-boost` w Cursorze — przed zmianami w Laravel sprawdź narzędzia (np. `search-docs`) |
-| Inne MCP | deskryptory: `mcps/<server>/tools/*.json` — **zawsze** odczytaj schema przed `call_mcp_tool` |
+| Cel                              | Jak                                                                                                                                               |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| SSH hosting (Cyber-Folks)        | `python ssh_exec.py "komenda"` — szczegóły i ścieżki w `start.md`                                                                                 |
+| SSH VPS                          | `python vps_exec.py "komenda"` — klucz i host w `vps.md`                                                                                          |
+| Backup na VPS przed edycją       | `python vps_exec.py --backup /remote/path [suffix]`                                                                                               |
+| Laravel Boost / docs             | serwer MCP `laravel-boost` w Cursorze — przed zmianami w Laravel sprawdź narzędzia (np. `search-docs`)                                            |
+| **n8n MCP**                      | `tools/n8n-mcp-runtime/run-n8n-mcp.ps1` wczytuje **`.cursor/mcp.env`** (`N8N_API_URL`, `N8N_API_KEY`). Setup: `mcp.env.example` → `mcp.env`, `install-n8n-mcp.ps1`, opcjonalnie `verify-n8n-api.ps1`. Zmiany na VPS nadal: backup + SSH/`vps_exec`. |
+| Inne MCP                         | deskryptory: `mcps/<server>/tools/*.json` — **zawsze** odczytaj schema przed `call_mcp_tool`                                                      |
 | Gravity Studio WOW (lokalny hub) | `tools/gravity-studio-wow-runtime/launch-gravity-studio-wow.ps1` lub `serve-wow-hub.ps1 -Open` (szczegóły w `HANDOFF.md` / README w tym katalogu) |
-| Skille | `.claude/skills`, `.agents/skills` — czytaj `SKILL.md` gdy domena pasuje do zadania |
+| Skille                           | `.claude/skills`, `.agents/skills` — czytaj `SKILL.md` gdy domena pasuje do zadania                                                               |
 
 ## Multi-agent / git (przed kodem)
 

@@ -1,3 +1,13 @@
+## 2026-04-12 — n8n MCP: launcher `run-n8n-mcp.ps1` + `.cursor/mcp.env`
+
+### Agent: Cursor
+
+### STATUS: REPO (developer experience / MCP)
+
+- **Cel:** jeden sposób uruchomienia n8n MCP w Cursorze — przypięty runtime, sekrety tylko w `mcp.env`, walidacja przed stdio.
+- **Pliki:** `tools/n8n-mcp-runtime/run-n8n-mcp.ps1`, `install-n8n-mcp.ps1`, `verify-n8n-api.ps1`, `README.md`; `.mcp.json` + `.cursor/mcp.json` → `n8n-mcp` przez PowerShell; zaktualizowane `mcp.env.example`, template top-apr, `agent-start-inventory.mdc`, `rs-n8n-wow-2026`.
+- **Operator:** skopiować `mcp.env.example` → `.cursor/mcp.env`, ustawić URL + API key, `install-n8n-mcp.ps1`, opcjonalnie `verify-n8n-api.ps1`, reload MCP.
+
 ## 2026-04-12 — Cursor: `agent-start-inventory.mdc` (start sesji) + RELAY §1
 
 ### Agent: Cursor

@@ -2,7 +2,7 @@
 name: rs-n8n-wow-2026
 description: Use when building, debugging, auditing, or hardening n8n workflows for RS Performance, especially when the task touches editorial automation, Telegram ops, IndexNow, invitation hub, workflow quality gates, or MCP-assisted workflow validation.
 version: 1.0.0
-updated: 2026-04-09
+updated: 2026-04-12
 author: codex
 tags: [n8n, workflow, automation, editorial, telegram, april-2026]
 ---
@@ -13,6 +13,7 @@ Project coordination skill for `n8n` work in `G:\gravity`.
 
 ## Primary sources
 
+- local MCP runtime (Cursor): `run-n8n-mcp.ps1` loads `.cursor/mcp.env` → pinned `n8n-mcp@2.47.5` stdio; verify with `verify-n8n-api.ps1`. See `tools/n8n-mcp-runtime/README.md`.
 - local MCP runtime:
     - `G:\gravity\tools\n8n-mcp-runtime`
 - local source repo:
@@ -57,6 +58,12 @@ Project coordination skill for `n8n` work in `G:\gravity`.
 - confirm cron timezone assumptions
 - confirm Telegram / alert sinks are not silently failing
 - confirm the workflow writes only through stable hosting APIs or verified VPS stores
+
+## Blog cadence workflow
+
+- Export / repo template: `n8n_workflow_blog_draft_cadence.json` (**RS Daily Automotive News Drafts**).
+- Node **Select Fresh Story** wstrzykuje **wirtualną redakcję (7 ról)** po polsku (poprawna polszczyzna) do `editorial_notes` dla `POST https://rsperformance.online/api/blog/pipeline/run` (zgodnie z `references/blog_newsroom_crew_2026.md`).
+- After editing JSON locally: re-import on VPS n8n or sync via your deployment process; confirm workflow **active** and schedule `15 8,13,18 * * *` (Warsaw intent).
 
 ## Operator WOW surface (Telegram + fleet)
 
