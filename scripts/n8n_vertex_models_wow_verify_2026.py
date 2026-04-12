@@ -39,6 +39,7 @@ import requests
 _root = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(_root / "scripts"))
 from gravity_cursor_env import load_cursor_env, repo_root, require_n8n_api  # noqa: E402
+from n8n_public_api_pagination import fetch_all_workflow_list_items  # noqa: E402
 
 _VERTEX_LIKE = re.compile(
     r"\b(?:gemini|imagen|claude)-[a-z0-9][a-z0-9.\-]*(?:@[a-z0-9.\-]+)?\b",
@@ -247,9 +248,7 @@ def _models_from_php_file(path: Path) -> set[str]:
 
 def _fetch_n8n_workflows_blob(base: str, key: str) -> list[tuple[str, str, str]]:
     headers = {"X-N8N-API-KEY": key}
-    r = requests.get(f"{base}/api/v1/workflows", headers=headers, timeout=120)
-    r.raise_for_status()
-    metas = r.json().get("data") or r.json()
+    metas = fetch_all_workflow_list_items(base.rstrip("/"), headers, timeout=120.0)
     out: list[tuple[str, str, str]] = []
     for m in metas:
         wid = m.get("id")

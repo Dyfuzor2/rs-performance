@@ -6,23 +6,30 @@ April 2026+ WOW — n8n fleet: last execution status, Telegram wiring sanity, ag
 - Telegram Bot API getMe (token from .cursor/mcp.env only; never prints token).
 - Compares operator TELEGRAM_CHAT_ID to chat_id literals found in workflow JSON (warn on mismatch).
 
-Usage: python scripts/n8n_fleet_wow_verify_apr2026.py
+Usage:
+  python scripts/n8n_fleet_wow_verify_apr2026.py
+  python scripts/n8n_fleet_wow_verify_apr2026.py --base-url https://n8n-s2.socmid.cloud --api-key-env N8N_API_KEY_SOCMID
+  python scripts/n8n_fleet_wow_verify_apr2026.py --strict   # exit 1 if any active workflow last=error or active+never
+  python scripts/n8n_fleet_wow_verify_apr2026.py --json      # machine-readable summary line on stderr/stdout
 """
 
 from __future__ import annotations
 
+import argparse
 import json
 import os
 import re
 import sys
 import urllib.parse
 from pathlib import Path
+from urllib.parse import urlparse
 
 import requests
 
 _root = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(_root / "scripts"))
-from gravity_cursor_env import load_cursor_env, require_n8n_api  # noqa: E402
+from gravity_cursor_env import load_cursor_env, resolve_n8n_api  # noqa: E402
+from n8n_public_api_pagination import fetch_all_workflow_list_items  # noqa: E402
 
 _CHAT_ID_RE = re.compile(r"chat_id['\"]?\s*[:=]\s*['\"]?([0-9-]+)")
 
@@ -79,8 +86,48 @@ def _last_error_message(base: str, headers: dict, eid: str) -> str:
 
 
 def main() -> int:
-    load_cursor_env()
-    base, key = require_n8n_api()
+    ap = argparse.ArgumentParser(description="n8n fleet WOW verify (VPS API)")
+    ap.add_argument(
+        "--strict",
+        action="store_true",
+        help="Exit 1 if any active workflow has last execution error or active+never.",
+    )
+    ap.add_argument(
+        "--json",
+        action="store_true",
+        help="Print one JSON object with counts and issue list (after human-readable output).",
+    )
+    ap.add_argument(
+        "--expect-host",
+        default="",
+        help="If set (e.g. auto.rs3d.pl), warn when N8N_API_URL does not contain this host.",
+    )
+    ap.add_argument(
+        "--base-url",
+        default="",
+        help="Override N8N_API_URL for this run (e.g. https://n8n-s2.socmid.cloud).",
+    )
+    ap.add_argument(
+        "--api-key-env",
+        default="N8N_API_KEY",
+        help="Which env var holds the API key for this instance (default N8N_API_KEY).",
+    )
+    args = ap.parse_args()
+
+    try:
+        base, key = resolve_n8n_api(
+            base_url=(args.base_url or None),
+            api_key_env=(args.api_key_env or "N8N_API_KEY"),
+        )
+    except RuntimeError as e:
+        print(str(e), file=sys.stderr)
+        return 2
+    expect_host = (args.expect_host or "").strip() or urlparse(base).netloc
+    if expect_host and expect_host.lower() not in base.lower():
+        print(
+            f"WARN: N8N_API_URL={base!r} does not contain --expect-host={expect_host!r}",
+            file=sys.stderr,
+        )
     headers = {"X-N8N-API-KEY": key}
     env_chat = (os.environ.get("TELEGRAM_CHAT_ID") or "").strip()
 
@@ -108,8 +155,17 @@ def main() -> int:
         print("  TELEGRAM_CHAT_ID (env): (not set)")
 
     print("\n=== n8n workflows - last run + agents + Telegram ===\n")
-    metas = requests.get(f"{base}/api/v1/workflows", headers=headers, timeout=120).json()
-    rows = metas.get("data") or metas
+    try:
+        rows = fetch_all_workflow_list_items(base.rstrip("/"), headers, timeout=120.0)
+    except requests.HTTPError as e:
+        r = e.response
+        body = (r.text[:400] if r is not None else "") or str(e)
+        print(f"ERROR: workflows list HTTP {getattr(r, 'status_code', '?')}: {body}", file=sys.stderr)
+        return 2
+    except requests.RequestException as e:
+        print(f"ERROR: workflows list: {e!s}", file=sys.stderr)
+        return 2
+    print(f"(workflows listed: {len(rows)})\n")
 
     issues: list[str] = []
     all_chat_ids: set[str] = set()
@@ -182,6 +238,19 @@ def main() -> int:
             print(f"    ... +{len(issues) - 25} more")
     else:
         print("  No active+error / active+never issues in this pass.")
+
+    if args.json:
+        payload = {
+            "suite": "n8n_fleet_wow_verify_apr2026",
+            "n8n_base": base,
+            "flagged_count": len(issues),
+            "issues": issues[:100],
+            "ok": len(issues) == 0,
+        }
+        print("\n__JSON__\n" + json.dumps(payload, ensure_ascii=False))
+
+    if args.strict and issues:
+        return 1
     return 0
 
 

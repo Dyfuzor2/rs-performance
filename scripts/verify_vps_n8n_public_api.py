@@ -9,6 +9,8 @@ import requests
 
 _root = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(_root))
+sys.path.insert(0, str(_root / "scripts"))
+from n8n_public_api_pagination import fetch_all_workflow_list_items  # noqa: E402
 from vps_exec import vps_exec_capture  # noqa: E402
 
 CMD = (
@@ -26,20 +28,14 @@ def main() -> int:
         print(err or key or f"exit {code}", file=sys.stderr)
         return 1
     jwt = (key or "").strip()
-    r = requests.get(
-        "https://auto.rs3d.pl/api/v1/workflows",
-        headers={"X-N8N-API-KEY": jwt},
-        params={"limit": 3},
-        timeout=30,
-    )
-    print("HTTP", r.status_code)
-    if not r.ok:
-        print(r.text[:500], file=sys.stderr)
+    h = {"X-N8N-API-KEY": jwt}
+    try:
+        rows = fetch_all_workflow_list_items("https://auto.rs3d.pl", h, timeout=60.0)
+    except requests.RequestException as e:
+        print(str(e), file=sys.stderr)
         return 1
-    data = r.json()
-    rows = data.get("data") if isinstance(data, dict) else data
-    n = len(rows) if isinstance(rows, list) else 0
-    print("sample_workflows", n)
+    print("HTTP", 200)
+    print("total_workflows", len(rows))
     return 0
 
 

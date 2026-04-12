@@ -14,6 +14,7 @@ import requests
 _root = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(_root / "scripts"))
 from gravity_cursor_env import resolve_n8n_api  # noqa: E402
+from n8n_public_api_pagination import fetch_all_workflow_list_items  # noqa: E402
 
 
 def last_error_detail(base: str, headers: dict, eid: str) -> str:
@@ -40,10 +41,7 @@ def last_error_detail(base: str, headers: dict, eid: str) -> str:
 def main() -> int:
     base, key = resolve_n8n_api()
     headers = {"X-N8N-API-KEY": key}
-    wr = requests.get(f"{base}/api/v1/workflows", headers=headers, timeout=120)
-    rows = wr.json()
-    if isinstance(rows, dict):
-        rows = rows.get("data") or []
+    rows = fetch_all_workflow_list_items(base.rstrip("/"), headers, timeout=120.0)
 
     print(f"n8n_base={base}\n")
     for m in sorted(rows, key=lambda x: (not x.get("active"), (x.get("name") or "").lower())):

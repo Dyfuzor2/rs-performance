@@ -11,6 +11,7 @@ import requests
 _root = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(_root / "scripts"))
 from gravity_cursor_env import require_n8n_api  # noqa: E402
+from n8n_public_api_pagination import fetch_all_workflow_list_items  # noqa: E402
 
 
 def looks_bad(body: str) -> bool:
@@ -31,8 +32,7 @@ def looks_bad(body: str) -> bool:
 def main() -> int:
     base, key = require_n8n_api()
     headers = {"X-N8N-API-KEY": key}
-    metas = requests.get(f"{base}/api/v1/workflows", headers=headers, timeout=120).json()
-    data = metas.get("data") or metas
+    data = fetch_all_workflow_list_items(base.rstrip("/"), headers, timeout=120.0)
     bad: list[tuple[str, str, str, str]] = []
     for m in data:
         wid = m.get("id")
