@@ -1,0 +1,36 @@
+{
+  "mcpServers": {
+    "laravel-boost": {
+      "command": "php",
+      "args": ["artisan", "boost:mcp"],
+      "cwd": "G:\\gravity"
+    },
+    "filesystem-gravity": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "G:\\gravity"]
+    },
+    "fetch": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-fetch"]
+    },
+    "n8n-mcp": {
+      "command": "npx",
+      "args": ["-y", "n8n-mcp@2.47.5"],
+      "env": {
+        "N8N_API_URL": "${env:N8N_API_URL}",
+        "N8N_API_KEY": "${env:N8N_API_KEY}"
+      }
+    },
+    "github": {
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "G:\\gravity\\tools\\github-mcp-runtime\\run-github-mcp.ps1"
+      ],
+      "description": "Official GitHub MCP (read-only). Install: tools/github-mcp-runtime/install-github-mcp.ps1"
+    }
+  }
+}

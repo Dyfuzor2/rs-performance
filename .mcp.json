@@ -1,0 +1,146 @@
+{
+  "mcpServers": {
+    "laravel-boost": {
+      "command": "php",
+      "args": ["artisan", "boost:mcp"],
+      "description": "Laravel Boost MCP integration"
+    },
+    "qdrant-rs-knowledge": {
+      "command": "G:\\gravity\\tools\\qdrant-mcp-runtime\\Scripts\\mcp-server-qdrant.exe",
+      "args": [],
+      "env": {
+        "QDRANT_URL": "http://185.180.207.211:6333",
+        "COLLECTION_NAME": "rs_static_knowledge",
+        "EMBEDDING_MODEL": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+      },
+      "description": "RS Performance static knowledge on VPS Qdrant. Local MCP runtime pinned in G:\\gravity, no uvx dependency."
+    },
+    "qdrant-rs-dynamic": {
+      "command": "G:\\gravity\\tools\\qdrant-mcp-runtime\\Scripts\\mcp-server-qdrant.exe",
+      "args": [],
+      "env": {
+        "QDRANT_URL": "http://185.180.207.211:6333",
+        "COLLECTION_NAME": "rs_dynamic_knowledge",
+        "EMBEDDING_MODEL": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+      },
+      "description": "RS Performance dynamic knowledge on VPS Qdrant for fresh imports and live diagnostic additions."
+    },
+    "qdrant-rs-answer-routing": {
+      "command": "G:\\gravity\\tools\\qdrant-mcp-runtime\\Scripts\\mcp-server-qdrant.exe",
+      "args": [],
+      "env": {
+        "QDRANT_URL": "http://185.180.207.211:6333",
+        "COLLECTION_NAME": "rs_answer_routing",
+        "EMBEDDING_MODEL": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+      },
+      "description": "RS Performance exact-answer routing collection on VPS Qdrant."
+    },
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp@latest"],
+      "description": "Up-to-date library documentation lookup (Laravel 13, PHP 8.5, Qdrant, etc.)"
+    },
+    "sequential-thinking": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
+      "description": "Break down complex problems into structured reasoning steps."
+    },
+    "memory": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-memory"],
+      "description": "Persistent knowledge graph for RS Performance project entities and decisions."
+    },
+    "fetch": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-fetch"],
+      "description": "Fetch and parse web pages, documentation, API responses to markdown."
+    },
+    "chrome-devtools-mcp": {
+      "command": "G:\\gravity\\tools\\aeo-audit-mcp-runtime\\node_modules\\.bin\\chrome-devtools-mcp.cmd",
+      "args": [],
+      "description": "Deep browser/debug audit for headers, schema injection, and rendered discovery surfaces."
+    },
+    "playwright-mcp": {
+      "command": "G:\\gravity\\tools\\aeo-audit-mcp-runtime\\node_modules\\.bin\\playwright-mcp.cmd",
+      "args": [],
+      "description": "Scripted browser verification for discovery surfaces, markdown mirrors, and admin routes."
+    },
+    "cloudflare-docs": {
+      "command": "G:\\gravity\\tools\\mcp-runtime\\node_modules\\.bin\\mcp-remote.cmd",
+      "args": ["https://docs.mcp.cloudflare.com/mcp"],
+      "description": "Cloudflare official docs MCP via local mcp-remote wrapper. Safe, read-mostly documentation access for DNS, cache, WAF, bots, and edge config."
+    },
+    "n8n-mcp": {
+      "command": "G:\\gravity\\tools\\n8n-mcp-runtime\\node_modules\\.bin\\n8n-mcp.cmd",
+      "args": [],
+      "env": {
+        "MCP_MODE": "stdio",
+        "LOG_LEVEL": "error",
+        "DISABLE_CONSOLE_OUTPUT": "true"
+      },
+      "description": "Pinned local n8n MCP runtime in G:\\gravity (v2.47.5). Use for workflow authoring, validation, and automation debugging without relying on transient npx resolution."
+    },
+    "a2a-bridge-local": {
+      "command": "G:\\gravity\\tools\\a2a-mcp-bridge-runtime\\node_modules\\.bin\\a2a-mcp-bridge.cmd",
+      "args": [],
+      "env": {
+        "A2A_AGENT_URLS": "https://rsperformance.online/.well-known/agent.json",
+        "A2A_REFRESH_INTERVAL_MS": "300000"
+      },
+      "description": "A2A-to-MCP bridge v2. Discovers RS Performance Agent Card (v2.0.0) at /.well-known/agent.json and exposes DTC lookup, diagnostics, repair, and booking skills as MCP tools."
+    },
+    "rs-local-docs": {
+      "command": "G:\\gravity\\tools\\filesystem-mcp-runtime\\node_modules\\.bin\\mcp-server-filesystem.cmd",
+      "args": [
+        "G:\\gravity\\research\\docs-sources",
+        "G:\\gravity\\n8n-skills",
+        "G:\\gravity\\.agents\\skills",
+        "G:\\gravity\\market-notes"
+      ],
+      "description": "Local filesystem MCP exposing curated docs mirrors, n8n skill packs, project skills, and operator notes inside G:\\gravity."
+    },
+    "seo-mcp": {
+      "command": "python",
+      "args": ["-m", "seo_mcp"],
+      "description": "SEO MCP server with Ahrefs data — backlinks, keywords, traffic analysis for AEO/GEO optimization."
+    },
+    "mcp-registry": {
+      "command": "npx",
+      "args": ["-y", "mcp-registry"],
+      "description": "MCP Registry — search and discover MCP servers and connectors from the registry."
+    },
+    "scheduled-tasks": {
+      "command": "npx",
+      "args": ["-y", "@anthropic-ai/claude-code-mcp-scheduled-tasks"],
+      "description": "Scheduled tasks — create recurring remote agents that run on a cron schedule."
+    },
+    "brave-search": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-brave-search"],
+      "env": {
+        "BRAVE_API_KEY": "BSApTqDLzFY8izekTdg_vPYPAdlYbjO"
+      },
+      "description": "Brave Web Search — fresh web results, podcasts, news, no tracking."
+    },
+    "postgres": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres",
+        "postgresql://rs_knowledge_user:RsKnwl2026Diag@127.0.0.1:15432/rs_knowledge"
+      ],
+      "description": "Postgres MCP — direct SQL access to rs_knowledge DB on VPS (via SSH tunnel on port 15432)."
+    },
+    "github": {
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "G:\\gravity\\tools\\github-mcp-runtime\\run-github-mcp.ps1"
+      ],
+      "description": "Official GitHub MCP (local exe, read-only): browse/search public repos. Run tools/github-mcp-runtime/install-github-mcp.ps1 once. Token: GITHUB_PERSONAL_ACCESS_TOKEN or first line of git.md."
+    }
+  }
+}

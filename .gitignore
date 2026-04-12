@@ -1,13 +1,18 @@
 __pycache__/
 *.pyc
 .env
+.cursor/mcp.env
 venv/
 .DS_Store
 *.zip
 .tmp/
 credentials.json
 token.json
+# Vertex / GCP service account (secrets — never commit)
+diagnosta-489719-96def3352c52.json
 git.md
+# Official GitHub MCP Windows binary (run tools/github-mcp-runtime/install-github-mcp.ps1)
+tools/github-mcp-runtime/bin/
 node_modules
 node_modules
 node_modules

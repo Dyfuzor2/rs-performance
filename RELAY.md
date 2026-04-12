@@ -96,19 +96,19 @@ Na VPS sa tylko rzeczy wspierajace:
 
 ## 4. Gdzie Sa Pelne Dyrektywy
 
-| Plik                        | Rola                                                                   | Status                                    |
-| --------------------------- | ---------------------------------------------------------------------- | ----------------------------------------- |
-| `G:\gravity\RELAY.md`       | pierwszy punkt wejscia i indeks                                        | nadrzedny                                 |
-| `G:\gravity\HANDOFF.md`     | biezacy stan, ostatni agent, next steps, aktywne zasady sesji          | obowiazkowy po RELAY                      |
-| `G:\gravity\plan.md`        | master plan, architektura, priorytety, blueprint VPS/support-plane/AEO | obowiazkowy po HANDOFF                    |
+| Plik                        | Rola                                                                                               | Status                                                |
+| --------------------------- | -------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| `G:\gravity\RELAY.md`       | pierwszy punkt wejscia i indeks                                                                    | nadrzedny                                             |
+| `G:\gravity\HANDOFF.md`     | biezacy stan, ostatni agent, next steps, aktywne zasady sesji                                      | obowiazkowy po RELAY                                  |
+| `G:\gravity\plan.md`        | master plan, architektura, priorytety, blueprint VPS/support-plane/AEO                             | obowiazkowy po HANDOFF                                |
 | `G:\gravity\GEO.md`         | GEO (Generative Engine Optimization): relacja do AEO, indeks skilli, regula `geo-*` vs `geo-geo-*` | obowiazkowy przy pracy nad GEO / audytem AI citations |
-| `G:\gravity\AGENTS.md`      | glowne dyrektywy operacyjne dla agentow                                | obowiazkowy                               |
-| `G:\gravity\CLAUDE.md`      | kopia / wariant dyrektyw dla agentow Claude                            | obowiazkowy dla Claude                    |
-| `G:\gravity\handoff-log.md` | append-only log zmian produkcyjnych                                    | obowiazkowy po zmianie prod               |
-| `G:\gravity\SESSION_LOG.md` | append-only log sesji agentow                                          | obowiazkowy po sesji                      |
-| `G:\gravity\vps.md`         | stan VPS, role, hardening, uslugi, support-plane                       | czytac przy pracy na VPS                  |
-| `G:\gravity\vertex.md`      | Vertex / GCP / modele / service accounts                               | czytac przy AI                            |
-| `G:\gravity\start.md`       | plik legacy / zdekapitowany, tylko pomocniczo                          | nie traktowac jako glowny source of truth |
+| `G:\gravity\AGENTS.md`      | glowne dyrektywy operacyjne dla agentow                                                            | obowiazkowy                                           |
+| `G:\gravity\CLAUDE.md`      | kopia / wariant dyrektyw dla agentow Claude                                                        | obowiazkowy dla Claude                                |
+| `G:\gravity\handoff-log.md` | append-only log zmian produkcyjnych                                                                | obowiazkowy po zmianie prod                           |
+| `G:\gravity\SESSION_LOG.md` | append-only log sesji agentow                                                                      | obowiazkowy po sesji                                  |
+| `G:\gravity\vps.md`         | stan VPS, role, hardening, uslugi, support-plane                                                   | czytac przy pracy na VPS                              |
+| `G:\gravity\vertex.md`      | Vertex / GCP / modele / service accounts                                                           | czytac przy AI                                        |
+| `G:\gravity\start.md`       | plik legacy / zdekapitowany, tylko pomocniczo                                                      | nie traktowac jako glowny source of truth             |
 
 ## 5. Credentials Map - Lokalizacje Sekretow, Loginow, API, JSON
 
@@ -148,6 +148,7 @@ W `RELAY.md` trzymamy tylko lokalizacje i opis. Nie kopiujemy tu samych hasel i 
 | --------------------------- | -------------------------------------------------------------------------------------- |
 | Telegram bot token / dane   | `G:\gravity\telegram.md`                                                               |
 | GitHub token / dane         | `G:\gravity\git.md` jesli istnieje; jesli nie, sprawdz aktualny sekret store poza repo |
+| GitHub MCP (public repos)   | `G:\gravity\tools\github-mcp-runtime\` — `install-github-mcp.ps1` pobiera oficjalny `github-mcp-server`; MCP `github` w `.mcp.json` (read-only, token z env `GITHUB_PERSONAL_ACCESS_TOKEN` lub pierwsza linia `git.md`) |
 | Google Cloud API key / dane | `G:\gravity\cloud.md`                                                                  |
 
 ### Runtime secrets na serwerach
@@ -192,22 +193,22 @@ W `RELAY.md` trzymamy tylko lokalizacje i opis. Nie kopiujemy tu samych hasel i 
 
 ### Skills
 
-| Skill                   | Lokalizacja                                                  |
-| ----------------------- | ------------------------------------------------------------ |
-| pest-testing            | `G:\gravity\.agents\skills\pest-testing\SKILL.md`            |
-| pulse-development       | `G:\gravity\.agents\skills\pulse-development\SKILL.md`       |
-| tailwindcss-development | `G:\gravity\.agents\skills\tailwindcss-development\SKILL.md` |
-| rs-n8n-wow-2026         | `G:\gravity\.agents\skills\rs-n8n-wow-2026\SKILL.md`         |
-| rs-aeo-skill            | `G:\gravity\.agents\skills\rs-aeo-skill\SKILL.md`            |
-| rs-discovery-wow-2026   | `G:\gravity\.agents\skills\rs-discovery-wow-2026\SKILL.md`   |
-| rs-a2a-wow-2026         | `G:\gravity\.agents\skills\rs-a2a-wow-2026\SKILL.md`         |
-| rs-schema-wow-2026      | `G:\gravity\.agents\skills\rs-schema-wow-2026\SKILL.md`      |
+| Skill                   | Lokalizacja                                                                                      |
+| ----------------------- | ------------------------------------------------------------------------------------------------ |
+| pest-testing            | `G:\gravity\.agents\skills\pest-testing\SKILL.md`                                                |
+| pulse-development       | `G:\gravity\.agents\skills\pulse-development\SKILL.md`                                           |
+| tailwindcss-development | `G:\gravity\.agents\skills\tailwindcss-development\SKILL.md`                                     |
+| rs-n8n-wow-2026         | `G:\gravity\.agents\skills\rs-n8n-wow-2026\SKILL.md`                                             |
+| rs-aeo-skill            | `G:\gravity\.agents\skills\rs-aeo-skill\SKILL.md`                                                |
+| rs-discovery-wow-2026   | `G:\gravity\.agents\skills\rs-discovery-wow-2026\SKILL.md`                                       |
+| rs-a2a-wow-2026         | `G:\gravity\.agents\skills\rs-a2a-wow-2026\SKILL.md`                                             |
+| rs-schema-wow-2026      | `G:\gravity\.agents\skills\rs-schema-wow-2026\SKILL.md`                                          |
 | GEO (mapa + moduly)     | `G:\gravity\GEO.md` + `G:\gravity\.agents\skills\geo-*\SKILL.md` (nie `geo-geo-*`, patrz GEO.md) |
-| qdrant-memory-market    | `G:\gravity\.agents\skills\qdrant-memory-market\SKILL.md`    |
-| qdrant-rest-api-market  | `G:\gravity\.agents\skills\qdrant-rest-api-market\SKILL.md`  |
-| laravel-13-php-85       | `G:\gravity\.agents\skills\laravel-13-php-85\SKILL.md`       |
-| design-extractor        | `G:\gravity\skills\analysis\`                                |
-| realtime-translator     | `G:\gravity\skills\python\`                                  |
+| qdrant-memory-market    | `G:\gravity\.agents\skills\qdrant-memory-market\SKILL.md`                                        |
+| qdrant-rest-api-market  | `G:\gravity\.agents\skills\qdrant-rest-api-market\SKILL.md`                                      |
+| laravel-13-php-85       | `G:\gravity\.agents\skills\laravel-13-php-85\SKILL.md`                                           |
+| design-extractor        | `G:\gravity\skills\analysis\`                                                                    |
+| realtime-translator     | `G:\gravity\skills\python\`                                                                      |
 
 ### Workflows
 
