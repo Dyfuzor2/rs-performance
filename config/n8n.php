@@ -40,4 +40,18 @@ return [
     'editor_base_url' => N8nPublicApiKeyNormalizer::baseUrl(
         env('N8N_EDITOR_BASE_URL') ?: env('N8N_API_URL')
     ),
+
+    /*
+    |--------------------------------------------------------------------------
+    | n8n-mcp HTTP (VPS support plane — Cursor / agent tools)
+    |--------------------------------------------------------------------------
+    |
+    | Filament pokazuje osobny ping zdrowia MCP (bez sekretów). Używaj pełnego
+    | URL /health zgodnego z Caddy (np. https://n8n-mcp.rs3d.pl/health).
+    |
+    */
+    'mcp_http' => [
+        'health_url' => env('N8N_MCP_HEALTH_URL', 'https://n8n-mcp.rs3d.pl/health'),
+        'public_label' => env('N8N_MCP_PUBLIC_LABEL', 'n8n-mcp.rs3d.pl'),
+    ],
 ];

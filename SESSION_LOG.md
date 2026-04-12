@@ -463,3 +463,22 @@ Pomiar `redirects` / `final_url`: `curl -L` (follow), `-w '%{num_redirects} %{ur
 
 - SSH hosting: komunikaty OK dla config clear/cache.
 - SSH VPS: `OK: N8N_API_KEY refreshed`; health 200.
+
+---
+
+## [2026-04-12] Cursor — Filament n8n WOW: VPS canonical API + MCP health + n8n-mcp env WOW
+
+### Wykonane
+
+- Hosting `.env`: `scripts/hosting_merge_n8n_from_vps_sqlite.py` → `N8N_*` = `https://auto.rs3d.pl` + JWT z VPS `user_api_keys`; `config:cache`.
+- Filament: drugi kafelek **MCP HTTP (VPS)** — `N8nPublicApiHealthService` ping `config('n8n.mcp_http.health_url')` (domyślnie `https://n8n-mcp.rs3d.pl/health`); `config/n8n.php` → `mcp_http`; WOW banner + subheading (Public API vs MCP).
+- VPS: `scripts/vps_n8n_mcp_apply_wow_env_apr2026.py` — merge `NODE_ENV`, `N8N_API_TIMEOUT`, `TRUST_PROXY`, `BASE_URL`, `AUTH_RATE_LIMIT_MAX`, `MCP_LOG_LEVEL`; `docker compose pull/up n8n-mcp`.
+- Skrypty: `verify_vps_n8n_public_api.py`, `run_n8n_fleet_verify_vps_auto.py` (fleet na auto.rs3d.pl z JWT z SQLite).
+- Deploy hosting: upload zmienionych plików + `N8nPublicApiKeyNormalizer.php` + `composer dump-autoload` + `config:cache`.
+- Testy: `N8nPublicApiHealthServiceTest` (MCP fake); naprawa `triggerWorkflowTableAction` (closure void vs arrow).
+
+### Weryfikacja
+
+- `php artisan test` — `N8nPublicApiHealthServiceTest`, `N8nWorkflowDocumentResourceSmokeTest` → **5 passed**.
+- `GET https://auto.rs3d.pl/api/v1/workflows` z JWT z VPS → **200**.
+- Fleet VPS: **9** workflowów z flagą (błędy last run / never) — osobna iteracja napraw węzłów.

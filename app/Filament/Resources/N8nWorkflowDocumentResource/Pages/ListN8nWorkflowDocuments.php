@@ -7,6 +7,7 @@ namespace App\Filament\Resources\N8nWorkflowDocumentResource\Pages;
 use App\Filament\Resources\N8nWorkflowDocumentResource;
 use App\Filament\Resources\N8nWorkflowDocumentResource\Widgets\N8nWorkflowHubOverview;
 use App\Models\N8nWorkflowDocument;
+use App\Support\N8n\N8nConfigPresenter;
 use App\Support\N8n\N8nPublicApiHealthService;
 use App\Support\N8n\N8nWorkflowCatalogService;
 use Filament\Actions\Action;
@@ -35,7 +36,8 @@ final class ListN8nWorkflowDocuments extends ListRecords
             ->count();
 
         return sprintf(
-            'Kwiecień 2026+ — glassmorphism, statystyki na żywo, kolory kategorii AEO. Katalog: %d wpisów · powiązanych z n8n: %d.',
+            'Kwiecień 2026+ — VPS: Public API n8n (N8N_API_URL — edytor „Graf n8n” + sync) oraz n8n-mcp HTTP (narzędzia agentów). Instancja API: %s · Katalog: %d wpisów · powiązanych z n8n: %d.',
+            N8nConfigPresenter::publicApiHostLabel(),
             $n,
             $linked
         );
@@ -56,7 +58,7 @@ final class ListN8nWorkflowDocuments extends ListRecords
                 ->icon('heroicon-o-signal')
                 ->color('info')
                 ->modalHeading('Public REST API (n8n docs)')
-                ->modalDescription('HEAD/GET jak w dokumentacji: nagłówek X-N8N-API-KEY, endpoint /api/v1/workflows. Odświeża podgląd „Połączenie API” w statystykach.')
+                ->modalDescription('Public REST n8n (nie MCP): nagłówek X-N8N-API-KEY, GET /api/v1/workflows. Osobno: ping /health serwera n8n-mcp na VPS (drugi kafelek). Odświeża oba podglądy.')
                 ->action(function (): void {
                     $h = app(N8nPublicApiHealthService::class)->probeFresh();
 
@@ -70,10 +72,17 @@ final class ListN8nWorkflowDocuments extends ListRecords
                         return;
                     }
 
+                    $body = (string) $h['message'];
+                    $hints = $h['hints'] ?? [];
+                    if (is_array($hints) && $hints !== []) {
+                        $body .= "\n\n" . implode("\n", array_map(static fn (string $line): string => '• ' . $line, $hints));
+                    }
+
                     Notification::make()
                         ->title('API n8n: problem')
-                        ->body($h['message'])
+                        ->body($body)
                         ->danger()
+                        ->persistent()
                         ->send();
                 }),
             Action::make('syncN8n')
@@ -82,7 +91,7 @@ final class ListN8nWorkflowDocuments extends ListRecords
                 ->color('success')
                 ->requiresConfirmation()
                 ->modalHeading('Synchronizacja z API n8n')
-                ->modalDescription('Pobierze listę workflowów i utworzy brakujące wpisy lub zaktualizuje nazwy istniejących (dopasowanie po ID workflow).')
+                ->modalDescription('Pobierze listę workflowów z instancji `N8N_API_URL` (docker n8n na VPS — np. auto.rs3d.pl). n8n-mcp to osobny serwer narzędzi; katalog w Filamentie buduje się z Public API.')
                 ->action(function (): void {
                     $result = app(N8nWorkflowCatalogService::class)->syncFromRemote();
 
