@@ -16,6 +16,15 @@ Docs: tools/laravel-boost-mcp-runtime/README.md
     exit 1
 }
 
+if (-not $env:GRAVITY_SKIP_PHP_INI) {
+    $ensure = Join-Path $Base "Ensure-GravityPhpIni.ps1"
+    & $ensure -Quiet
+    if ($LASTEXITCODE -ne 0) {
+        [Console]::Error.WriteLine("Gravity: PHP ini bootstrap failed. Run: $ensure Or set GRAVITY_SKIP_PHP_INI=1.")
+        exit $LASTEXITCODE
+    }
+}
+
 $Artisan = Join-Path $ProjectRoot "artisan"
 if (-not (Test-Path -LiteralPath $Artisan)) {
     Write-Error "Missing $Artisan - open G:\gravity as the Laravel project root."

@@ -12,6 +12,14 @@ if (-not $Php) {
     exit 1
 }
 Write-Host "[laravel-boost-mcp] Using: $Php" -ForegroundColor DarkGray
+if (-not $env:GRAVITY_SKIP_PHP_INI) {
+    $ensure = Join-Path $Base "Ensure-GravityPhpIni.ps1"
+    & $ensure
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "FAIL: Ensure-GravityPhpIni.ps1" -ForegroundColor Red
+        exit 1
+    }
+}
 $ver = & $Php @("-v") 2>&1 | Out-String
 Write-Host $ver
 

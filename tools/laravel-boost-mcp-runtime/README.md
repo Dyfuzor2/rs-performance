@@ -13,6 +13,12 @@ Runs `php artisan boost:mcp` from **`G:\gravity`** via a PowerShell launcher so 
 2. **User env `GRAVITY_PHP`** = full path to `php.exe`.
 3. **`php.path`** in this folder: copy `php.path.example` → `php.path`, one line = full path to `php.exe`.
 
+## WinGet PHP without `php.ini` (Pint / Box / mbstring)
+
+**`Ensure-GravityPhpIni.ps1`** runs automatically from `run-laravel-boost-mcp.ps1` and `run-pint.ps1` (unless **`GRAVITY_SKIP_PHP_INI=1`**). It copies `php.ini-production` → `php.ini` next to `php.exe`, sets `extension_dir`, and uncomments extensions Laravel/Pint need (`mbstring`, `openssl`, `curl`, etc.).
+
+Manual once: `powershell -ExecutionPolicy Bypass -File .\Ensure-GravityPhpIni.ps1`
+
 ## Quick path (verify + deck)
 
 ```powershell

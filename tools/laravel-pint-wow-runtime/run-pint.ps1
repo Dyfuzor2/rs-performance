@@ -6,10 +6,20 @@ $Base = Split-Path -Parent $MyInvocation.MyCommand.Path
 $ProjectRoot = "G:\gravity"
 . (Join-Path $Base "..\laravel-boost-mcp-runtime\Resolve-GravityPhp.ps1")
 
-$Php = Get-GravityPhpExecutable -RuntimeDir (Join-Path $Base "..\laravel-boost-mcp-runtime")
+$Runtime = Join-Path $Base "..\laravel-boost-mcp-runtime"
+$Php = Get-GravityPhpExecutable -RuntimeDir $Runtime
 if (-not $Php) {
     Write-Host "FAIL: PHP not found. Use GRAVITY_PHP or tools/laravel-boost-mcp-runtime/php.path" -ForegroundColor Red
     exit 1
+}
+
+if (-not $env:GRAVITY_SKIP_PHP_INI) {
+    $ensure = Join-Path $Runtime "Ensure-GravityPhpIni.ps1"
+    & $ensure -Quiet
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "FAIL: PHP ini bootstrap failed. Run: $ensure" -ForegroundColor Red
+        exit $LASTEXITCODE
+    }
 }
 
 $pint = Join-Path $ProjectRoot "vendor\bin\pint"

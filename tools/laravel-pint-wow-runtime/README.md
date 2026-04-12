@@ -21,3 +21,4 @@ G:\gravity\tools\laravel-pint-wow-runtime\run-pint.ps1
 
 - `vendor/bin/pint` (Composer dev dependency).
 - PHP 8.5+ jak reszta stacku.
+- **Rozszerzenia:** Pint wymaga **mbstring**. `run-pint.ps1` wywołuje **`Ensure-GravityPhpIni.ps1`** (ten sam co Boost MCP): jednorazowo tworzy `php.ini` z WinGet i włącza `mbstring` i resztę. Ręcznie: `G:\gravity\tools\laravel-boost-mcp-runtime\Ensure-GravityPhpIni.ps1`. Aby pominąć: **`GRAVITY_SKIP_PHP_INI=1`**.

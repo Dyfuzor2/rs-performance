@@ -4,6 +4,35 @@ Format relay: jeden blok na sesję, bez kasowania cudzych wpisów. Starsze wpisy
 
 ---
 
+## [2026-04-11 wieczór CET] Cursor — Blog/newsroom PL + n8n „Select Fresh Story” + Vertex pipeline copy
+
+### Kontekst
+
+Użytkownik: blog polskojęzyczny, pełne polskie znaki; dopięcie „wirtualnej redakcji” i workflow n8n pod standard kwiecień 2026+; na koniec — zapis stanu przed snem.
+
+### Wykonane (repo lokalne, bez potwierdzonego deploy na hosting w tej turze)
+
+- `references/blog_newsroom_crew_2026.md` — poprawki języka PL (źródła, copy desk), bez angielskiego „random” w opisie stocku.
+- `n8n_workflow_blog_draft_cadence.json` — node **Select Fresh Story**: `jsCode` po polsku (role, konteksty, `familyLeadMap`, kategorie, dopiski scoringu pod PL/Trójmiasto). JSON waliduje się.
+- `.agents/skills/rs-blog-newsroom-wow-2026/SKILL.md` — sekcja **Wirtualna redakcja (PL)** + naprawa formatowania przy `research_brief`.
+- `.agents/skills/rs-n8n-wow-2026/SKILL.md` — dopisek, że `editorial_notes` z Select Fresh Story jest po polsku.
+- `app/Support/Blog/BlogVertexPipelineService.php` — polskie prompty (research, writer HEREDOC, daily news / premiera, premium review); usunięcie zdublowanych znaków zamiany (U+FFFD) przy frazach typu "zestaw źródeł" / "źródło".
+
+### Ryzyko / uwagi
+
+- W eksporcie workflow n8n może być **token bota Telegram w plaintext** — **rotacja** i trzymanie w credentialach n8n, nie w repo.
+- Lokalnie nie uruchamiano `pint` (PHP poza PATH na Windows).
+
+### Kontynuacja (dla następnego agenta)
+
+- Deploy na hosting zmian w `BlogVertexPipelineService.php` (backup, `optimize:clear`, smoke).
+- Opcjonalny grep reszty pliku pod mojibake / ASCII-only tam gdzie ma być PL.
+- Import workflow na VPS po synchronizacji JSON.
+- Produkt: `/blog` z trybem `daily_news` + pola daty — wymaga zmiany `BlogTelegramBotService::handleBlogCommand` (obecnie domyślnie `--editorial-mode=evergreen`).
+- Uporządkować `git status` — commit tylko powiązanych plików (był bałagan untracked).
+
+---
+
 ## [2026-04-12] Cursor — WOW digest: n8n fleet + Telegram (skills rs-n8n-wow-2026 + telegram-bot-skills)
 
 ### Wykonane
@@ -133,3 +162,31 @@ Pomiar `redirects` / `final_url`: `curl -L` (follow), `-w '%{num_redirects} %{ur
 ### Git
 
 - Commit: `15520e6` na gałęzi `feature/v9-architecture-rebuild` — `SESSION_LOG.md`, `HANDOFF.md`, `plan.md`, `handoff-log.md`.
+
+---
+
+## [2026-04-11] Cursor — deploy katalogu AI agentów + test na hostingu
+
+- **Produkcja (Cyber-Folks):** backup `*.bak_cursor_aiagents_deploy_20260411`, upload `config/ai_agents.php`, `TrackAiAgentTraffic.php`, `public_html/.htaccess` z `.htaccess_remote`; `mkdir tests/Unit` + upload `AiAgentsInclusivePolicyTest.php`.
+- **Pest:** w pliku testu dodano `uses(Tests\TestCase::class)` — bez tego `config()` nie działa w `tests/Unit` (Pest ładuje `TestCase` tylko dla `Feature` w `tests/Pest.php`).
+- **Wynik:** `php85 artisan config:clear`, `php85 artisan test --compact tests/Unit/AiAgentsInclusivePolicyTest.php` → **1 passed**; `php85 -l` OK na wgranych plikach.
+- **Smoke:** `FirecrawlAgent` na `/` → `302` → `ai.rsperformance.online`; zwykły UA → `200`.
+- **Dokumentacja:** `start.md` (blok LIVE AI AGENT CATALOG), `handoff-log.md` (wpis).
+
+---
+
+## [2026-04-12] Cursor — Ensure-GravityPhpIni (WinGet WOW) + Boost/Pint auto-bootstrap
+
+### Wykonane
+
+- `tools/laravel-boost-mcp-runtime/Ensure-GravityPhpIni.ps1` — idempotentny bootstrap `php.ini` z `php.ini-production` obok `php.exe`, `extension_dir`, odblokowanie `mbstring`, `openssl`, `curl`, `fileinfo`, `intl`, `pdo_mysql`, `zip`, `sodium`, `exif`; szybki exit gdy `mbstring` już załadowany; `-Quiet` dla MCP; `GRAVITY_SKIP_PHP_INI=1` pomija.
+- `run-laravel-boost-mcp.ps1`, `run-pint.ps1`, `install-laravel-boost-mcp.ps1` — wywołanie `Ensure-GravityPhpIni.ps1` przed `boost:mcp` / Pint.
+- README (boost + pint), `RELAY.md` — dokumentacja i indeks.
+
+### Weryfikacja lokalna
+
+- WinGet `PHP.PHP.8.5`: po skrypcie `php --ini` wskazuje załadowany plik; `Pint 1.29.0` z `run-pint.ps1 --version`.
+
+### Uwagi
+
+- Zmiana dotyczy **lokalnego** `php.ini` w katalogu WinGet użytkownika (nie hosting/VPS).
