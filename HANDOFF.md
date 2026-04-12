@@ -1311,7 +1311,7 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhNTIzYmM3ZC0wMjIwLTQ3NjktYjYyNC0
 
 ## AKTUALNA OPERACJA (W TRAKCIE)
 
-- **Obecnie brak** (2026-04-11 wieczór: zapis sesji — polonizacja blog/newsroom, `Select Fresh Story` w `n8n_workflow_blog_draft_cadence.json`, `BlogVertexPipelineService.php`, skille; użytkownik offline. Wcześniej: retest AEO `ai.rsperformance.online` — OK.)
+- **Obecnie brak** (2026-04-12: reguła startowa `.cursor/rules/agent-start-inventory.mdc` + RELAY §1; commit `f580d69`. Wcześniej 2026-04-11 wieczór: polonizacja blog/newsroom, n8n Select Fresh Story, skille; retest AEO `ai.rsperformance.online` — OK.)
     > **[RACE CONDITION & DEAD AGENT GUARD]**: ZANIM siebie tu wpiszesz, sprawdź czy ktoś już nie pracuje. Jeśli inny agent wisi tu od >3 godzin, zrób **Dead Agent Recovery** (git status -> git diff -> napraw/usuń jego resztki) i dopiero przejmij pałeczkę.
 
 ## ZAMROĹ»ONE BLOCKERY (Fail-Forward)
