@@ -3,8 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="color-scheme" content="dark" />
-  <meta name="theme-color" content="#120808" />
+  <meta name="color-scheme" content="dark light" />
+  <meta name="theme-color" content="#120808" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#f6f2ea" media="(prefers-color-scheme: light)" />
+  <meta name="description" content="Gravity Studio WOW — jeden hub: PHP WinGate, GitHub MCP, Laravel Boost, Qdrant RAG, Cursor MCP reload. April 2026+ AEO-ready." />
   <title>Gravity Studio WOW · RS · 2026</title>
   <style>
     @property --hub-hue { syntax: "<angle>"; inherits: false; initial-value: 45deg; }
@@ -17,6 +19,18 @@
       --text: oklch(0.97 0.01 280);
       --muted: oklch(0.62 0.03 280);
       --font: "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
+    }
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg: oklch(0.98 0.01 85);
+        --glass: color-mix(in oklch, oklch(0.55 0.08 75) 14%, transparent);
+        --border: color-mix(in oklch, oklch(0.35 0.06 55) 22%, transparent);
+        --text: oklch(0.2 0.03 280);
+        --muted: oklch(0.45 0.03 280);
+      }
+      .mesh {
+        opacity: 0.92;
+      }
     }
     @media (prefers-reduced-motion: reduce) {
       * { animation-duration: 0.01ms !important; }
@@ -92,11 +106,19 @@
       grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
     }
     .card {
+      container-type: inline-size;
       border: 1px solid var(--border);
       border-radius: 1.05rem;
       padding: 1rem 1.1rem;
       background: var(--glass);
       backdrop-filter: blur(16px);
+      transition: border-color 0.2s ease, box-shadow 0.25s ease;
+    }
+    @media (hover: hover) {
+      .card:hover {
+        border-color: color-mix(in oklch, var(--gold) 28%, var(--border));
+        box-shadow: 0 12px 40px color-mix(in oklch, oklch(0.2 0.08 290) 18%, transparent);
+      }
     }
     .card h2 {
       margin: 0 0 0.55rem;
@@ -248,7 +270,10 @@
     }
   </style>
   <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"WebApplication","name":"Gravity Studio WOW","applicationCategory":"DeveloperApplication","description":"Single-entry health hub for GitHub MCP, Laravel Boost, and local Qdrant RAG on RS Performance Gravity (April 2026+).","operatingSystem":"Windows","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
+  {"@context":"https://schema.org","@type":"WebApplication","name":"Gravity Studio WOW","applicationCategory":"DeveloperApplication","description":"Single-entry health hub for GitHub MCP, Laravel Boost, and local Qdrant RAG on RS Performance Gravity (April 2026+).","operatingSystem":"Windows","browserRequirements":"Requires JavaScript. Clipboard API recommended over http://127.0.0.1.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
+  </script>
+  <script type="speculationrules">
+  {"prefetch":[{"source":"list","urls":["../github-mcp-runtime/wow.html","../laravel-boost-mcp-runtime/wow.html","../qdrant-local-runtime/wow.html"],"eagerness":"moderate"}]}
   </script>
 </head>
 <body>
@@ -270,6 +295,8 @@
       <p style="margin:0 0 0.35rem;color:var(--muted);font-size:0.82rem">Jedno kliknięcie = kopia do clipboard. Cursor: MCP → Reload po włączeniu serwerów.</p>
       <div class="quick-actions">
         <button type="button" class="btn-wow" id="btn-copy-studio">Kopiuj komendę Studio (-NoBrowser)</button>
+        <button type="button" class="btn-wow" id="btn-copy-serve">Kopiuj localhost hub (-Open)</button>
+        <button type="button" class="btn-wow" id="btn-copy-launch">Kopiuj pełny launch (setup + serve)</button>
         <button type="button" class="btn-wow" id="btn-copy-mcp">Kopiuj listę MCP (włącz w Cursorze)</button>
         <button type="button" class="btn-wow" id="btn-copy-hint">Kopiuj checklistę Reload</button>
       </div>
@@ -280,10 +307,16 @@
         <textarea id="fb-studio" readonly rows="2" spellcheck="false"></textarea>
         <label for="fb-mcp">Lista MCP</label>
         <textarea id="fb-mcp" readonly rows="5" spellcheck="false"></textarea>
+        <label for="fb-serve">Komenda localhost (-Open)</label>
+        <textarea id="fb-serve" readonly rows="2" spellcheck="false"></textarea>
+        <label for="fb-launch">Komenda launch (jednym strzałem)</label>
+        <textarea id="fb-launch" readonly rows="2" spellcheck="false"></textarea>
         <label for="fb-hint">Checklista Reload</label>
         <textarea id="fb-hint" readonly rows="5" spellcheck="false"></textarea>
         <div class="row">
-          <button type="button" class="btn-wow" id="btn-fallback-select-studio">Zaznacz komendę</button>
+          <button type="button" class="btn-wow" id="btn-fallback-select-studio">Zaznacz Studio</button>
+          <button type="button" class="btn-wow" id="btn-fallback-select-serve">Zaznacz serve</button>
+          <button type="button" class="btn-wow" id="btn-fallback-select-launch">Zaznacz launch</button>
           <button type="button" class="btn-wow" id="btn-fallback-select-mcp">Zaznacz listę MCP</button>
           <button type="button" class="btn-wow" id="btn-fallback-select-hint">Zaznacz checklistę</button>
         </div>
@@ -295,24 +328,23 @@
       <div class="card enter">
         <h2>GitHub MCP</h2>
         <p style="margin:0;color:var(--muted);font-size:0.85rem">Binarka + test tokenu.</p>
-        <a href="file:///G:/gravity/tools/github-mcp-runtime/wow.html">Otwórz deck GitHub</a>
+        <a href="../github-mcp-runtime/wow.html">Otwórz deck GitHub</a>
       </div>
       <div class="card enter">
         <h2>Laravel Boost</h2>
         <p style="margin:0;color:var(--muted);font-size:0.85rem">PHP 8.5 + boost:mcp.</p>
-        <a href="file:///G:/gravity/tools/laravel-boost-mcp-runtime/wow.html">Otwórz deck Boost</a>
+        <a href="../laravel-boost-mcp-runtime/wow.html">Otwórz deck Boost</a>
       </div>
       <div class="card enter">
         <h2>Qdrant local</h2>
         <p style="margin:0;color:var(--muted);font-size:0.85rem">Wymaga Docker Desktop.</p>
-        <a href="file:///G:/gravity/tools/qdrant-local-runtime/wow.html">Otwórz deck Qdrant</a>
+        <a href="../qdrant-local-runtime/wow.html">Otwórz deck Qdrant</a>
       </div>
     </div>
 
-    <p class="ts" style="margin-top:1.25rem">
-      Uruchom ponownie: <code>powershell -ExecutionPolicy Bypass -File G:\gravity\tools\gravity-studio-wow-runtime\setup-gravity-studio-wow.ps1</code>
-      · <a href="file:///G:/gravity/.mcp.json" style="color:inherit;font-weight:600">Otwórz .mcp.json</a>
-      · localhost hub: <code>powershell -ExecutionPolicy Bypass -File G:\gravity\tools\gravity-studio-wow-runtime\serve-wow-hub.ps1</code>
+    <p class="ts" style="margin-top:1.25rem" id="hub-foot">
+      Ścieżki w schowku po <strong>setup</strong> są dopasowane do Twojego klonu. Plik <code>.mcp.json</code> leży w katalogu głównym repozytorium (nad <code>tools/</code>).
+      Pełny WOW: uruchom skrypt <strong>launch-gravity-studio-wow.ps1</strong> (setup + przeglądarka na localhost).
     </p>
   </main>
   <script>
@@ -348,9 +380,13 @@
     });
   }
   var fs = document.getElementById('fb-studio');
+  var fv = document.getElementById('fb-serve');
+  var fl = document.getElementById('fb-launch');
   var fm = document.getElementById('fb-mcp');
   var fh = document.getElementById('fb-hint');
   if (fs) fs.value = cfg.studioCmd || '';
+  if (fv) fv.value = cfg.serveCmd || '';
+  if (fl) fl.value = cfg.launchFullCmd || '';
   if (fm) fm.value = cfg.mcpBlock || '';
   if (fh) fh.value = cfg.reloadChecklist || '';
   if (toggleFb && panel) {
@@ -364,12 +400,18 @@
     if (b) b.addEventListener('click', function () { openFallback(taId); });
   }
   wireSelect('btn-fallback-select-studio', 'fb-studio');
+  wireSelect('btn-fallback-select-serve', 'fb-serve');
+  wireSelect('btn-fallback-select-launch', 'fb-launch');
   wireSelect('btn-fallback-select-mcp', 'fb-mcp');
   wireSelect('btn-fallback-select-hint', 'fb-hint');
   var b1 = document.getElementById('btn-copy-studio');
+  var b1b = document.getElementById('btn-copy-serve');
+  var b1c = document.getElementById('btn-copy-launch');
   var b2 = document.getElementById('btn-copy-mcp');
   var b3 = document.getElementById('btn-copy-hint');
   if (b1) b1.addEventListener('click', function () { copy(cfg.studioCmd, 'Komenda Studio skopiowana', 'fb-studio'); });
+  if (b1b) b1b.addEventListener('click', function () { copy(cfg.serveCmd, 'Komenda serve (-Open) skopiowana', 'fb-serve'); });
+  if (b1c) b1c.addEventListener('click', function () { copy(cfg.launchFullCmd, 'Komenda launch skopiowana', 'fb-launch'); });
   if (b2) b2.addEventListener('click', function () { copy(cfg.mcpBlock, 'Lista MCP skopiowana', 'fb-mcp'); });
   if (b3) b3.addEventListener('click', function () { copy(cfg.reloadChecklist, 'Checklista skopiowana', 'fb-hint'); });
 })();

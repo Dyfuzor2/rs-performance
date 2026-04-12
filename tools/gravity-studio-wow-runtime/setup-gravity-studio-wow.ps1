@@ -6,8 +6,9 @@ param(
 $ErrorActionPreference = "Stop"
 # Fresh PATH for child processes (PHP from winget may not be in legacy session PATH).
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
-$Tools = "G:\gravity\tools"
 $Base = Split-Path -Parent $MyInvocation.MyCommand.Path
+$RepoRoot = (Resolve-Path (Join-Path $Base "..\..")).Path
+$Tools = Join-Path $RepoRoot "tools"
 
 function Invoke-Ps {
     param([string]$ScriptPath)
@@ -146,8 +147,14 @@ $ragLine
 <p class="ts">Last run (UTC): $($payload.generatedAtUtc)</p>
 "@
 
+$setupPs1 = Join-Path $Base "setup-gravity-studio-wow.ps1"
+$servePs1 = Join-Path $Base "serve-wow-hub.ps1"
+$launchPs1 = Join-Path $Base "launch-gravity-studio-wow.ps1"
+$mcpJson = Join-Path $RepoRoot ".mcp.json"
 $copyPayload = [ordered]@{
-    studioCmd = 'powershell -NoProfile -ExecutionPolicy Bypass -File G:\gravity\tools\gravity-studio-wow-runtime\setup-gravity-studio-wow.ps1 -NoBrowser'
+    studioCmd       = "powershell -NoProfile -ExecutionPolicy Bypass -File `"$setupPs1`" -NoBrowser"
+    serveCmd        = "powershell -NoProfile -ExecutionPolicy Bypass -File `"$servePs1`" -Port 18765 -Open"
+    launchFullCmd   = "powershell -NoProfile -ExecutionPolicy Bypass -File `"$launchPs1`""
     mcpBlock = @(
         'github',
         'laravel-boost',
@@ -159,7 +166,7 @@ $copyPayload = [ordered]@{
         'Cursor: Settings > MCP - wlacz serwery, potem Reload.',
         'Minimum: github, laravel-boost.',
         'Lokalny RAG (Docker Qdrant): qdrant-rs-knowledge-local, qdrant-rs-dynamic-local, qdrant-rs-answer-routing-local.',
-        'Zrodlo nazw serwerow: G:\gravity\.mcp.json'
+        "Zrodlo nazw serwerow: $mcpJson"
     ) -join [Environment]::NewLine
 }
 $jsonRaw = $copyPayload | ConvertTo-Json -Compress -Depth 5
@@ -200,7 +207,8 @@ $ragS = if (-not $results.dockerRunning) { 'N/A (Docker)' } elseif (-not $result
 $ragC = if ($results.ragReadyzOk) { 'Green' } elseif ($ragS -like 'N/A*') { 'DarkGray' } else { 'Red' }
 Write-Host "  RAG readyz:         $ragS" -ForegroundColor $ragC
 Write-Host ""
-Write-Host "  Local hub (Clipboard unlock): serve-wow-hub.ps1 -> http://127.0.0.1:18765/wow.html" -ForegroundColor DarkGray
+Write-Host "  Local hub (Clipboard unlock): serve-wow-hub.ps1 -Open -> http://127.0.0.1:18765/wow.html" -ForegroundColor DarkGray
+Write-Host "  One-shot: launch-gravity-studio-wow.ps1 (setup -NoBrowser + serve -Open)" -ForegroundColor DarkGray
 Write-Host "  Next: Cursor - Reload MCP. Enable github, laravel-boost, qdrant-rs-*-local as needed." -ForegroundColor Green
 Write-Host ""
 exit 0

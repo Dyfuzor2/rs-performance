@@ -232,3 +232,19 @@ Pomiar `redirects` / `final_url`: `curl -L` (follow), `-w '%{num_redirects} %{ur
 ### Weryfikacja
 
 - Regeneracja `wow.html` przez `setup-gravity-studio-wow.ps1 -NoBrowser`.
+
+---
+
+## [2026-04-12] Cursor — Studio WOW: launch lane + portable paths + 2026 hub polish
+
+### Wykonane
+
+- `launch-gravity-studio-wow.ps1` — `setup -NoBrowser` → `serve -Open` (jeden strzał).
+- `serve-wow-hub.ps1` — `-Port`, `-Open` (Start-Job + opóźnione `Start-Process`), opcjonalny `Ensure-GravityPhpIni -Quiet` przed PHP.
+- `setup-gravity-studio-wow.ps1` — `$RepoRoot` / `$Tools` z `Resolve-Path` (komendy w JSON bez sztywnego `G:\`); `serveCmd`, `launchFullCmd` w payloadzie.
+- `wow.template.html` — quick actions serve/launch, fallback pola, względne linki decków, `prefers-color-scheme: light`, **Speculation Rules** prefetch, `container-type` + hover na kartach, JSON-LD `browserRequirements`.
+- `README.md`, `RELAY.md`.
+
+### Weryfikacja
+
+- `setup-gravity-studio-wow.ps1 -NoBrowser` EXIT=0; `wow.html` zawiera `serveCmd` i `launchFullCmd` w `gravity-studio-copy`.
