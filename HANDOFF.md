@@ -1,3 +1,15 @@
+## 2026-04-12 (lokalnie) — Ensure-GravityPhpIni: WinGet PHP + mbstring auto dla Boost MCP / Pint
+
+### Agent: Cursor
+
+### STATUS: REPO + LOKALNY WINDOWS (nie hosting)
+
+- **Problem:** WinGet `PHP.PHP.8.5` bez `php.ini` → Pint/Box: brak **mbstring**; Boost MCP mógł padać na tym samym PHP.
+- **Fix w repo:** `tools/laravel-boost-mcp-runtime/Ensure-GravityPhpIni.ps1` (idempotentny bootstrap `php.ini`, `extension_dir`, exts Laravel/Pint). Wywoływany z `run-laravel-boost-mcp.ps1`, `run-pint.ps1`, `install-laravel-boost-mcp.ps1` (pomiń: `GRAVITY_SKIP_PHP_INI=1`).
+- **Na tej maszynie:** utworzono `php.ini` w katalogu pakietu WinGet; `run-pint.ps1 --version` → Pint OK.
+- **Git:** commit `820d68c` na `feature/v9-architecture-rebuild` (RELAY, SESSION_LOG, README).
+- **Next:** Reload MCP w Cursorze; RAG: `tools/qdrant-local-runtime/verify-rag-ready.ps1` po starcie Dockera.
+
 ## 2026-04-12 ~03:00 CET - VPS n8n: jeden aktywny Bot Invitation Hub (F6uos canonical)
 
 ### Agent: Cursor
@@ -1285,7 +1297,7 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhNTIzYmM3ZC0wMjIwLTQ3NjktYjYyNC0
 
 ## AKTUALNA OPERACJA (W TRAKCIE)
 
-- **Obecnie brak** (ostatnia krótka sesja: 2026-04-12 — retest bramki AEO `ai.rsperformance.online` po 302: GPTBot na canonical → jeden 302, finalnie 200 na bramce; bez pętli; ścieżki `/`, `/uslugi`, `/for-agents` OK).
+- **Obecnie brak** (2026-04-11 wieczór: zapis sesji — polonizacja blog/newsroom, `Select Fresh Story` w `n8n_workflow_blog_draft_cadence.json`, `BlogVertexPipelineService.php`, skille; użytkownik offline. Wcześniej: retest AEO `ai.rsperformance.online` — OK.)
     > **[RACE CONDITION & DEAD AGENT GUARD]**: ZANIM siebie tu wpiszesz, sprawdź czy ktoś już nie pracuje. Jeśli inny agent wisi tu od >3 godzin, zrób **Dead Agent Recovery** (git status -> git diff -> napraw/usuń jego resztki) i dopiero przejmij pałeczkę.
 
 ## ZAMROĹ»ONE BLOCKERY (Fail-Forward)
@@ -1396,17 +1408,17 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhNTIzYmM3ZC0wMjIwLTQ3NjktYjYyNC0
 ## OSTATNI AGENT
 
 - **Kto:** Cursor (Composer)
-- **Kiedy:** 2026-04-12 (VPS n8n Vertex import + masowa publikacja)
-- **Co zrobił:** Import Vertex JSON (jak wcześniej), potem **`n8n publish:workflow`** dla 16 workflowów produkcyjnych, **pominięty** duplikat hub `FM1BxBIDKRmhr57i` (zostaje nieaktywny), **`docker compose restart n8n`**. Stan: **16 aktywnych** /1 celowo wyłączony duplikat nazwy „Invitation Hub”; `healthz` OK.
+- **Kiedy:** 2026-04-11 wieczór CET
+- **Co zrobił:** Polonizacja ścieżki blog/newsroom: `references/blog_newsroom_crew_2026.md`; `n8n_workflow_blog_draft_cadence.json` (node **Select Fresh Story**, `jsCode` PL); `.agents/skills/rs-blog-newsroom-wow-2026/SKILL.md`, `.agents/skills/rs-n8n-wow-2026/SKILL.md`; `app/Support/Blog/BlogVertexPipelineService.php` (prompty PL, naprawa mojibake przy „źródło”). **Bez** potwierdzonego deploy na hosting w tej sesji. **Ryzyko:** token Telegram w eksporcie workflow — sprawdzić repo, rotować, użyć credentiali n8n.
 - **Czego NIE ruszać:** Sekrety w sekcji KLUCZOWE USTALENIA — nie duplikować; nie kasować plików backup/import na VPS bez świadomego rollbacku.
 
 ## NASTĘPNE KROKI (priorytet)
 
-1. Smoke **n8n**: pierwszy zaplanowany lub ręczny przebieg `RS Daily Automotive News Drafts`, Telegram z monitorów; opcjonalnie `curl` proxy `https://rsperformance.online/api/n8n/vertex/*` z tokenem jak w węzłach HTTP. (Reaktywacja masowa — zrobiona.)
-2. Biznesowy smoke support-plane (VPS) po L13 — nie tylko health i artisan.
-3. Decyzja: osobna aplikacja Nightwatch dla hostingu `rsperformance.online` vs tylko VPS.
-4. Wzbogacić A2A / affordances pod agentów (karty, discovery) bez regresji canonical.
-5. Uptime Kuma: monitoringi dla analytics, qdrant-mcp, api/chat oraz bramki `ai.*` (alert przy 5xx lub pętli redirectów).
+1. **Deploy hosting:** backup → wgranie `BlogVertexPipelineService.php` → `php85 artisan optimize:clear` → smoke pipeline bloga / Vertex.
+2. **Bezpieczeństwo n8n:** jeśli token bota jest w `n8n_workflow_blog_draft_cadence.json` lub innym eksporcie — rotacja + credentiale w n8n; nie commitować sekretów.
+3. **n8n VPS:** import/sync workflow po zmianach JSON; smoke **Select Fresh Story** / cadence draftów.
+4. Opcjonalnie **Telegram `/blog`:** tryb `daily_news` + `news_date` / `editorial_notes` — `BlogTelegramBotService::handleBlogCommand` (dziś sztywno `evergreen`).
+5. `git`: uporządkować drzewo, commit plików z tej sesji; dalej: smoke support-plane, Nightwatch, A2A, Uptime Kuma (jak wcześniej w planie).
 
 ## KLUCZOWE USTALENIA Z TEJ SESJI
 
