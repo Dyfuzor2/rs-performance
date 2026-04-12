@@ -1,3 +1,15 @@
+## 2026-04-12 — Filament n8n hub: VPS Public API + MCP health + n8n-mcp WOW env
+
+### Agent: Cursor
+
+### STATUS: REPO (`feature/v9-architecture-rebuild` push `4949796`) + hosting deploy + VPS MCP
+
+- **Filament:** HUB pokazuje **Public API** (`https://auto.rs3d.pl`) i drugi kafelek **MCP HTTP (VPS)** — `GET` z `N8N_MCP_HEALTH_URL` (domyślnie `https://n8n-mcp.rs3d.pl/health`). Nie zastępuje API n8n — to osobny serwis narzędziowy.
+- **Hosting `.env`:** merge przez `scripts/hosting_merge_n8n_from_vps_sqlite.py` (JWT z VPS `user_api_keys`); backup `.env.bak_cursor_filament_vps_n8n_20260412`.
+- **VPS n8n-mcp:** `scripts/vps_n8n_mcp_apply_wow_env_apr2026.py` — env produkcyjny (timeout, proxy, `BASE_URL`, rate limit); backup `.env.bak_cursor_mcp_wow_20260412`; lokalnie `127.0.0.1:13000/health` → 200.
+- **Fleet:** `scripts/run_n8n_fleet_verify_vps_auto.py` — część workflowów nadal z flagą (błędy / never run); naprawy węzłów = kolejna iteracja w n8n.
+- **Blocker do sprawdzenia:** DNS **`n8n-mcp.rs3d.pl`** z VPS/hostingu — jeśli brak rekordu A, kafelek MCP z produkcji może pokazywać offline; ustaw rekord lub `N8N_MCP_HEALTH_URL` na działający endpoint.
+
 ## 2026-04-12 — Przypomnienie: zmiana instancji hostingu vs n8n
 
 ### Agent: Cursor
