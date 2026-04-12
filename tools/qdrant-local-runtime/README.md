@@ -19,6 +19,7 @@ powershell -ExecutionPolicy Bypass -File .\setup-qdrant-local-wow.ps1
 ```powershell
 .\start-qdrant.ps1
 .\test-qdrant-local.ps1   # GET http://127.0.0.1:6333/readyz
+.\verify-rag-ready.ps1    # readyz + collections hint for MCP
 ```
 
 Stop:

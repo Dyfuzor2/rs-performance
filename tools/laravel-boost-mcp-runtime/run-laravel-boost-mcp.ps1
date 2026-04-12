@@ -1,18 +1,18 @@
 # MCP stdio launcher: Laravel Boost (php artisan boost:mcp) from G:\gravity
 $ErrorActionPreference = "Stop"
+# Cursor spawns this script with a minimal PATH; merge Machine+User like a fresh login session.
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
 $Base = Split-Path -Parent $MyInvocation.MyCommand.Path
 $ProjectRoot = "G:\gravity"
 . (Join-Path $Base "Resolve-GravityPhp.ps1")
 
 $Php = Get-GravityPhpExecutable -RuntimeDir $Base
 if (-not $Php) {
-    Write-Error @"
-PHP not found. Install PHP 8.5+ for Windows, then either:
-  - Add php.exe to PATH, or
-  - Set user env GRAVITY_PHP to full path of php.exe, or
-  - Copy php.path.example to php.path and put one line: full path to php.exe
-See tools/laravel-boost-mcp-runtime/README.md
-"@
+    [Console]::Error.WriteLine(@"
+PHP not found (Cursor MCP often lacks winget PHP on PATH).
+Fix one of: winget install PHP.PHP.8.5 | User env GRAVITY_PHP=full\path\to\php.exe | php.path in this folder (see php.path.example)
+Docs: tools/laravel-boost-mcp-runtime/README.md
+"@)
     exit 1
 }
 

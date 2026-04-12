@@ -86,6 +86,8 @@ Na VPS sa tylko rzeczy wspierajace:
 - **VPS**: ten sam support plane co bramka `ai.rsperformance.online` — **Qdrant** (`rs_static_knowledge`, `rs_dynamic_knowledge` i pokrewne) przechowuje **embeddingi / wektorowa pamiec** zsynchronizowana z danymi produkcyjnymi (joby na VPS, nie bezposrednie crawlowanie MySQL przez boty).
 - **Lokalnie (Cursor / dev)**: `G:\gravity\tools\qdrant-local-runtime\` — Docker **Qdrant** na `127.0.0.1:6333`, kolekcje `rs_local_*`, MCP w `.mcp.json` jako `qdrant-rs-*-local` (ten sam `mcp-server-qdrant.exe` co `tools/qdrant-mcp-runtime`). Nie zastepuje VPS; sluzy eksperymentom RAG bez ryzyka dla wektorow produkcyjnych.
 - **Hub WOW (jeden entry point)**: `G:\gravity\tools\gravity-studio-wow-runtime\setup-gravity-studio-wow.ps1` — zbiorcza weryfikacja GitHub MCP + Laravel Boost + (opcjonalnie) Qdrant local, jeden dashboard `wow.html` zamiast wielu okien przegladarki.
+- **Pint (agent / Cursor)**: `G:\gravity\tools\laravel-pint-wow-runtime\run-pint.ps1` — ten sam resolver PHP co Boost MCP (`Resolve-GravityPhp` + WinGet); np. `run-pint.ps1 --dirty` przed commitem.
+- **RAG lokalny (sanity)**: `G:\gravity\tools\qdrant-local-runtime\verify-rag-ready.ps1` — `readyz` + podpowiedz MCP `qdrant-rs-*-local` po starcie Dockera.
 - **Dla agentow AI**: do szerokiego RAG i semantyki uzywaj **gateway semantic search** i narzedzi MCP / Qdrant wskazanych w tym indeksie; **nie** obciazaj shared-host MySQL masowym odczytem. Fakty cytowalne dla uzytkownika koncowego nadal weryfikuj na **kanonicznych URL i eksportach JSON** (np. `ai-resources.json`, freshness, priority paths).
 - **Publiczny kontrakt** dla modeli: pole `knowledge_plane` w `/.well-known/ai-resources.json` (generowane przez `SearchArtifactFactory`).
 

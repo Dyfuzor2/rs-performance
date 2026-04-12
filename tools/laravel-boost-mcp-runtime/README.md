@@ -30,6 +30,8 @@ powershell -ExecutionPolicy Bypass -File .\install-laravel-boost-mcp.ps1
 
 Root **`G:\gravity\.mcp.json`** uses server **`laravel-boost`** → `run-laravel-boost-mcp.ps1`. Reload MCP after PHP path changes.
 
+**Suwak MCP w Cursorze:** proces dostaje często **ucięty PATH** (brak `php` z WinGet). Launcher **odświeża PATH** (Machine+User) i szuka **WinGet `PHP.PHP*`** pod `%LocalAppData%\Microsoft\WinGet\Packages`. Jeśli nadal FAIL: ustaw **`GRAVITY_PHP`** albo plik **`php.path`** (jedna linia = pełna ścieżka do `php.exe`).
+
 ## Notes
 
 - Boost MCP speaks **stdio** to Cursor; the Laravel app code lives in **`G:\gravity`** — not on VPS for this MCP entry.

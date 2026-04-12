@@ -21,6 +21,25 @@ function Get-GravityPhpExecutable {
     if ($cmd -and $cmd.Source) {
         return $cmd.Source
     }
+    # WinGet PHP (e.g. PHP.PHP.8.5_* under LocalAppData) — Cursor MCP often has no PATH entry for this.
+    $wingetRoot = Join-Path $env:LocalAppData "Microsoft\WinGet\Packages"
+    if (Test-Path -LiteralPath $wingetRoot) {
+        $wingetDirs = Get-ChildItem -LiteralPath $wingetRoot -Directory -ErrorAction SilentlyContinue |
+            Where-Object { $_.Name -match '^PHP\.PHP\.8\.5' } |
+            Sort-Object { $_.Name } -Descending
+        foreach ($d in $wingetDirs) {
+            $wx = Join-Path $d.FullName "php.exe"
+            if (Test-Path -LiteralPath $wx) {
+                return (Resolve-Path -LiteralPath $wx).Path
+            }
+        }
+        foreach ($d in (Get-ChildItem -LiteralPath $wingetRoot -Directory -ErrorAction SilentlyContinue | Where-Object { $_.Name -like 'PHP.PHP*' })) {
+            $wx = Join-Path $d.FullName "php.exe"
+            if (Test-Path -LiteralPath $wx) {
+                return (Resolve-Path -LiteralPath $wx).Path
+            }
+        }
+    }
     $common = @(
         "C:\php\php.exe",
         "C:\tools\php\php.exe",

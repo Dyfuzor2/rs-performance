@@ -1,5 +1,6 @@
 # Verifies PHP, vendor/laravel/boost, and artisan boost:mcp (April 2026+ local MCP hygiene).
 $ErrorActionPreference = "Stop"
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
 $Base = Split-Path -Parent $MyInvocation.MyCommand.Path
 $ProjectRoot = "G:\gravity"
 . (Join-Path $Base "Resolve-GravityPhp.ps1")

@@ -2,3 +2,5 @@
 # Examples (edit to match your PC):
 # C:\php\php.exe
 # C:\laragon\bin\php\php-8.3.4-Win32-vs16-x64\php.exe
+# WinGet 8.5 (folder name varies by build):
+# C:\Users\YOU\AppData\Local\Microsoft\WinGet\Packages\PHP.PHP.8.5_Microsoft.Winget.Source_*\php.exe
