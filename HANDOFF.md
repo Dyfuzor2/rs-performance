@@ -1,3 +1,14 @@
+## 2026-04-12 — n8n fleet April 2026+: HttpRequest jsonBody + Monitor (Code + Recepcja)
+
+### Agent: Cursor
+
+### STATUS: REPO (skrypty) + **PUT przez n8n public API** (auto.rs3d.pl)
+
+- **`scripts/n8n_apr2026_fleet_http_jsonfix.py`** — Trinity, Trending (w tym `$json` dla Store on Hosting), Content, SEO-AEO, Blog on Demand (token FB z istniejącego node), duplikat nieaktywny `VPTe4…` Generate Topic.
+- **`scripts/n8n_monitor_diagnosta_code_node.py`** — Prepare Diagnosta Body + jsonBody dla Diagnosta/Recepcja.
+- **`scripts/n8n_scan_bad_jsonbody.py`**, **`scripts/n8n_fleet_health_apr2026.py`** — audyt / health.
+- **Next:** po kolejnych cronach `n8n_fleet_health_apr2026.py` — oczekiwane `success` tam, gdzie wcześniej padał HttpRequest JSON; triage Daily News / Editorial jeśli dalej `error`.
+
 ## 2026-04-12 — Hydrate `mcp.env` z `cursor.md` + JSON; deploy tylko `__main__`
 
 ### Agent: Cursor

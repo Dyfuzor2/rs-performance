@@ -4,6 +4,23 @@ Format relay: jeden blok na sesję, bez kasowania cudzych wpisów. Starsze wpisy
 
 ---
 
+## [2026-04-12] Cursor — n8n April 2026+ fleet: HttpRequest jsonBody + Monitor Code node
+
+### Wykonane
+
+- **`scripts/n8n_monitor_diagnosta_code_node.py`** — węzeł **Prepare Diagnosta Body** + `Notify Diagnosta` / **Notify Recepcja** z `JSON.stringify` (HttpRequest v4.2).
+- **`scripts/n8n_apr2026_fleet_http_jsonfix.py`** — masowy PATCH przez API: Trinity DTC, Trending Faults (`Store on Hosting` naprawione `$json.packet.title` zamiast `.packet`), Content, SEO-AEO, Blog on Demand (token Facebook odczytywany z istniejącego węzła, brak hardcode w repo), nieaktywny duplikat `VPTe4…` — **Generate Topic**.
+- **`scripts/n8n_scan_bad_jsonbody.py`** — skan podejrzanych `jsonBody` (0 po fixach); bezpieczny print na Windows (ASCII).
+- **`scripts/n8n_fleet_health_apr2026.py`** — ostatni status exec per workflow (API).
+- Pomocnicze VPS: `_vps_n8n_errors_by_workflow.py`, `_vps_n8n_dump_exec.py` (wcześniej).
+
+### Weryfikacja
+
+- `python scripts/n8n_scan_bad_jsonbody.py` → **0** podejrzanych.
+- `python scripts/n8n_fleet_health_apr2026.py` — **ostatnie błędy historyczne**; pełna weryfikacja po następnych triggerach cron.
+
+---
+
 ## [2026-04-12] Cursor — bootstrap-operator-wow-stack.ps1 (mega jeden strzal)
 
 ### Wykonane
