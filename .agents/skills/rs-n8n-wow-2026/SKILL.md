@@ -1,7 +1,7 @@
 ---
 name: rs-n8n-wow-2026
 description: Use when building, debugging, auditing, or hardening n8n workflows for RS Performance, especially when the task touches editorial automation, Telegram ops, IndexNow, invitation hub, workflow quality gates, or MCP-assisted workflow validation.
-version: 1.2.1
+version: 1.2.2
 updated: 2026-04-12
 author: codex
 tags: [n8n, workflow, automation, editorial, telegram, vertex-ai, april-2026]
@@ -109,3 +109,12 @@ Patch eksportów workflowów (stare URL-e → proxy): `scripts/patch_n8n_vertex_
 - **`scripts/vps_n8n_telegram_wow_digest.py`** (run on VPS): health matrix + invitation webhook + **per-workflow last execution status** for all active workflows, one HTML message to the same Telegram chat as **RS AI Agent Monitor** (parsed from workflow JSON — no token echo). Flags: **`--quiet`** for cron (stderr only on failure).
 - **Daily automation:** host cron (not inside n8n container — no Python there): **`0 8 * * *`** with **`CRON_TZ=Europe/Warsaw`**, script path **`/srv/ops-stack/scripts/vps_n8n_telegram_wow_digest.py`**, install via **`scripts/vps_install_wow_digest_cron.sh`**.
 - Pair with **`scripts/vps_n8n_wow_smoke.py`** for CLI matrix + minimal ping when you do not need the full fleet table.
+
+### Telegram message quality (April 2026+)
+
+- **Never** put emoji or non-ASCII literals inside n8n expression strings saved as UTF-8 in workflow JSON — broken exports cause **mojibake** in Telegram. Prefer **`parse_mode: HTML`** with ASCII tags (`<b>…</b>`) and `String(x ?? '—')` for null-safe fields.
+- **HttpRequest → Telegram:** use **`specifyBody: json`**, **`Content-Type: application/json; charset=utf-8`**, URL `https://api.telegram.org/bot` + `$env.RS_TELEGRAM_BOT_TOKEN` (or `TELEGRAM_BOT_TOKEN`), **`disable_web_page_preview: true`**.
+- **Dedicated PUT scripts (backup under `scripts/.tmp_n8n_wf_backup_*`, `--dry-run`, `--vps-jwt`):**
+  - `scripts/n8n_apply_indexnow_drip_telegram_wow_apr2026.py` — DTC IndexNow Drip (chain IndexNow→Bing→Telegram, dedupe COMPLETE, `--workflow-id`).
+  - `scripts/n8n_apply_dtc_enrichment_telegram_wow_apr2026.py` — **RS DTC Enrichment Engine** (migrates `bodyParameters` Telegram nodes → JSON + env; fixes garbled status prefix).
+- Fleet jsonBody hygiene: `scripts/n8n_apr2026_fleet_http_jsonfix.py` (chat_id from env for Trending / Blog / SEO-AEO).

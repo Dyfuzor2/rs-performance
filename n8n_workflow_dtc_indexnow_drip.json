@@ -1,0 +1,381 @@
+{
+  "name": "DTC IndexNow Drip",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 1
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Every Hour",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://rsperformance.online/sitemap-dtc-p.xml",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "text"
+            }
+          }
+        }
+      },
+      "id": "fetch-sitemap-p",
+      "name": "Fetch Sitemap P",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [220, -200]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://rsperformance.online/sitemap-dtc-c.xml",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "text"
+            }
+          }
+        }
+      },
+      "id": "fetch-sitemap-c",
+      "name": "Fetch Sitemap C",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [220, -50]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://rsperformance.online/sitemap-dtc-b.xml",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "text"
+            }
+          }
+        }
+      },
+      "id": "fetch-sitemap-b",
+      "name": "Fetch Sitemap B",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [220, 100]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://rsperformance.online/sitemap-dtc-u.xml",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "text"
+            }
+          }
+        }
+      },
+      "id": "fetch-sitemap-u",
+      "name": "Fetch Sitemap U",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [220, 250]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const xml = $input.first().json.data;\nconst urlRegex = /<loc>([^<]+)<\\/loc>/g;\nconst urls = [];\nlet match;\nwhile ((match = urlRegex.exec(xml)) !== null) {\n  urls.push(match[1]);\n}\nreturn urls.map(url => ({ json: { url } }));"
+      },
+      "id": "parse-urls-p",
+      "name": "Parse URLs P",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, -200]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const xml = $input.first().json.data;\nconst urlRegex = /<loc>([^<]+)<\\/loc>/g;\nconst urls = [];\nlet match;\nwhile ((match = urlRegex.exec(xml)) !== null) {\n  urls.push(match[1]);\n}\nreturn urls.map(url => ({ json: { url } }));"
+      },
+      "id": "parse-urls-c",
+      "name": "Parse URLs C",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, -50]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const xml = $input.first().json.data;\nconst urlRegex = /<loc>([^<]+)<\\/loc>/g;\nconst urls = [];\nlet match;\nwhile ((match = urlRegex.exec(xml)) !== null) {\n  urls.push(match[1]);\n}\nreturn urls.map(url => ({ json: { url } }));"
+      },
+      "id": "parse-urls-b",
+      "name": "Parse URLs B",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 100]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const xml = $input.first().json.data;\nconst urlRegex = /<loc>([^<]+)<\\/loc>/g;\nconst urls = [];\nlet match;\nwhile ((match = urlRegex.exec(xml)) !== null) {\n  urls.push(match[1]);\n}\nreturn urls.map(url => ({ json: { url } }));"
+      },
+      "id": "parse-urls-u",
+      "name": "Parse URLs U",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 250]
+    },
+    {
+      "parameters": {
+        "mode": "append",
+        "options": {}
+      },
+      "id": "merge-all-urls",
+      "name": "Merge All URLs",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [660, 0]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const rows = $input.all();\nconst allUrls = [];\nfor (const row of rows) {\n  const u = row.json && row.json.url;\n  if (typeof u === 'string' && u.length > 0) {\n    allUrls.push(u);\n  }\n}\nconst staticData = $getWorkflowStaticData('global');\nconst submittedSet = new Set(staticData.submitted || []);\nconst batchSize = 500;\nconst pending = allUrls.filter((url) => !submittedSet.has(url));\n\nif (pending.length === 0) {\n  const total = submittedSet.size;\n  const n = allUrls.length;\n  const sig = `${total}|${n}`;\n  const prevSig = String(staticData.dripCompleteSig || '');\n  const prevAt = Number(staticData.dripCompleteAt || 0);\n  if (prevSig === sig && Date.now() - prevAt < 20000) {\n    return [];\n  }\n  staticData.dripCompleteSig = sig;\n  staticData.dripCompleteAt = Date.now();\n  return [{\n    json: {\n      status: 'complete',\n      totalSubmitted: total,\n      remaining: 0,\n      batch: [],\n      batchSize: 0,\n      totalUrls: n,\n    },\n  }];\n}\n\nconst batch = pending.slice(0, batchSize);\nbatch.forEach((url) => submittedSet.add(url));\nstaticData.submitted = Array.from(submittedSet);\n\nreturn [{\n  json: {\n    status: 'submitting',\n    batchSize: batch.length,\n    totalSubmitted: submittedSet.size,\n    totalUrls: allUrls.length,\n    remaining: pending.length - batch.length,\n    batch,\n  },\n}];"
+      },
+      "id": "batch-selector",
+      "name": "Select Next Batch",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [880, 0]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond-status",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "submitting",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "if-has-batch",
+      "name": "Has Batch?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1100, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.indexnow.org/IndexNow",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ host: 'rsperformance.online', key: '1400166dcb5865b1b7acb697801e2e7d', keyLocation: 'https://rsperformance.online/1400166dcb5865b1b7acb697801e2e7d.txt', urlList: $json.batch }) }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "indexnow-submit",
+      "name": "IndexNow Submit",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1320, -100]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://www.bing.com/IndexNow",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ host: 'rsperformance.online', key: '1400166dcb5865b1b7acb697801e2e7d', keyLocation: 'https://rsperformance.online/1400166dcb5865b1b7acb697801e2e7d.txt', urlList: $node['Select Next Batch'].json.batch }) }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "bing-submit",
+      "name": "Bing IndexNow",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1320, 50]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ 'https://api.telegram.org/bot' + String($env.RS_TELEGRAM_BOT_TOKEN || $env.TELEGRAM_BOT_TOKEN || '') + '/sendMessage' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ chat_id: String($env.RS_TELEGRAM_CHAT_ID || $env.TELEGRAM_CHAT_ID || ''), parse_mode: 'HTML', disable_web_page_preview: true, text: '<b>RS / DTC / IndexNow</b>\\n' + '<b>Status:</b> ' + String($node['Select Next Batch'].json.status || '') + '\\n' + '<b>Batch:</b> ' + String($node['Select Next Batch'].json.batchSize || 0) + ' URL\\n' + '<b>Wyslane:</b> ' + String($node['Select Next Batch'].json.totalSubmitted || 0) + '/' + String($node['Select Next Batch'].json.totalUrls || '?') + '\\n' + '<b>Pozostalo:</b> ' + String($node['Select Next Batch'].json.remaining ?? 0) + '\\n' + '<b>IndexNow HTTP:</b> ' + String($node['IndexNow Submit'].json.statusCode ?? 'OK') + '\\n' + '<b>Bing HTTP:</b> ' + String($node['Bing IndexNow'].json.statusCode ?? 'OK') }) }}",
+        "options": {}
+      },
+      "id": "telegram-report",
+      "name": "Telegram Report",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1540, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ 'https://api.telegram.org/bot' + String($env.RS_TELEGRAM_BOT_TOKEN || $env.TELEGRAM_BOT_TOKEN || '') + '/sendMessage' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ chat_id: String($env.RS_TELEGRAM_CHAT_ID || $env.TELEGRAM_CHAT_ID || ''), parse_mode: 'HTML', disable_web_page_preview: true, text: '<b>RS / DTC / IndexNow</b> — <b>KONIEC KOLEJKI</b>\\n' + 'Lacznie w historii statycznej: <b>' + String($json.totalSubmitted ?? 0) + '</b> URL\\n' + 'W tym uruchomieniu nie ma juz URL do wyslania.' }) }}",
+        "options": {}
+      },
+      "id": "telegram-complete",
+      "name": "Telegram Complete",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1320, 200]
+    }
+  ],
+  "connections": {
+    "Every Hour": {
+      "main": [
+        [
+          { "node": "Fetch Sitemap P", "type": "main", "index": 0 },
+          { "node": "Fetch Sitemap C", "type": "main", "index": 0 },
+          { "node": "Fetch Sitemap B", "type": "main", "index": 0 },
+          { "node": "Fetch Sitemap U", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Fetch Sitemap P": {
+      "main": [
+        [{ "node": "Parse URLs P", "type": "main", "index": 0 }]
+      ]
+    },
+    "Fetch Sitemap C": {
+      "main": [
+        [{ "node": "Parse URLs C", "type": "main", "index": 0 }]
+      ]
+    },
+    "Fetch Sitemap B": {
+      "main": [
+        [{ "node": "Parse URLs B", "type": "main", "index": 0 }]
+      ]
+    },
+    "Fetch Sitemap U": {
+      "main": [
+        [{ "node": "Parse URLs U", "type": "main", "index": 0 }]
+      ]
+    },
+    "Parse URLs P": {
+      "main": [
+        [{ "node": "Merge All URLs", "type": "main", "index": 0 }]
+      ]
+    },
+    "Parse URLs C": {
+      "main": [
+        [{ "node": "Merge All URLs", "type": "main", "index": 0 }]
+      ]
+    },
+    "Parse URLs B": {
+      "main": [
+        [{ "node": "Merge All URLs", "type": "main", "index": 0 }]
+      ]
+    },
+    "Parse URLs U": {
+      "main": [
+        [{ "node": "Merge All URLs", "type": "main", "index": 0 }]
+      ]
+    },
+    "Merge All URLs": {
+      "main": [
+        [{ "node": "Select Next Batch", "type": "main", "index": 0 }]
+      ]
+    },
+    "Select Next Batch": {
+      "main": [
+        [{ "node": "Has Batch?", "type": "main", "index": 0 }]
+      ]
+    },
+    "Has Batch?": {
+      "main": [
+        [
+          { "node": "IndexNow Submit", "type": "main", "index": 0 }
+        ],
+        [
+          { "node": "Telegram Complete", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "IndexNow Submit": {
+      "main": [
+        [{ "node": "Bing IndexNow", "type": "main", "index": 0 }]
+      ]
+    },
+    "Bing IndexNow": {
+      "main": [
+        [{ "node": "Telegram Report", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "tags": [
+    { "name": "SEO" },
+    { "name": "IndexNow" },
+    { "name": "DTC" }
+  ]
+}

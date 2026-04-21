@@ -21,27 +21,11 @@ sys.path.insert(0, str(_root / "scripts"))
 from gravity_cursor_env import require_n8n_api  # noqa: E402
 
 # workflow_id -> node_name -> new jsonBody (n8n expression)
+# RS DTC Enrichment Engine Telegram: use ``scripts/n8n_apply_dtc_enrichment_telegram_wow_apr2026.py``
+# (migrates bodyParameters → JSON + env bot URL; old id ``3szHjQMqRDz7isnw`` was stale).
 PATCHES: dict[str, dict[str, str]] = {
-    "3szHjQMqRDz7isnw": {
+    "9oAbPosvf0h860Xg": {
         "Store Enrichments": "={{ JSON.stringify({ enriched: $json.enriched }) }}",
-        "Telegram Success": (
-            "={{ JSON.stringify({ chat_id: '6534705697', text: "
-            "'🔥 Trinity DTC Crew Report\\n\\n✅ Stored: ' + $json.updated + '/' + "
-            "$node['Parse AI Response'].json.expectedCount + ' codes\\n📈 Progress: ' + "
-            "$json.stats.progress + '\\n⏳ Remaining: ' + $json.stats.remaining + "
-            "'\\n🤖 Model: ' + $node['Parse AI Response'].json.model + '\\n⚡ Tokens: ' + "
-            "$node['Parse AI Response'].json.tokensUsed, parse_mode: 'HTML' }) }}"
-        ),
-        "Telegram Error": (
-            "={{ JSON.stringify({ chat_id: '6534705697', text: "
-            "'⚠️ Trinity DTC: Brak kodów do wzbogacenia lub błąd AI\\n\\nError: ' + "
-            "($json.error || 'No enriched codes'), parse_mode: 'HTML' }) }}"
-        ),
-        "Telegram All Done": (
-            "={{ JSON.stringify({ chat_id: '6534705697', text: "
-            "'🏁 Trinity DTC: Wszystkie kody wzbogacone! Database complete.\\nTotal: ' + "
-            "$json.stats.total, parse_mode: 'HTML' }) }}"
-        ),
     },
     "crLLcdEAfxYEiNA9": {
         "Store on Hosting": (
@@ -54,13 +38,16 @@ PATCHES: dict[str, dict[str, str]] = {
             "'https://rsperformance.online/trending/' + $node['Build Knowledge Packet'].json.slug] }) }}"
         ),
         "Telegram Report": (
-            "={{ JSON.stringify({ chat_id: '6534705697', text: "
-            "'📊 Trending Faults Daily Packet\\n\\n📅 ' + $node['Build Knowledge Packet'].json.date + "
-            "' (' + $node['Build Knowledge Packet'].json.context.season + ')\\n🔧 Usterek: ' + "
-            "$node['Build Knowledge Packet'].json.faultCount + '\\n🤖 Model: ' + "
-            "$node['Build Knowledge Packet'].json.model + '\\n🔢 Tokens: ' + "
-            "$node['Build Knowledge Packet'].json.tokensUsed + '\\n🔗 https://rsperformance.online/trending/' + "
-            "$node['Build Knowledge Packet'].json.slug, parse_mode: 'HTML' }) }}"
+            "={{ JSON.stringify({ chat_id: String($env.RS_TELEGRAM_CHAT_ID || $env.TELEGRAM_CHAT_ID || ''), "
+            "parse_mode: 'HTML', disable_web_page_preview: true, text: "
+            "'<b>RS / Trending faults</b>\\n\\n<b>Date:</b> ' + "
+            "String($node['Build Knowledge Packet'].json.date || '—') + "
+            " ' (' + String(($node['Build Knowledge Packet'].json.context || {}).season || '—') + ')\\n' + "
+            "'<b>Faults:</b> ' + String($node['Build Knowledge Packet'].json.faultCount ?? '—') + '\\n' + "
+            "'<b>Model:</b> ' + String($node['Build Knowledge Packet'].json.model || '—') + '\\n' + "
+            "'<b>Tokens:</b> ' + String($node['Build Knowledge Packet'].json.tokensUsed ?? '—') + '\\n' + "
+            "'<b>URL:</b> https://rsperformance.online/trending/' + "
+            "String($node['Build Knowledge Packet'].json.slug || '') }) }}"
         ),
     },
     "9Kvb4S6vmp4MJJyq": {
@@ -69,12 +56,14 @@ PATCHES: dict[str, dict[str, str]] = {
             "quality_gate_enforced: true }) }}"
         ),
         "Telegram Report": (
-            "={{ JSON.stringify({ chat_id: '6534705697', text: $json.text, parse_mode: 'Markdown' }) }}"
+            "={{ JSON.stringify({ chat_id: String($env.RS_TELEGRAM_CHAT_ID || $env.TELEGRAM_CHAT_ID || ''), "
+            "text: String($json.text || ''), parse_mode: 'HTML', disable_web_page_preview: true }) }}"
         ),
     },
     "yE7tLieYNJa4FDW3": {
         "Telegram SEO Report": (
-            "={{ JSON.stringify({ chat_id: '6534705697', text: $json.text, parse_mode: 'Markdown' }) }}"
+            "={{ JSON.stringify({ chat_id: String($env.RS_TELEGRAM_CHAT_ID || $env.TELEGRAM_CHAT_ID || ''), "
+            "text: String($json.text || ''), parse_mode: 'HTML', disable_web_page_preview: true }) }}"
         ),
         "Store SEO Issues": (
             "={{ JSON.stringify({ text: 'SEO-AEO AUDIT: ' + $json.text.substring(0, 500), "
