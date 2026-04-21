@@ -13,7 +13,9 @@ Usage:
   python scripts/n8n_fleet_wow_verify_apr2026.py --json      # machine-readable summary line on stderr/stdout
   python scripts/n8n_fleet_wow_verify_apr2026.py --definition-gate --json
       # Active workflows whose *last* run failed but current JSON passes April-2026 sanity
-      #   are downgraded to DEF-OK (not counted as issues / strict failures).
+      #   are downgraded to DEFOK (not counted as issues / strict failures).
+
+See also ``--help`` epilog: VPS wrapper, GitHub Actions workflow, skill path.
 """
 
 from __future__ import annotations
@@ -131,7 +133,24 @@ def _last_error_message(base: str, headers: dict, eid: str) -> str:
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(description="n8n fleet WOW verify (VPS API)")
+    ap = argparse.ArgumentParser(
+        description="n8n fleet WOW verify (VPS API)",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  python scripts/n8n_fleet_wow_verify_apr2026.py --json
+  python scripts/n8n_fleet_wow_verify_apr2026.py --definition-gate --strict --json
+
+Windows / operator (JWT z VPS SQLite user_api_keys, ten sam weryfikator):
+  python scripts/run_n8n_fleet_verify_vps_auto.py --definition-gate --json
+
+CI (workflow_dispatch, sekrety jak w .cursor/mcp.env):
+  .github/workflows/n8n-fleet-definition-gate.yml
+
+Skill:
+  .agents/skills/rs-n8n-wow-2026/SKILL.md
+""".strip(),
+    )
     ap.add_argument(
         "--strict",
         action="store_true",
@@ -162,7 +181,7 @@ def main() -> int:
         action="store_true",
         help=(
             "If last execution is error but workflow JSON passes static sanity checks, "
-            "show DEF-OK and do not count as failure (--strict / JSON ok)."
+            "show DEFOK and do not count as failure (--strict / JSON ok)."
         ),
     )
     args = ap.parse_args()
