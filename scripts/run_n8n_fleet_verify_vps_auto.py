@@ -6,6 +6,7 @@ sets ``N8N_API_URL`` / ``N8N_API_KEY``, then delegates all CLI flags to the veri
 
 Examples::
 
+    python scripts/run_n8n_fleet_verify_vps_auto.py --help
     python scripts/run_n8n_fleet_verify_vps_auto.py --json
     python scripts/run_n8n_fleet_verify_vps_auto.py --definition-gate --json
     python scripts/run_n8n_fleet_verify_vps_auto.py --definition-gate --strict --json
@@ -35,6 +36,14 @@ _CMD = (
 
 
 def main() -> int:
+    if any(a in ("-h", "--help") for a in sys.argv[1:]):
+        print((__doc__ or "").strip(), flush=True)
+        print("\n--- Verifier (full flags; no VPS SSH this run) ---\n", flush=True)
+        return subprocess.call(
+            [sys.executable, str(_root / "scripts" / "n8n_fleet_wow_verify_apr2026.py"), "--help"],
+            cwd=str(_root),
+        )
+
     out, err, code = vps_exec_capture(_CMD, timeout=60)
     if code != 0:
         print(err or out or f"exit {code}", file=sys.stderr)

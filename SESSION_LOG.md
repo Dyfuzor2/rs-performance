@@ -4,6 +4,19 @@ Format relay: jeden blok na sesję, bez kasowania cudzych wpisów. Starsze wpisy
 
 ---
 
+## [2026-04-12] Cursor — n8n fleet wrapper `--help` + `gravity_cursor_env.resolve_n8n_api`
+
+### Wykonane
+
+- `scripts/run_n8n_fleet_verify_vps_auto.py`: ścieżka `-h` / `--help` bez SSH; docstring + delegacja do `n8n_fleet_wow_verify_apr2026.py --help`; `flush=True` na nagłówkach wrappera.
+- `scripts/gravity_cursor_env.py`: `resolve_n8n_api()` dla skryptów fleet / suite / deep scan (URL + klucz po `load_cursor_env()`).
+
+### Repo
+
+- Branch: `feature/v9-architecture-rebuild` (commit po `git push`).
+
+---
+
 ## [2026-04-12] Cursor — hosting `.htaccess`: parity UA z `config/ai_agents.php` (naprawa 406 / Exabot)
 
 ### Wykonane

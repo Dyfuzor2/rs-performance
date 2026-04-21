@@ -1,3 +1,14 @@
+## 2026-04-12 — n8n wrapper: `--help` bez SSH + `resolve_n8n_api` (fleet / suite)
+
+### Agent: Cursor
+
+### STATUS: REPO (`feature/v9-architecture-rebuild`)
+
+- **`scripts/run_n8n_fleet_verify_vps_auto.py`:** `-h` / `--help` → docstring wrappera + pełny help `n8n_fleet_wow_verify_apr2026.py` **bez** `vps_exec` / JWT; `flush=True` żeby kolejność stdout była czytelna.
+- **`scripts/gravity_cursor_env.py`:** `resolve_n8n_api()` — jedna ścieżka URL + klucz po `load_cursor_env()` (używane m.in. przez `n8n_fleet_wow_verify_apr2026.py`, `n8n_vps_fleet_wow_suite_apr2026.py`, `n8n_vps_execution_deep_scan_apr2026.py`).
+
+---
+
 ## 2026-04-12 — n8n fleet: GitHub Actions definition gate + wrapper docs
 
 ### Agent: Cursor

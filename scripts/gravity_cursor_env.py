@@ -72,6 +72,28 @@ def require_n8n_api() -> tuple[str, str]:
     return url, key
 
 
+def resolve_n8n_api(
+    *,
+    base_url: str | None = None,
+    api_key_env: str = "N8N_API_KEY",
+) -> tuple[str, str]:
+    """Resolve n8n base URL and API key after ``load_cursor_env`` (fleet / audit scripts).
+
+    If ``base_url`` is set, it wins over ``N8N_API_URL``. API key is read from
+    ``api_key_env`` (default ``N8N_API_KEY``).
+    """
+    load_cursor_env()
+    url = (base_url or os.environ.get("N8N_API_URL") or "").strip().rstrip("/")
+    env_key = (api_key_env or "N8N_API_KEY").strip() or "N8N_API_KEY"
+    key = (os.environ.get(env_key) or "").strip()
+    if not url or not key:
+        raise RuntimeError(
+            f"Missing n8n URL or API key (env: {env_key}). "
+            "Fill .cursor/mcp.env — see .cursor/mcp.env.example."
+        )
+    return url, key
+
+
 def require_openrouter_api_key() -> str:
     return require_env_any("OPENROUTER_API_KEY")
 
