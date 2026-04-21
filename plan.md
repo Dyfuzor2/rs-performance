@@ -34,6 +34,7 @@ Source of truth runtime: Cyber-Folks production + VPS support stack
 - **Done (WOW):** Google Cloud CLI — opcjonalna lokalna instalacja `gcloud` (`tools/gcp-gcloud-wow-runtime/install-gcloud-wow.ps1`, winget) na potrzeby ADC / eksperymentow Vertex; read-only MCP statusu `gcloud_wow_version` + `gcloud_wow_config_list` (`tools/gcp-gcloud-wow-runtime`). Pelna administracja projektem GCP nadal: VPS + procedury z `RELAY.md` / `vertex.md`, hosting canonical bez zmian.
 - **Done (WOW):** `scripts/n8n_apply_telegram_wow_suite_apr2026.py` — przed trzema PUT-ami Telegram WOW: **preflight** (`[suite] n8n base …`) + **WARN** na stderr, gdy `N8N_API_URL` nie jest RS VPS (typowe **404** na id workflowów); skill `rs-n8n-wow-2026` **v1.2.5**.
 - **Done (WOW):** ten sam suite — **`--help`** z epilogiem (kolejność kroków, przykłady), **`flush=True`**, wpis w **`.cursor/mcp.env.example`**; skill **v1.2.6**.
+- **Done (WOW):** **`scripts/run_n8n_telegram_wow_suite_vps_auto.py`** — jeden JWT z VPS + env (jak fleet verify wrapper); skill **v1.2.7**.
 
 ### 2026-04-12 gateway chain + relay addendum
 

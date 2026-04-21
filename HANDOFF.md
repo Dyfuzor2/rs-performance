@@ -1,3 +1,14 @@
+## 2026-04-12 — n8n: wrapper `run_n8n_telegram_wow_suite_vps_auto.py` (jeden JWT z VPS)
+
+### Agent: Cursor
+
+### STATUS: REPO (`feature/v9-architecture-rebuild`)
+
+- **`scripts/run_n8n_telegram_wow_suite_vps_auto.py`:** ten sam wzorzec co `run_n8n_fleet_verify_vps_auto.py` — `--help` bez drugiego SSH; run: jeden odczyt `user_api_keys` → env → suite (bez potrójnego `vps_exec` w dzieciach).
+- **Skill `rs-n8n-wow-2026`:** **v1.2.7**; **`mcp.env.example`:** linia z `run_n8n_telegram_wow_suite_vps_auto.py`.
+
+---
+
 ## 2026-04-12 — n8n Telegram WOW suite: `--help` epilog + `flush=True` + `mcp.env.example`
 
 ### Agent: Cursor

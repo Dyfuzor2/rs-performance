@@ -4,6 +4,19 @@ Format relay: jeden blok na sesję, bez kasowania cudzych wpisów. Starsze wpisy
 
 ---
 
+## [2026-04-12] Cursor — n8n: `run_n8n_telegram_wow_suite_vps_auto.py` (jeden JWT, jak fleet verify)
+
+### Wykonane
+
+- Nowy wrapper: `scripts/run_n8n_telegram_wow_suite_vps_auto.py` — `vps_exec` raz → `N8N_API_URL`/`N8N_API_KEY` w env → `n8n_apply_telegram_wow_suite_apr2026.py` bez `--vps-jwt` (dzieci nie robią 3× SQLite); `--help` deleguje do suite bez SSH.
+- `.cursor/mcp.env.example`, skill `rs-n8n-wow-2026` **v1.2.7**.
+
+### Repo
+
+- Branch: `feature/v9-architecture-rebuild` — komunikat: `n8n: add run_n8n_telegram_wow_suite_vps_auto wrapper`.
+
+---
+
 ## [2026-04-12] Cursor — n8n Telegram WOW suite: `--help` epilog + flush (operator ergonomics)
 
 ### Wykonane

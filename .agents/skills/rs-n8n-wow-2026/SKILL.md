@@ -1,7 +1,7 @@
 ---
 name: rs-n8n-wow-2026
 description: Use when building, debugging, auditing, or hardening n8n workflows for RS Performance, especially when the task touches editorial automation, Telegram ops, IndexNow, invitation hub, workflow quality gates, or MCP-assisted workflow validation.
-version: 1.2.6
+version: 1.2.7
 updated: 2026-04-12
 author: codex
 tags: [n8n, workflow, automation, editorial, telegram, vertex-ai, april-2026]
@@ -13,7 +13,7 @@ Project coordination skill for `n8n` work in `G:\gravity`.
 
 ## Primary sources
 
-- local MCP runtime (Cursor): `run-n8n-mcp.ps1` loads `.cursor/mcp.env` → pinned `n8n-mcp@2.47.5` stdio; verify with `verify-n8n-api.ps1`; webhook matrix: `smoke-critical-webhooks.ps1`. **`N8N_API_URL` domyślnie:** `https://auto.rs3d.pl` (produkcyjny n8n na VPS), nie SOCmid — patrz `mcp.env.example`. Python: `scripts/gravity_cursor_env` — `load_cursor_env`, `require_n8n_api`, **`resolve_n8n_api()`** (URL + klucz dla skryptów fleet / suite po załadowaniu `.cursor/mcp.env`) plus OpenRouter / Telegram / Meta / `RS_X_API_TOKEN` / `RS_BLOG_PIPELINE_KEY` (see `mcp.env.example`); no literals in `deploy_*.py`.
+- local MCP runtime (Cursor): `run-n8n-mcp.ps1` loads `.cursor/mcp.env` → pinned `n8n-mcp@2.47.5` stdio; verify with `verify-n8n-api.ps1`; webhook matrix: `smoke-critical-webhooks.ps1`. **`N8N_API_URL` domyślnie:** `https://auto.rs3d.pl` (produkcyjny n8n na VPS), nie SOCmid — patrz `mcp.env.example`. Python: `scripts/gravity_cursor_env` — `load_cursor_env`, `require_n8n_api`, **`resolve_n8n_api()`** (URL + klucz dla skryptów fleet / suite po załadowaniu `.cursor/mcp.env`) plus OpenRouter / Telegram / Meta / `RS_X_API_TOKEN` / `RS_BLOG_PIPELINE_KEY` (see `mcp.env.example`); no literals in `deploy_*.py`. **VPS JWT once:** `run_n8n_fleet_verify_vps_auto.py` (fleet), **`run_n8n_telegram_wow_suite_vps_auto.py`** (Telegram WOW suite) — env z jednego `vps_exec`, bez łańcucha `--vps-jwt` w dzieciach.
 - local MCP runtime:
     - `G:\gravity\tools\n8n-mcp-runtime`
 - local source repo:
@@ -119,5 +119,6 @@ Patch eksportów workflowów (stare URL-e → proxy): `scripts/patch_n8n_vertex_
   - `scripts/n8n_apply_dtc_enrichment_telegram_wow_apr2026.py` — **RS DTC Enrichment Engine** (migrates `bodyParameters` Telegram nodes → JSON + env; fixes garbled status prefix).
   - `scripts/n8n_apply_research_harvester_telegram_wow_apr2026.py` — **RS Research Harvester** (`xcwu34W87JpmV75S`): null-safe `$json.body?.…` for harvest stats, HTML Telegram, env tokens, optional ``RS_RESEARCH_HARVEST_URL`` override.
 - **One-shot:** `scripts/n8n_apply_telegram_wow_suite_apr2026.py` — runs the three scripts above in order; flags ``--dry-run``, ``--vps-jwt``, ``--base-url``, optional ``--continue-on-error``, ``--json`` (machine-readable summary). **Preflight:** pierwsza linia ``[suite] n8n base …`` + ``WARN`` na stderr gdy ``N8N_API_URL`` wygląda na inną instancję niż RS VPS (uniknij trzech 404 z rzędu). **``--help``:** epilog z kolejnością kroków i przykładami (``flush=True`` na liniach suite).
+- **VPS auto (jeden JWT):** `scripts/run_n8n_telegram_wow_suite_vps_auto.py` — jak `run_n8n_fleet_verify_vps_auto.py`: ``--help`` bez drugiego SSH; przy prawdziwym runie jeden odczyt SQLite → ``N8N_API_URL``/``N8N_API_KEY`` w env → suite **bez** ``--vps-jwt`` (dzieci nie robią trzech osobnych ``vps_exec``).
 - Repo template: `n8n_workflow_research_harvester.json` (no literals — import / diff against VPS).
 - Fleet jsonBody hygiene: `scripts/n8n_apr2026_fleet_http_jsonfix.py` (chat_id from env for Trending / Blog / SEO-AEO).
