@@ -117,4 +117,6 @@ Patch eksportów workflowów (stare URL-e → proxy): `scripts/patch_n8n_vertex_
 - **Dedicated PUT scripts (backup under `scripts/.tmp_n8n_wf_backup_*`, `--dry-run`, `--vps-jwt`):**
   - `scripts/n8n_apply_indexnow_drip_telegram_wow_apr2026.py` — DTC IndexNow Drip (chain IndexNow→Bing→Telegram, dedupe COMPLETE, `--workflow-id`).
   - `scripts/n8n_apply_dtc_enrichment_telegram_wow_apr2026.py` — **RS DTC Enrichment Engine** (migrates `bodyParameters` Telegram nodes → JSON + env; fixes garbled status prefix).
+  - `scripts/n8n_apply_research_harvester_telegram_wow_apr2026.py` — **RS Research Harvester** (`xcwu34W87JpmV75S`): null-safe `$json.body?.…` for harvest stats, HTML Telegram, env tokens, optional ``RS_RESEARCH_HARVEST_URL`` override.
+- Repo template: `n8n_workflow_research_harvester.json` (no literals — import / diff against VPS).
 - Fleet jsonBody hygiene: `scripts/n8n_apr2026_fleet_http_jsonfix.py` (chat_id from env for Trending / Blog / SEO-AEO).

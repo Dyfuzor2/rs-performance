@@ -1,0 +1,106 @@
+{
+  "name": "RS Research Harvester",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 1
+            }
+          ]
+        }
+      },
+      "id": "harvest-trigger",
+      "name": "Every Hour",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ String($env.RS_RESEARCH_HARVEST_URL || 'https://auto.rs3d.pl/research/harvest') }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "X-API-Token",
+              "value": "={{ String($env.RS_EDITORIAL_API_TOKEN || $env.RS_X_API_TOKEN || $env.RS_API_TOKEN || $env.N8N_API_TOKEN || '') }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "harvest-request",
+      "name": "Harvest RSS & Trends",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ 'https://api.telegram.org/bot' + String($env.RS_TELEGRAM_BOT_TOKEN || $env.TELEGRAM_BOT_TOKEN || '') + '/sendMessage' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ chat_id: String($env.RS_TELEGRAM_CHAT_ID || $env.TELEGRAM_CHAT_ID || ''), parse_mode: 'HTML', disable_web_page_preview: true, text: '<b>RS / Research harvester</b>\\n' + '<b>Articles:</b> ' + String($json.body?.harvested ?? $json.harvested ?? '—') + ' (<b>new:</b> ' + String($json.body?.new ?? $json.new ?? '—') + ')\\n' + '<b>Avg relevance:</b> ' + String($json.body?.avg_relevance ?? $json.avg_relevance ?? '—') + '\\n' + '<b>Sources OK:</b> ' + String($json.body?.sources_ok ?? $json.sources_ok ?? '—') }) }}",
+        "options": {}
+      },
+      "id": "harvest-telegram",
+      "name": "Telegram Report",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [720, 300]
+    }
+  ],
+  "connections": {
+    "Every Hour": {
+      "main": [
+        [
+          {
+            "node": "Harvest RSS & Trends",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Harvest RSS & Trends": {
+      "main": [
+        [
+          {
+            "node": "Telegram Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Europe/Warsaw",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "tags": [
+    { "name": "Research" },
+    { "name": "Editorial" }
+  ]
+}
