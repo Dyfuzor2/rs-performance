@@ -537,4 +537,4 @@ Pomiar `redirects` / `final_url`: `curl -L` (follow), `-w '%{num_redirects} %{ur
 
 ### Commity
 
-- `05c8be6` — `ci(n8n): add workflow_dispatch fleet verify with definition gate`.
+- `ci(n8n): add workflow_dispatch fleet verify with definition gate` — branch `feature/v9-architecture-rebuild`.
