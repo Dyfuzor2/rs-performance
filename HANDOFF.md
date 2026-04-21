@@ -1,3 +1,13 @@
+## 2026-04-12 — skill `rs-n8n-wow-2026` v1.2.1: wrapper `--help` + `resolve_n8n_api` w Primary sources
+
+### Agent: Cursor
+
+### STATUS: REPO (`feature/v9-architecture-rebuild`)
+
+- **`.agents/skills/rs-n8n-wow-2026/SKILL.md`:** wersja **1.2.1** — sekcja *Fleet verify* uzupełniona o **operator ergonomics**: `run_n8n_fleet_verify_vps_auto.py --help` bez SSH; w *Primary sources* dopisane `resolve_n8n_api()` obok `require_n8n_api`.
+
+---
+
 ## 2026-04-12 — n8n wrapper: `--help` bez SSH + `resolve_n8n_api` (fleet / suite)
 
 ### Agent: Cursor

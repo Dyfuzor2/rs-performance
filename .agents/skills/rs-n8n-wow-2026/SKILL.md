@@ -1,8 +1,8 @@
 ---
 name: rs-n8n-wow-2026
 description: Use when building, debugging, auditing, or hardening n8n workflows for RS Performance, especially when the task touches editorial automation, Telegram ops, IndexNow, invitation hub, workflow quality gates, or MCP-assisted workflow validation.
-version: 1.2.0
-updated: 2026-04-21
+version: 1.2.1
+updated: 2026-04-12
 author: codex
 tags: [n8n, workflow, automation, editorial, telegram, vertex-ai, april-2026]
 ---
@@ -13,7 +13,7 @@ Project coordination skill for `n8n` work in `G:\gravity`.
 
 ## Primary sources
 
-- local MCP runtime (Cursor): `run-n8n-mcp.ps1` loads `.cursor/mcp.env` → pinned `n8n-mcp@2.47.5` stdio; verify with `verify-n8n-api.ps1`; webhook matrix: `smoke-critical-webhooks.ps1`. **`N8N_API_URL` domyślnie:** `https://auto.rs3d.pl` (produkcyjny n8n na VPS), nie SOCmid — patrz `mcp.env.example`. Python: `scripts/gravity_cursor_env` — `require_n8n_api` plus OpenRouter / Telegram / Meta / `RS_X_API_TOKEN` / `RS_BLOG_PIPELINE_KEY` (see `mcp.env.example`); no literals in `deploy_*.py`.
+- local MCP runtime (Cursor): `run-n8n-mcp.ps1` loads `.cursor/mcp.env` → pinned `n8n-mcp@2.47.5` stdio; verify with `verify-n8n-api.ps1`; webhook matrix: `smoke-critical-webhooks.ps1`. **`N8N_API_URL` domyślnie:** `https://auto.rs3d.pl` (produkcyjny n8n na VPS), nie SOCmid — patrz `mcp.env.example`. Python: `scripts/gravity_cursor_env` — `load_cursor_env`, `require_n8n_api`, **`resolve_n8n_api()`** (URL + klucz dla skryptów fleet / suite po załadowaniu `.cursor/mcp.env`) plus OpenRouter / Telegram / Meta / `RS_X_API_TOKEN` / `RS_BLOG_PIPELINE_KEY` (see `mcp.env.example`); no literals in `deploy_*.py`.
 - local MCP runtime:
     - `G:\gravity\tools\n8n-mcp-runtime`
 - local source repo:
@@ -75,6 +75,8 @@ Project coordination skill for `n8n` work in `G:\gravity`.
 ```bash
 python scripts/run_n8n_fleet_verify_vps_auto.py --definition-gate --json
 ```
+
+**Operator ergonomics (kwiecień 2026+):** `python scripts/run_n8n_fleet_verify_vps_auto.py --help` (lub `-h`) — **bez** połączenia SSH / odczytu SQLite: najpierw docstring wrappera, potem pełny `--help` z `n8n_fleet_wow_verify_apr2026.py` (wszystkie flagi: `--strict`, `--json`, `--definition-gate`, `--base-url`, …). Przy prawdziwym audycie floty wrapper nadal pobiera JWT z VPS i eksportuje `N8N_API_URL=https://auto.rs3d.pl`.
 
 Flaga `--definition-gate` w `scripts/n8n_fleet_wow_verify_apr2026.py` robi **statyczne sanity** definicji (m.in. brak `require('crypto')`, poprawny wzorzec `jsonBody` pod HttpRequest v2+, brak oczywistych literówek URL Telegram). Aktywne workflowy z `last=error` ale **czystą definicją** → wiersz **`DEFOK`**, `ok: true` przy `--strict`, lista w JSON: `stale_error_recovered`.
 

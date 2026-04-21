@@ -10,6 +10,7 @@ Format relay: jeden blok na sesję, bez kasowania cudzych wpisów. Starsze wpisy
 
 - `scripts/run_n8n_fleet_verify_vps_auto.py`: ścieżka `-h` / `--help` bez SSH; docstring + delegacja do `n8n_fleet_wow_verify_apr2026.py --help`; `flush=True` na nagłówkach wrappera.
 - `scripts/gravity_cursor_env.py`: `resolve_n8n_api()` dla skryptów fleet / suite / deep scan (URL + klucz po `load_cursor_env()`).
+- **Skill:** `.agents/skills/rs-n8n-wow-2026/SKILL.md` **v1.2.1** — ten sam kontrakt opisany dla agentów (Primary sources + Fleet verify).
 
 ### Repo
 
