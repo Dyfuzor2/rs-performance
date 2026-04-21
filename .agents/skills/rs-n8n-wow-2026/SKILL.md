@@ -1,8 +1,8 @@
 ---
 name: rs-n8n-wow-2026
 description: Use when building, debugging, auditing, or hardening n8n workflows for RS Performance, especially when the task touches editorial automation, Telegram ops, IndexNow, invitation hub, workflow quality gates, or MCP-assisted workflow validation.
-version: 1.1.0
-updated: 2026-04-12
+version: 1.2.0
+updated: 2026-04-21
 author: codex
 tags: [n8n, workflow, automation, editorial, telegram, vertex-ai, april-2026]
 ---
@@ -65,6 +65,23 @@ Project coordination skill for `n8n` work in `G:\gravity`.
 - confirm cron timezone assumptions
 - confirm Telegram / alert sinks are not silently failing
 - confirm the workflow writes only through stable hosting APIs or verified VPS stores
+
+## Fleet verify + definition gate (April 2026+)
+
+**Problem:** n8n UI / API pokazuje **ostatni** execution jako `error` nawet wtedy, gdy workflow JSON został już naprawiony (PUT) — do kolejnego sukcesu crona historia zostaje „czerwona”.
+
+**Lokalnie (JWT z VPS SQLite przez `vps_exec`):**
+
+```bash
+python scripts/run_n8n_fleet_verify_vps_auto.py --definition-gate --json
+```
+
+Flaga `--definition-gate` w `scripts/n8n_fleet_wow_verify_apr2026.py` robi **statyczne sanity** definicji (m.in. brak `require('crypto')`, poprawny wzorzec `jsonBody` pod HttpRequest v2+, brak oczywistych literówek URL Telegram). Aktywne workflowy z `last=error` ale **czystą definicją** → wiersz **`DEFOK`**, `ok: true` przy `--strict`, lista w JSON: `stale_error_recovered`.
+
+**CI (GitHub Actions, bez sekretów na forkach PR):**
+
+- `.github/workflows/n8n-fleet-definition-gate.yml` — **`workflow_dispatch`**, sekrety: `N8N_API_KEY` (+ opcjonalnie `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`) — **te same nazwy** co w `.cursor/mcp.env` (szablon: `.cursor/mcp.env.example`).
+- Lokalny audyt pustych pól **bez drukowania wartości:** `python scripts/hydrate_mcp_env_from_workspace.py --check`
 
 ## Vertex AI Studio × n8n (proxy na hostingu — kwiecień 2026+)
 
