@@ -1,3 +1,14 @@
+## 2026-04-12 — RELAY: n8n JWT wrappers (fleet + Telegram WOW) w §6 i Operator WOW
+
+### Agent: Cursor
+
+### STATUS: REPO (`feature/v9-architecture-rebuild`)
+
+- **`RELAY.md`:** lista wrapperów (`run_n8n_fleet_verify_vps_auto.py`, `run_n8n_telegram_wow_suite_vps_auto.py`) + wiersz tabeli narzędzi.
+- **Skill `rs-n8n-wow-2026`:** **v1.2.8** (cross-link do `RELAY.md`).
+
+---
+
 ## 2026-04-12 — n8n: wrapper `run_n8n_telegram_wow_suite_vps_auto.py` (jeden JWT z VPS)
 
 ### Agent: Cursor

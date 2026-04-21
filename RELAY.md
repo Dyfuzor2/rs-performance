@@ -185,6 +185,7 @@ W `RELAY.md` trzymamy tylko lokalizacje i opis. Nie kopiujemy tu samych hasel i 
 - **Tylko env:** `pwsh -File G:\gravity\scripts\sync-operator-env-wow.ps1` — merge + `--check`.
 - **Recznie:** `python scripts/hydrate_mcp_env_from_workspace.py` potem `python scripts/hydrate_mcp_env_from_workspace.py --check` (opcja `--json` dla agentow).
 - **Walidacja n8n po sync:** `python -c "import sys; sys.path.insert(0,'scripts'); from gravity_cursor_env import require_n8n_api; require_n8n_api(); print('n8n OK')"`
+- **n8n VPS JWT wrappers (2026-04+):** `scripts/run_n8n_fleet_verify_vps_auto.py` (fleet verify / definition gate) oraz **`scripts/run_n8n_telegram_wow_suite_vps_auto.py`** (suite 3× PUT Telegram WOW) — jeden `vps_exec` → `N8N_API_URL` + `N8N_API_KEY` w env docelowego procesu; **`--help`** pokazuje docstring wrappera i pelne `--help` skryptu docelowego **bez** drugiego SSH. Skill: `rs-n8n-wow-2026`.
 - **n8n Public API (2026-04+):** ten sam kontrakt (`/api/v1/*`, `X-N8N-API-KEY`) dla **Filament** (hosting `.env`), **skryptów** (`mcp.env` / `n8n.txt`) oraz **n8n-mcp** — ale **serwer MCP n8n dziala na VPS** (`vps.md`), nie na laptopie; lokalny `run-n8n-mcp.ps1` to opcjonalny dev. **Domyslna instancja RS:** `https://auto.rs3d.pl` (VPS, flota WOW). **SOCmid** (`n8n-s2.socmid.cloud`) to osobna baza workflowow — osobny URL + klucz, tylko gdy celowo. Szczegoly: `n8n.md`.
 
 ### Google Cloud CLI lokalnie (kwiecien 2026+) + MCP statusu
@@ -210,6 +211,7 @@ W `RELAY.md` trzymamy tylko lokalizacje i opis. Nie kopiujemy tu samych hasel i 
 | MCP env template               | `G:\gravity\.cursor\mcp.env.example`                | nazwy zmiennych dla n8n / opcjonalnie Qdrant / MySQL RO                                                                    |
 | n8n MCP zrodlo (repo)          | `G:\gravity\mcp-servers\n8n-mcp`                    | pelny kod + docs; wersja npm pin w runtime                                                                                 |
 | n8n MCP runtime (pin)          | `G:\gravity\tools\n8n-mcp-runtime`                  | `n8n-mcp@^2.47.5` dla spojnosci z `npx`                                                                                    |
+| n8n JWT wrappers (Windows)     | `G:\gravity\scripts\run_n8n_fleet_verify_vps_auto.py`, `G:\gravity\scripts\run_n8n_telegram_wow_suite_vps_auto.py` | jeden odczyt API key z VPS SQLite (`vps_exec`), env `N8N_*`, `--help` bez drugiego SSH; skill `rs-n8n-wow-2026`            |
 | Telegram MCP (operator)        | `G:\gravity\tools\telegram-mcp-runtime`             | Bot API stdio MCP; `install-telegram-mcp.ps1`, `run-telegram-mcp.ps1`, env z `.cursor/mcp.env`                             |
 | gcloud WOW (CLI + status MCP)  | `G:\gravity\tools\gcp-gcloud-wow-runtime`           | `install-gcloud-wow.ps1` (winget), read-only MCP `gcloud_wow_*`; pelny GCP nadal VPS/SSH                                   |
 | Operator bootstrap WOW         | `G:\gravity\tools\bootstrap-operator-wow-stack.ps1` | jeden strzal: gcloud + env + check + MCP foldery; `-InstallDeps` = pelny npm                                               |

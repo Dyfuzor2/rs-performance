@@ -4,6 +4,19 @@ Format relay: jeden blok na sesję, bez kasowania cudzych wpisów. Starsze wpisy
 
 ---
 
+## [2026-04-12] Cursor — RELAY: n8n JWT wrappers (fleet + Telegram suite) w mapie narzędzi
+
+### Wykonane
+
+- **`RELAY.md`:** punkt w „Operator env WOW” (fleet verify + `run_n8n_telegram_wow_suite_vps_auto.py`) oraz wiersz w tabeli §6.
+- **Skill `rs-n8n-wow-2026`:** **v1.2.8** — odsyłacz do `RELAY.md` przy Primary sources.
+
+### Repo
+
+- Branch: `feature/v9-architecture-rebuild` — komunikat: `docs(relay): n8n JWT wrappers fleet + telegram suite`.
+
+---
+
 ## [2026-04-12] Cursor — n8n: `run_n8n_telegram_wow_suite_vps_auto.py` (jeden JWT, jak fleet verify)
 
 ### Wykonane
