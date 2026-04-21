@@ -1,3 +1,15 @@
+## 2026-04-12 — n8n Telegram WOW suite: `--help` epilog + `flush=True` + `mcp.env.example`
+
+### Agent: Cursor
+
+### STATUS: REPO (`feature/v9-architecture-rebuild`)
+
+- **`scripts/n8n_apply_telegram_wow_suite_apr2026.py`:** `argparse` epilog (kolejność 3 kroków, preflight, przykłady); `flush=True` na liniach `[suite]` / `[OK|FAIL]`.
+- **`.cursor/mcp.env.example`:** w sekcji n8n — one-shot suite + `--help`.
+- **Skill `rs-n8n-wow-2026`:** **v1.2.6**.
+
+---
+
 ## 2026-04-12 — n8n Telegram WOW suite: preflight `N8N_API_URL` + WARN (wrong instance → 404)
 
 ### Agent: Cursor

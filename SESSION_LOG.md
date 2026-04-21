@@ -4,6 +4,20 @@ Format relay: jeden blok na sesję, bez kasowania cudzych wpisów. Starsze wpisy
 
 ---
 
+## [2026-04-12] Cursor — n8n Telegram WOW suite: `--help` epilog + flush (operator ergonomics)
+
+### Wykonane
+
+- `scripts/n8n_apply_telegram_wow_suite_apr2026.py`: `argparse.RawDescriptionHelpFormatter` + epilog (kolejność kroków, preflight, przykłady); `flush=True` na stdout/stderr suite.
+- `.cursor/mcp.env.example`: krótka wzmianka o one-shot suite + `--help`.
+- Skill `rs-n8n-wow-2026` **v1.2.6**.
+
+### Repo
+
+- Branch: `feature/v9-architecture-rebuild` — komunikat commitu: `n8n: Telegram WOW suite help epilog and flush`.
+
+---
+
 ## [2026-04-12] Cursor — n8n Telegram WOW suite: preflight URL + operator WARN (wrong instance)
 
 ### Wykonane

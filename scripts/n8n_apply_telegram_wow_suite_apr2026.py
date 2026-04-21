@@ -22,6 +22,8 @@ Examples::
 
 At startup the suite prints **one preflight line** (resolved ``N8N_API_URL`` or JWT-mode base)
 and **stderr WARN** when the URL likely is not the RS VPS production n8n (wrong instance → **404** on workflow ids).
+
+``python scripts/n8n_apply_telegram_wow_suite_apr2026.py --help`` — pełna lista flag + kolejność kroków (kwiecień 2026+ ergonomia operatora).
 """
 
 from __future__ import annotations
@@ -47,6 +49,22 @@ STEPS: tuple[Step, ...] = (
     Step("scripts/n8n_apply_indexnow_drip_telegram_wow_apr2026.py", "DTC IndexNow Drip Telegram"),
 )
 
+_HELP_EPILOG = """
+Order (each child supports --dry-run and --vps-jwt):
+  1) Research Harvester Telegram
+  2) DTC Enrichment Telegram
+  3) DTC IndexNow Drip Telegram
+
+Preflight: one stdout line [suite] n8n base (...); stderr WARN if N8N_API_URL is not the RS VPS
+instance (typical cause of HTTP 404 on production workflow ids). Fix: set N8N_API_URL in
+.cursor/mcp.env (see .cursor/mcp.env.example) or pass --vps-jwt [--base-url https://auto.rs3d.pl].
+
+Examples:
+  python scripts/n8n_apply_telegram_wow_suite_apr2026.py --dry-run
+  python scripts/n8n_apply_telegram_wow_suite_apr2026.py --vps-jwt --dry-run
+  python scripts/n8n_apply_telegram_wow_suite_apr2026.py --vps-jwt --json
+"""
+
 
 def _print_suite_n8n_target(*, base_url_override: str, vps_jwt: bool) -> None:
     """Help operators spot wrong ``N8N_API_URL`` before three child 404s."""
@@ -60,12 +78,13 @@ def _print_suite_n8n_target(*, base_url_override: str, vps_jwt: bool) -> None:
     override = (base_url_override or "").strip()
     if vps_jwt:
         base = (override or os.environ.get("N8N_API_URL") or "https://auto.rs3d.pl").rstrip("/")
-        print(f"[suite] n8n base (JWT from VPS): {base}")
+        print(f"[suite] n8n base (JWT from VPS): {base}", flush=True)
         if "socmid" in base.lower():
             print(
                 "[suite] WARN: URL looks like SOCmid; VPS JWT is for VPS n8n — use "
                 "`--base-url https://auto.rs3d.pl` if workflows are missing.",
                 file=sys.stderr,
+                flush=True,
             )
         return
 
@@ -74,20 +93,25 @@ def _print_suite_n8n_target(*, base_url_override: str, vps_jwt: bool) -> None:
     try:
         url, _ = resolve_n8n_api(base_url=override or None)
     except RuntimeError as exc:
-        print(f"[suite] WARN: {exc}", file=sys.stderr)
+        print(f"[suite] WARN: {exc}", file=sys.stderr, flush=True)
         return
-    print(f"[suite] n8n base (env): {url}")
+    print(f"[suite] n8n base (env): {url}", flush=True)
     u = url.rstrip("/").lower()
     if "auto.rs3d.pl" not in u and "rs3d" not in u:
         print(
             "[suite] WARN: RS Telegram WOW workflow ids are on VPS n8n; HTTP 404 usually means "
             "wrong instance. Use `--vps-jwt` or set `N8N_API_URL=https://auto.rs3d.pl` in `.cursor/mcp.env`.",
             file=sys.stderr,
+            flush=True,
         )
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(description="Run all n8n Telegram WOW apply scripts (Apr 2026+)")
+    ap = argparse.ArgumentParser(
+        description="Run all n8n Telegram WOW apply scripts (Apr 2026+)",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=_HELP_EPILOG,
+    )
     ap.add_argument("--dry-run", action="store_true", help="Forward to each child script")
     ap.add_argument("--vps-jwt", action="store_true", help="Read n8n API key from VPS SQLite via vps_exec")
     ap.add_argument("--base-url", default="", help="Override N8N_API_URL for all children")
@@ -144,9 +168,9 @@ def main() -> int:
                 "tail": tail,
             }
         )
-        print(f"[{'OK' if ok else 'FAIL'}] {step.title} ({step.script}) exit={p.returncode}")
+        print(f"[{'OK' if ok else 'FAIL'}] {step.title} ({step.script}) exit={p.returncode}", flush=True)
         if not ok and tail:
-            print(tail)
+            print(tail, flush=True)
         if not ok and not args.continue_on_error:
             break
 
