@@ -502,3 +502,22 @@ Pomiar `redirects` / `final_url`: `curl -L` (follow), `-w '%{num_redirects} %{ur
 - `php artisan test` — `N8nPublicApiHealthServiceTest`, `N8nWorkflowDocumentResourceSmokeTest` → **5 passed**.
 - `GET https://auto.rs3d.pl/api/v1/workflows` z JWT z VPS → **200**.
 - Fleet VPS: **9** workflowów z flagą (błędy last run / never) — osobna iteracja napraw węzłów.
+
+---
+
+## [2026-04-12] Cursor — VPS `/srv/ai-gateway/sync.sh`: pętla `feeds/` z `ev-hybrid.json`
+
+### Wykonane
+
+- Backup: `cp /srv/ai-gateway/sync.sh /srv/ai-gateway/sync.sh.bak_cursor_ev_hybrid_feed_20260412`.
+- Jedna zmiana w liście plików `for f in …`: dopisano `ev-hybrid.json` obok `priority-answer-paths.json`.
+- `bash -n /srv/ai-gateway/sync.sh` → OK; `sudo /srv/ai-gateway/sync.sh` → OK.
+
+### Weryfikacja
+
+- Na VPS: `/srv/ai-gateway/feeds/ev-hybrid.json` istnieje (~23 KiB); log `/var/log/ai-gateway-sync.log` kończy się `AI GATEWAY SYNC COMPLETE`.
+- Public: `curl.exe -sI https://ai.rsperformance.online/feeds/ev-hybrid.json` → **HTTP 200**, `Content-Length: 23066`.
+
+### Uwagi
+
+- Skrypt `sync.sh` nie ma kopii w repo — źródło prawdy zmiany = VPS; przy odtwarzaniu bramki nie pomijać `ev-hybrid.json` w pętli `feeds/`.
