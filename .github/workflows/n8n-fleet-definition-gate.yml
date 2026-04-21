@@ -4,12 +4,16 @@
 # when workflow JSON is repair-clean even if the last *execution* row is still error
 # (stale history until the next cron tick).
 #
-# Setup (repository secrets):
+# Setup (GitHub Actions repository secrets — same *names* as local operator env):
 #   N8N_API_KEY — n8n public API key for https://auto.rs3d.pl
-# Optional (Telegram section + chat consistency):
+# Optional (Telegram getMe + chat_id consistency in fleet output):
 #   TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID
 #
-# Trigger manually until secrets are configured; avoids fork PR secret leaks.
+# Local source of truth (never commit): .cursor/mcp.env — see .cursor/mcp.env.example
+# Sanity (no values printed): python scripts/hydrate_mcp_env_from_workspace.py --check
+# Ops skill pack: .agents/skills/rs-n8n-wow-2026/SKILL.md
+#
+# workflow_dispatch only — avoids fork PRs touching secrets; run after mirroring secrets from mcp.env.
 
 name: n8n fleet (definition gate)
 
