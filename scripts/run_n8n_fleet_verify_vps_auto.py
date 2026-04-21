@@ -1,5 +1,19 @@
 #!/usr/bin/env python3
-"""Run n8n_fleet_wow_verify_apr2026 against https://auto.rs3d.pl with JWT from VPS SQLite."""
+"""Run ``n8n_fleet_wow_verify_apr2026`` against ``https://auto.rs3d.pl`` with JWT from VPS SQLite.
+
+Fetches the latest n8n API key via ``vps_exec`` (same pattern as ops scripts on Windows),
+sets ``N8N_API_URL`` / ``N8N_API_KEY``, then delegates all CLI flags to the verifier.
+
+Examples::
+
+    python scripts/run_n8n_fleet_verify_vps_auto.py --json
+    python scripts/run_n8n_fleet_verify_vps_auto.py --definition-gate --json
+    python scripts/run_n8n_fleet_verify_vps_auto.py --definition-gate --strict --json
+
+``--definition-gate`` (April 2026+): active workflows whose *last* execution is ``error``
+but whose current workflow JSON passes static repair checks are reported as ``DEFOK``
+and do not fail ``--strict`` (stale execution history until the next successful run).
+"""
 from __future__ import annotations
 
 import os

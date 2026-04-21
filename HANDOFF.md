@@ -1,3 +1,16 @@
+## 2026-04-12 — n8n fleet: GitHub Actions definition gate + wrapper docs
+
+### Agent: Cursor
+
+### STATUS: REPO (`feature/v9-architecture-rebuild`)
+
+- **`scripts/n8n_fleet_wow_verify_apr2026.py`:** już wcześniej `--definition-gate` (commit `fda6e67`) — statyczna bramka vs stary `last=error` w historii n8n.
+- **Nowe:** `.github/workflows/n8n-fleet-definition-gate.yml` — `workflow_dispatch`, `pip install requests`, `N8N_API_KEY` + opcjonalnie `TELEGRAM_*` (runner **bez** `vps_exec`; ten sam klucz co w `.cursor/mcp.env`).
+- **`scripts/run_n8n_fleet_verify_vps_auto.py`:** docstring z przykładami `--definition-gate`; **`.cursor/mcp.env.example`:** jedna linia o sekrecie GHA.
+- **Lokalna weryfikacja:** `python scripts/run_n8n_fleet_verify_vps_auto.py --definition-gate --json` → `ok: true` przy naprawionych definicjach na VPS.
+
+---
+
 ## 2026-04-12 — Hosting `.htaccess`: pełna parity UA z `config/ai_agents.php` (Exabot / OpenRouter / Cohere…)
 
 ### Agent: Cursor

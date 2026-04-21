@@ -521,3 +521,20 @@ Pomiar `redirects` / `final_url`: `curl -L` (follow), `-w '%{num_redirects} %{ur
 ### Uwagi
 
 - Skrypt `sync.sh` nie ma kopii w repo — źródło prawdy zmiany = VPS; przy odtwarzaniu bramki nie pomijać `ev-hybrid.json` w pętli `feeds/`.
+
+---
+
+## [2026-04-12] Cursor — n8n fleet: CI workflow_dispatch + dokumentacja wrappera
+
+### Wykonane
+
+- `.github/workflows/n8n-fleet-definition-gate.yml` — ręczny job na `ubuntu-latest`: `pip install requests`, potem `n8n_fleet_wow_verify_apr2026.py --base-url https://auto.rs3d.pl --expect-host auto.rs3d.pl --definition-gate --strict --json` z sekretem **`N8N_API_KEY`** (opcjonalnie `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`).
+- `scripts/run_n8n_fleet_verify_vps_auto.py` — docstring (przykłady `--definition-gate`); `.cursor/mcp.env.example` — wskazówka że wartość `N8N_API_KEY` = ten sam sekret co w GHA.
+
+### Weryfikacja
+
+- Lokalnie: `python scripts/run_n8n_fleet_verify_vps_auto.py --definition-gate --json` → `ok: true`, `stale_error_recovered_count: 5` (do czasu kolejnego sukcesu cron w historii wykonań n8n).
+
+### Commity
+
+- `05c8be6` — `ci(n8n): add workflow_dispatch fleet verify with definition gate`.

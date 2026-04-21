@@ -1,0 +1,58 @@
+# RS Performance — n8n fleet static gate (April 2026+)
+#
+# Runs scripts/n8n_fleet_wow_verify_apr2026.py with --definition-gate so CI passes
+# when workflow JSON is repair-clean even if the last *execution* row is still error
+# (stale history until the next cron tick).
+#
+# Setup (repository secrets):
+#   N8N_API_KEY — n8n public API key for https://auto.rs3d.pl
+# Optional (Telegram section + chat consistency):
+#   TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID
+#
+# Trigger manually until secrets are configured; avoids fork PR secret leaks.
+
+name: n8n fleet (definition gate)
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: n8n-fleet-definition-gate-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  N8N_API_URL: https://auto.rs3d.pl
+
+jobs:
+  fleet-verify:
+    name: Fleet verify (--definition-gate --strict)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Install script dependencies
+        run: pip install --disable-pip-version-check requests
+
+      - name: Run fleet verify
+        env:
+          N8N_API_KEY: ${{ secrets.N8N_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          set -euo pipefail
+          python scripts/n8n_fleet_wow_verify_apr2026.py \
+            --base-url "${N8N_API_URL}" \
+            --expect-host auto.rs3d.pl \
+            --definition-gate \
+            --strict \
+            --json
