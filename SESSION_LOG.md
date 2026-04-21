@@ -14,7 +14,7 @@ Format relay: jeden blok na sesję, bez kasowania cudzych wpisów. Starsze wpisy
 
 ### Repo
 
-- Branch: `feature/v9-architecture-rebuild`, commity `382b178` (fix) + `01c7b8d` (SESSION_LOG hash).
+- Branch: `feature/v9-architecture-rebuild`, commity `382b178` (fix) + `01c7b8d` / `77abe85` / `9c93284` (relay) + `459223f` (skill **v1.2.1**).
 
 ---
 
