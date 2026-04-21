@@ -16,6 +16,11 @@ Format relay: jeden blok na sesję, bez kasowania cudzych wpisów. Starsze wpisy
 
 - Branch: `feature/v9-architecture-rebuild` — commit po `git add` wyłącznie plików powyżej.
 
+### Dopisek (ta sama oś czasu)
+
+- **`scripts/smoke_aeo_gateway_openapi_canonical.py`** — smoke stdlib: `gateway.openapi_yaml` + `Link` na `/` (dla operatora / CI bez SSH).
+- **`HANDOFF.md`:** poprawka hasha commita na **`eed7a34`** (amend po relay); **`plan.md` / `RELAY.md`:** odnośnik do smoke.
+
 ---
 
 ## [2026-04-12] Cursor — RELAY: n8n JWT wrappers (fleet + Telegram suite) w mapie narzędzi

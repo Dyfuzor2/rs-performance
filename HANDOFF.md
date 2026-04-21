@@ -1505,7 +1505,7 @@
 
 ## AKTUALNA OPERACJA (W TRAKCIE)
 
-- **Obecnie brak** (2026-04-12: deploy hostingu AEO OpenAPI — `RsUri`, `AiCitationHeaders`, `AiDiscoveryArtifactBuilder`, `SearchArtifactFactory`; backupi `*.bak_cursor_aeo_openapi_20260412`; `search:artifacts-generate` + `optimize:clear`; smoke `openapi_yaml` w `ai-resources.json` + `Link` z `openapi.yaml`. Repo: `ssh_exec.py` (hasło z `mcp.env` / `cs.txt` / `CYBERFOLKS_SSH_PASSWORD_FILE`), `7c9e4d5` na `feature/v9-architecture-rebuild` wypchnięty na `origin`.)
+- **Obecnie brak** (2026-04-12: deploy hostingu AEO OpenAPI — `RsUri`, `AiCitationHeaders`, `AiDiscoveryArtifactBuilder`, `SearchArtifactFactory`; backupi `*.bak_cursor_aeo_openapi_20260412`; `search:artifacts-generate` + `optimize:clear`; smoke `openapi_yaml` w `ai-resources.json` + `Link` z `openapi.yaml`. Repo: `ssh_exec.py` (hasło z `mcp.env` / `cs.txt` / `CYBERFOLKS_SSH_PASSWORD_FILE`), commit **`eed7a34`**; następnie **`d9a2139`** (`scripts/smoke_aeo_gateway_openapi_canonical.py` + relay). Operator: `python scripts/smoke_aeo_gateway_openapi_canonical.py`.)
     > **[RACE CONDITION & DEAD AGENT GUARD]**: ZANIM siebie tu wpiszesz, sprawdź czy ktoś już nie pracuje. Jeśli inny agent wisi tu od >3 godzin, zrób **Dead Agent Recovery** (git status -> git diff -> napraw/usuń jego resztki) i dopiero przejmij pałeczkę.
 
 ## ZAMROĹ»ONE BLOCKERY (Fail-Forward)
@@ -1617,12 +1617,12 @@
 
 - **Kto:** Cursor (Composer)
 - **Kiedy:** 2026-04-12 ~22:45 CET
-- **Co zrobił:** **`ssh_exec.py` + deploy AEO OpenAPI na hostingu** — `load_cursor_env()` + odczyt hasła z `CYBERFOLKS_SSH_PASSWORD` lub pierwszej linii `cs.txt` (gitignored) / `CYBERFOLKS_SSH_PASSWORD_FILE`; `.gitignore`, `RELAY.md`, `.cursor/mcp.env.example`. **Hosting:** backupi `*.bak_cursor_aeo_openapi_20260412`, SFTP czterech plików PHP (`RsUri`, `AiCitationHeaders`, `AiDiscoveryArtifactBuilder`, `SearchArtifactFactory`), `php85 artisan search:artifacts-generate`, `optimize:clear`. Smoke: `/` **200**, `gateway.openapi_yaml` w `ai-resources.json`, `Link` z `openapi.yaml`. Commit `7c9e4d5` → `git push origin feature/v9-architecture-rebuild`. **Uwaga:** w workspace Cursor nie było pliku `cs.txt` — SSH użyło istniejącego `.cursor/mcp.env`; operator może przenieść hasło wyłącznie do `cs.txt`.
+- **Co zrobił:** **`ssh_exec.py` + deploy AEO OpenAPI na hostingu** — `load_cursor_env()` + odczyt hasła z `CYBERFOLKS_SSH_PASSWORD` lub pierwszej linii `cs.txt` (gitignored) / `CYBERFOLKS_SSH_PASSWORD_FILE`; `.gitignore`, `RELAY.md`, `.cursor/mcp.env.example`. **Hosting:** backupi `*.bak_cursor_aeo_openapi_20260412`, SFTP czterech plików PHP (`RsUri`, `AiCitationHeaders`, `AiDiscoveryArtifactBuilder`, `SearchArtifactFactory`), `php85 artisan search:artifacts-generate`, `optimize:clear`. Smoke: `/` **200**, `gateway.openapi_yaml` w `ai-resources.json`, `Link` z `openapi.yaml`. Commit **`eed7a34`** (`git push --force-with-lease` po amend z `HANDOFF.md`). **Uwaga:** w workspace Cursor nie było pliku `cs.txt` — SSH użyło istniejącego `.cursor/mcp.env`; operator może przenieść hasło wyłącznie do `cs.txt`.
 - **Czego NIE ruszać:** Sekrety w sekcji KLUCZOWE USTALENIA — nie duplikować; nie kasować plików backup/import na VPS bez świadomego rollbacku. Przy kolejnej edycji `config/ai_agents.php` — **zsynchronizuj** te same tokeny w `.htaccess_remote` (komentarz w pliku wskazuje na parity).
 
 ## NASTĘPNE KROKI (priorytet)
 
-1. **Merge do `main`:** procedura właściciela po review brancha `feature/v9-architecture-rebuild` (ostatni push: `7c9e4d5` — ssh_exec + AEO hosting deploy docs).
+1. **Merge do `main`:** procedura właściciela po review brancha `feature/v9-architecture-rebuild` (ostatni commit: **`d9a2139`** — smoke OpenAPI + relay; wcześniej **`eed7a34`** ssh_exec/deploy).
 2. **Panel:** zalogować się do Filament i sprawdzić **n8n WOW Ops Hub** (`/admin/n8n-workflow-documents`) — widok WOW, sync z API jeśli w `.env` są `N8N_API_URL` / `N8N_API_KEY`; opcjonalnie `php85 artisan ops:verify-n8n-hosting-bridge`.
 3. **n8n VPS:** `n8n_fleet_health_apr2026.py` po kolejnym cyklu cron; triage workflowów wciąż w `error` (trasy hosting / OpenRouter / Diagnosta).
 4. **Bezpieczeństwo n8n:** tokeny tylko w credentiale n8n / `mcp.env` — nie w eksporcie JSON w repo.
