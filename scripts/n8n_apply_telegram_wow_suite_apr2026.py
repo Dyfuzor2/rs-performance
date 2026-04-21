@@ -19,12 +19,16 @@ Examples::
     python scripts/n8n_apply_telegram_wow_suite_apr2026.py --vps-jwt --dry-run
     python scripts/n8n_apply_telegram_wow_suite_apr2026.py --vps-jwt
     python scripts/n8n_apply_telegram_wow_suite_apr2026.py --vps-jwt --json
+
+At startup the suite prints **one preflight line** (resolved ``N8N_API_URL`` or JWT-mode base)
+and **stderr WARN** when the URL likely is not the RS VPS production n8n (wrong instance → **404** on workflow ids).
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import os
 import subprocess
 import sys
 from dataclasses import dataclass
@@ -44,6 +48,44 @@ STEPS: tuple[Step, ...] = (
 )
 
 
+def _print_suite_n8n_target(*, base_url_override: str, vps_jwt: bool) -> None:
+    """Help operators spot wrong ``N8N_API_URL`` before three child 404s."""
+    root = Path(__file__).resolve().parents[1]
+    if str(root) not in sys.path:
+        sys.path.insert(0, str(root))
+
+    from gravity_cursor_env import load_cursor_env  # noqa: E402
+
+    load_cursor_env()
+    override = (base_url_override or "").strip()
+    if vps_jwt:
+        base = (override or os.environ.get("N8N_API_URL") or "https://auto.rs3d.pl").rstrip("/")
+        print(f"[suite] n8n base (JWT from VPS): {base}")
+        if "socmid" in base.lower():
+            print(
+                "[suite] WARN: URL looks like SOCmid; VPS JWT is for VPS n8n — use "
+                "`--base-url https://auto.rs3d.pl` if workflows are missing.",
+                file=sys.stderr,
+            )
+        return
+
+    from gravity_cursor_env import resolve_n8n_api  # noqa: E402
+
+    try:
+        url, _ = resolve_n8n_api(base_url=override or None)
+    except RuntimeError as exc:
+        print(f"[suite] WARN: {exc}", file=sys.stderr)
+        return
+    print(f"[suite] n8n base (env): {url}")
+    u = url.rstrip("/").lower()
+    if "auto.rs3d.pl" not in u and "rs3d" not in u:
+        print(
+            "[suite] WARN: RS Telegram WOW workflow ids are on VPS n8n; HTTP 404 usually means "
+            "wrong instance. Use `--vps-jwt` or set `N8N_API_URL=https://auto.rs3d.pl` in `.cursor/mcp.env`.",
+            file=sys.stderr,
+        )
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description="Run all n8n Telegram WOW apply scripts (Apr 2026+)")
     ap.add_argument("--dry-run", action="store_true", help="Forward to each child script")
@@ -56,6 +98,8 @@ def main() -> int:
     )
     ap.add_argument("--json", action="store_true", help="Print one-line JSON summary to stdout at end")
     args = ap.parse_args()
+
+    _print_suite_n8n_target(base_url_override=args.base_url, vps_jwt=args.vps_jwt)
 
     root = Path(__file__).resolve().parents[1]
     extra: list[str] = []

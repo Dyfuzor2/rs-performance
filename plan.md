@@ -32,6 +32,7 @@ Source of truth runtime: Cyber-Folks production + VPS support stack
 - **Done (WOW):** Operator env: `scripts/sync-operator-env-wow.ps1`, `hydrate_mcp_env_from_workspace.py --check` / `--json`, RELAY section 5 — jedna paczka `.cursor/mcp.env` bez wklejania sekretow do czatu.
 - **Done (WOW):** Telegram Bot API MCP — `tools/telegram-mcp-runtime` (`telegram_get_me`, `telegram_send_message`), sekrety wylacznie z `.cursor/mcp.env`; wpis w `.mcp.json` / `.cursor/mcp.json` jako `telegram-rs`.
 - **Done (WOW):** Google Cloud CLI — opcjonalna lokalna instalacja `gcloud` (`tools/gcp-gcloud-wow-runtime/install-gcloud-wow.ps1`, winget) na potrzeby ADC / eksperymentow Vertex; read-only MCP statusu `gcloud_wow_version` + `gcloud_wow_config_list` (`tools/gcp-gcloud-wow-runtime`). Pelna administracja projektem GCP nadal: VPS + procedury z `RELAY.md` / `vertex.md`, hosting canonical bez zmian.
+- **Done (WOW):** `scripts/n8n_apply_telegram_wow_suite_apr2026.py` — przed trzema PUT-ami Telegram WOW: **preflight** (`[suite] n8n base …`) + **WARN** na stderr, gdy `N8N_API_URL` nie jest RS VPS (typowe **404** na id workflowów); skill `rs-n8n-wow-2026` **v1.2.5**.
 
 ### 2026-04-12 gateway chain + relay addendum
 

@@ -1,3 +1,14 @@
+## 2026-04-12 — n8n Telegram WOW suite: preflight `N8N_API_URL` + WARN (wrong instance → 404)
+
+### Agent: Cursor
+
+### STATUS: REPO (`feature/v9-architecture-rebuild`)
+
+- **`scripts/n8n_apply_telegram_wow_suite_apr2026.py`:** przed uruchomieniem trzech skryptów PUT — linia `[suite] n8n base …` + ostrzeżenie stderr, gdy URL nie wygląda na RS VPS (`auto.rs3d.pl` / `rs3d`); osobno WARN dla trybu `--vps-jwt` + host typu SOCmid.
+- **`.agents/skills/rs-n8n-wow-2026/SKILL.md`:** **v1.2.5** — dokumentacja preflightu przy one-shot suite.
+
+---
+
 ## 2026-04-12 — skill `rs-n8n-wow-2026` v1.2.1: wrapper `--help` + `resolve_n8n_api` w Primary sources
 
 ### Agent: Cursor

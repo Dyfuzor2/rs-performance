@@ -4,6 +4,19 @@ Format relay: jeden blok na sesję, bez kasowania cudzych wpisów. Starsze wpisy
 
 ---
 
+## [2026-04-12] Cursor — n8n Telegram WOW suite: preflight URL + operator WARN (wrong instance)
+
+### Wykonane
+
+- `scripts/n8n_apply_telegram_wow_suite_apr2026.py`: przed krokami 1–3 drukuje `[suite] n8n base …` (tryb env lub `--vps-jwt`); na stderr **WARN** gdy `N8N_API_URL` nie wygląda na RS VPS (`auto.rs3d.pl` / `rs3d`) — typowy powód **404** na id workflowów z produkcji.
+- **Skill:** `.agents/skills/rs-n8n-wow-2026/SKILL.md` **v1.2.5** — opis preflightu przy one-shot suite.
+
+### Repo
+
+- Branch: `feature/v9-architecture-rebuild` — komunikat commitu: `n8n: Telegram WOW suite preflight warns on wrong N8N instance`.
+
+---
+
 ## [2026-04-12] Cursor — n8n fleet wrapper `--help` + `gravity_cursor_env.resolve_n8n_api`
 
 ### Wykonane
