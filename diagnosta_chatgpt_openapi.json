@@ -1,0 +1,318 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Diagnosta RS — Baza Wiedzy Diagnostycznej",
+    "description": "API wektorowej bazy wiedzy dla agenta Diagnosty. Przeszukuje kolekcje statyczne (DTC, procedury napraw, schematy CAN), dynamiczne (nowe wpisy z sesji diagnostycznych) oraz opcjonalnie zewnętrzną kolekcję EV/hybrid (HEEV lane) przez dedykowany endpoint EV.",
+    "version": "2.1.0"
+  },
+  "servers": [
+    {
+      "url": "https://mcp.rs3d.pl"
+    }
+  ],
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-Token"
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ],
+  "paths": {
+    "/internal/diagnostic-search": {
+      "post": {
+        "operationId": "diagnostic_search",
+        "summary": "Przeszukaj bazę wiedzy diagnostycznej (kody DTC, procedury napraw, schematy CAN/LIN, live data)",
+        "description": "Semantyczne wyszukiwanie wektorowe w bazie wiedzy. Zwraca trafienia z tytułem, snippetem, źródłem i score. Używaj ZAWSZE przed diagnozowaniem — najpierw sprawdź co wie baza.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["query"],
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "Zapytanie po polsku lub angielsku. Może zawierać kod DTC, markę, system, objaw. Np. 'P20EA SCR NOx VW TDI' lub 'U1008 komunikacja CAN magistrala VAG'."
+                  },
+                  "top_k": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 20,
+                    "default": 5,
+                    "description": "Ile wyników zwrócić (1-20)"
+                  },
+                  "use_dynamic": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Czy szukać też w kolekcji dynamicznej (nowe wpisy z sesji)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Lista trafień z bazy wiedzy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "hits": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": { "type": "integer" },
+                          "title": { "type": "string" },
+                          "snippet": { "type": "string", "description": "Fragment treści (max 500 znaków)" },
+                          "source_path": { "type": "string" },
+                          "source_type": { "type": "string", "enum": ["static", "dynamic"] },
+                          "score": { "type": "number", "description": "Trafność 0-1 (>0.5 = dobre trafienie)" }
+                        }
+                      }
+                    },
+                    "query": { "type": "string" },
+                    "total": { "type": "integer" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/internal/diagnostic-store": {
+      "post": {
+        "operationId": "diagnostic_store",
+        "summary": "Zapisz nowy dokument do dynamicznej bazy wiedzy",
+        "description": "Używaj gdy znalazłeś wartościową informację spoza bazy (z forum, wiki, doświadczenia mechanika) i chcesz ją zapamiętać na przyszłość. Dokument trafia do Postgres + Qdrant (kolekcja dynamiczna).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["title", "content"],
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "Tytuł dokumentu, np. 'P20EA VW Caddy 2.0 TDI — wymiana czujnika NOx'"
+                  },
+                  "content": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "Treść: procedura, opis, kroki naprawy. Maks ~3000 znaków."
+                  },
+                  "external_id": {
+                    "type": "string",
+                    "description": "Opcjonalne ID zewnętrzne (np. URL forum)"
+                  },
+                  "source_path": {
+                    "type": "string",
+                    "description": "Źródło informacji (URL, nazwa dokumentu)"
+                  },
+                  "source_type": {
+                    "type": "string",
+                    "default": "dynamic",
+                    "description": "Zawsze 'dynamic' przy ręcznym zapisie"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Dokument zapisany",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "integer" },
+                    "message": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/internal/ev-knowledge-search": {
+      "post": {
+        "operationId": "ev_knowledge_search",
+        "summary": "Przeszukaj bazę wiedzy EV / hybrid (HEEV lane, kolekcja zewnętrzna)",
+        "description": "Semantyczne wyszukiwanie w kolekcji `rs_external_ev_knowledge` (telemetria, edge, BMS, MQTT, repozytoria techniczne). Użyj gdy pytanie dotyczy EV/hybrida, oprogramowania pokładowego, telemetrii zamiast klasycznych kodów DTC warsztatowych. Dla typowej diagnostyki silnika najpierw rozważ `/internal/diagnostic-search`.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["query"],
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "Zapytanie po polsku lub angielsku, np. telemetria, Raspberry Pi, MQTT, BMS, hybryda."
+                  },
+                  "limit": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 20,
+                    "default": 5,
+                    "description": "Maksymalna liczba trafień do zwrócenia"
+                  },
+                  "min_score": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.1,
+                    "description": "Próg podobieństwa wektorowego (0–1); niższe wartości zwracają więcej kandydatów"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Trafienia z kolekcji EV/hybrid (HEEV); pola mogą być uzupełniane w zależności od wersji API",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "hits": {
+                      "type": "array",
+                      "description": "Lista dopasowanych fragmentów wiedzy",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "title": { "type": "string" },
+                          "snippet": { "type": "string" },
+                          "source_path": { "type": "string" },
+                          "score": { "type": "number" }
+                        }
+                      }
+                    },
+                    "query": { "type": "string" },
+                    "total": { "type": "integer" },
+                    "best_score": {
+                      "type": "number",
+                      "description": "Najwyższy score wśród trafień (0–1)"
+                    },
+                    "confidence": {
+                      "type": "string",
+                      "enum": ["low", "medium", "high"],
+                      "description": "Heurystyka ufności do odpowiedzi"
+                    },
+                    "display_mode": {
+                      "type": "string",
+                      "enum": ["external_ev_knowledge"],
+                      "description": "Tryb prezentacji — zewnętrzna wiedza EV"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/internal/scrape-public": {
+      "post": {
+        "operationId": "diagnostic_scrape",
+        "summary": "Przeszukaj internet (fora, GitHub, wiki) i wyciągnij treść diagnostyczną",
+        "description": "Wyszukuje na forach (MHH Auto, Drive2.ru, TDIClub), GitHubie (opendbc, DBC), wiki (Ross-Tech VCDS) i stronach producentów. Używaj gdy baza wiedzy nie ma odpowiedzi — scraper znajdzie info w internecie. Domyślnie auto_store=false — pokaż wyniki mechanikowi, niech zdecyduje co zapisać.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["query"],
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "Zapytanie diagnostyczne, np. 'P20EE SCR NOx VW TDI repair' lub 'Drive2 Fiat Ducato AdBlue pompa'"
+                  },
+                  "sources": {
+                    "type": "string",
+                    "default": "all",
+                    "enum": ["searxng", "google", "all"],
+                    "description": "Źródło wyszukiwania: searxng (darmowe), google (płatne CSE), all (oba)"
+                  },
+                  "max_results": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 10,
+                    "default": 5,
+                    "description": "Ile stron pobrać i sparsować (1-10)"
+                  },
+                  "auto_store": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "true = automatycznie zapisz wyniki do bazy wiedzy. false = pokaż do przeglądu."
+                  },
+                  "prefer_google": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "true = użyj Google CSE jako pierwsze (lepsze wyniki, kosztuje)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Wyniki scrapingu",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "results": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "url": { "type": "string" },
+                          "title": { "type": "string" },
+                          "content": { "type": "string", "description": "Wyciągnięta treść (max 1000 znaków)" },
+                          "source": { "type": "string" },
+                          "language": { "type": "string", "enum": ["pl", "en", "ru", "de"] },
+                          "stored": { "type": "boolean" },
+                          "stored_id": { "type": "integer" }
+                        }
+                      }
+                    },
+                    "query": { "type": "string" },
+                    "total": { "type": "integer" },
+                    "budget": { "type": "object", "description": "Status budżetu Google CSE" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
