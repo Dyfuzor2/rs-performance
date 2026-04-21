@@ -13,7 +13,7 @@ Format relay: jeden blok na sesję, bez kasowania cudzych wpisów. Starsze wpisy
 
 ### Repo
 
-- Branch: `feature/v9-architecture-rebuild`, commit `382b178` — `fix(n8n): wrapper --help without VPS; resolve_n8n_api for fleet scripts`.
+- Branch: `feature/v9-architecture-rebuild`, commity `382b178` (fix) + `01c7b8d` (SESSION_LOG hash).
 
 ---
 
