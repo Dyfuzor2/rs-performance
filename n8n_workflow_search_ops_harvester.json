@@ -1,0 +1,198 @@
+{
+  "name": "RS Search Ops Harvester",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "20 6 * * 1,4"
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Twice Weekly Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "search-ops-harvest-manual",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "manual-webhook",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        180
+      ],
+      "webhookId": "rs-search-ops-harvest-manual"
+    },
+    {
+      "parameters": {
+        "jsCode": "const now = new Date().toISOString();\nconst baseUrl = ($env.RS_CANONICAL_BASE_URL || 'https://rsperformance.online').replace(/\\/$/, '');\nconst token = $env.N8N_API_TOKEN || $env.RS_API_TOKEN || '';\nif (!String(token).trim()) {\n  throw new Error('SearchOps harvester: set RS_API_TOKEN or N8N_API_TOKEN in n8n environment (X-API-Token for hosting API).');\n}\n\nreturn [\n  {\n    json: {\n      source: 'gsc',\n      days: 28,\n      limit: 25,\n      baseUrl,\n      token,\n      runLabel: 'weekly-harvest',\n      startedAt: now,\n    },\n  },\n  {\n    json: {\n      source: 'bing',\n      days: 28,\n      limit: 25,\n      baseUrl,\n      token,\n      runLabel: 'weekly-harvest',\n      startedAt: now,\n    },\n  },\n];"
+      },
+      "id": "build-sources",
+      "name": "Build Sources",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        90
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.baseUrl + '/api/search-ops/fetch-signals' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "X-API-Token",
+              "value": "={{ $json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ source: $json.source, days: $json.days, limit: $json.limit }) }}",
+        "options": {
+          "timeout": 45000
+        }
+      },
+      "id": "fetch-signals",
+      "name": "Fetch Search Signals",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        500,
+        90
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst lines = [];\nlet storedTotal = 0;\nlet okCount = 0;\nlet failCount = 0;\n\nfor (const item of items) {\n  const source = item.json.source || item.json.body?.source || 'unknown';\n  const status = item.json.status || item.json.body?.status || 'error';\n  const stored = Number(item.json.stored || item.json.body?.stored || 0);\n  const statusCode = item.json.statusCode || item.json.code || 200;\n  const ok = status === 'ok' && statusCode >= 200 && statusCode < 300;\n\n  if (ok) {\n    okCount += 1;\n    storedTotal += stored;\n  } else {\n    failCount += 1;\n  }\n\n  lines.push(`${ok ? 'OK' : 'FAIL'} ${source}: stored=${stored} code=${statusCode}`);\n}\n\nreturn [{\n  json: {\n    status: failCount === 0 ? 'ok' : 'warning',\n    storedTotal,\n    okCount,\n    failCount,\n    checkedAt: new Date().toISOString(),\n    report: lines.join('\\n'),\n  },\n}];"
+      },
+      "id": "summarize-harvest",
+      "name": "Summarize Harvest",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        760,
+        90
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ 'https://api.telegram.org/bot' + $env.RS_TELEGRAM_BOT_TOKEN + '/sendMessage' }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ chat_id: $env.RS_TELEGRAM_CHAT_ID, text: 'Search Ops Harvester\\n\\n' + $json.report + '\\n\\nStored total: ' + $json.storedTotal + '\\nOK: ' + $json.okCount + ' | Fail: ' + $json.failCount + '\\nChecked: ' + $json.checkedAt, parse_mode: 'HTML' }) }}",
+        "options": {
+          "timeout": 20000
+        }
+      },
+      "id": "telegram-harvest",
+      "name": "Telegram Harvest Report",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1020,
+        90
+      ]
+    }
+  ],
+  "connections": {
+    "Twice Weekly Trigger": {
+      "main": [
+        [
+          {
+            "node": "Build Sources",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Build Sources",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Sources": {
+      "main": [
+        [
+          {
+            "node": "Fetch Search Signals",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Search Signals": {
+      "main": [
+        [
+          {
+            "node": "Summarize Harvest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize Harvest": {
+      "main": [
+        [
+          {
+            "node": "Telegram Harvest Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "tags": [
+    {
+      "name": "SearchOps"
+    },
+    {
+      "name": "GSC"
+    },
+    {
+      "name": "Bing"
+    },
+    {
+      "name": "AEO"
+    }
+  ]
+}

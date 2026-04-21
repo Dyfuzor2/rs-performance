@@ -1,0 +1,333 @@
+{
+  "name": "RS Search Ops Promoter",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "45 6 * * 2,3,5"
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Guarded Promotion Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "search-ops-promote-manual",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "manual-webhook",
+      "name": "Manual Promote Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        200
+      ],
+      "webhookId": "rs-search-ops-promote-manual"
+    },
+    {
+      "parameters": {
+        "jsCode": "const baseUrl = ($env.RS_CANONICAL_BASE_URL || 'https://rsperformance.online').replace(/\\/$/, '');\nconst token = $env.N8N_API_TOKEN || $env.RS_API_TOKEN || '';\nif (!String(token).trim()) {\n  throw new Error('SearchOps promoter: set RS_API_TOKEN or N8N_API_TOKEN in n8n environment (X-API-Token for hosting API).');\n}\n\nreturn [\n  {\n    json: {\n      queueType: 'micro_expansion',\n      path: '/api/search-ops/opportunities?decision=micro_expansion&tier=tier_a&limit=4',\n      baseUrl,\n      token,\n    },\n  },\n  {\n    json: {\n      queueType: 'new_support_page',\n      path: '/api/search-ops/opportunities?decision=new_support_page&tier=tier_b&limit=4',\n      baseUrl,\n      token,\n    },\n  },\n];"
+      },
+      "id": "build-queues",
+      "name": "Build Promotion Queues",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $json.baseUrl + $json.path }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-Token",
+              "value": "={{ $json.token }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "fetch-queue",
+      "name": "Fetch Opportunity Queue",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        500,
+        100
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const seeds = $('Build Promotion Queues').all();\nconst fallbackBaseUrl = ($env.RS_CANONICAL_BASE_URL || 'https://rsperformance.online').replace(/\\/$/, '');\nconst fallbackToken = $env.N8N_API_TOKEN || $env.RS_API_TOKEN || '';\nconst payloads = [];\n\nfor (const item of $input.all()) {\n  const pairedIndex = typeof item.pairedItem?.item === 'number' ? item.pairedItem.item : 0;\n  const seed = seeds[pairedIndex]?.json || {};\n  const queueType = seed.queueType || item.json.queueType || 'unknown';\n  const baseUrl = seed.baseUrl || item.json.baseUrl || fallbackBaseUrl;\n  const token = seed.token || item.json.token || fallbackToken;\n  const rows = Array.isArray(item.json.items) ? item.json.items : [];\n\n  for (const row of rows) {\n    payloads.push({\n      json: {\n        queueType,\n        baseUrl,\n        token,\n        query: row.query,\n        decision: row.route?.decision || 'reject',\n        tier: row.score?.tier || 'out_of_band',\n        target_path: row.route?.target_path || null,\n        has_existing_target: Boolean(row.route?.target_path),\n        intent: row.intent || 'unknown',\n        estimated_chars: queueType === 'micro_expansion' ? 420 : 780,\n        requires_title_rewrite: false,\n        cannibalization_risk: queueType === 'micro_expansion' ? 'low' : 'medium',\n      },\n    });\n  }\n}\n\nif (payloads.length === 0) {\n  return [{ json: { queueType: 'empty', baseUrl: fallbackBaseUrl, token: fallbackToken, query: 'no-op', decision: 'reject', tier: 'out_of_band', skipPromotion: true } }];\n}\n\nreturn payloads;"
+      },
+      "id": "expand-queue",
+      "name": "Expand Queue Items",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        760,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.skipPromotion || false }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "skip-empty",
+      "name": "Skip Empty Queue?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        980,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.baseUrl + '/api/search-ops/promote' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "X-API-Token",
+              "value": "={{ $json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ query: $json.query, decision: $json.decision, tier: $json.tier, target_path: $json.target_path, has_existing_target: $json.has_existing_target, intent: $json.intent, estimated_chars: $json.estimated_chars, requires_title_rewrite: $json.requires_title_rewrite, cannibalization_risk: $json.cannibalization_risk }) }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "promote-item",
+      "name": "Promote Opportunity",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1220,
+        20
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nlet ready = 0;\nlet review = 0;\nconst lines = [];\n\nfor (const item of items) {\n  const status = item.json.status || 'idle';\n  const query = item.json.query || item.json.body?.query || item.json.draft?.headline || 'n/a';\n\n  if (status === 'ready_for_apply') {\n    ready += 1;\n  }\n  if (status === 'review_required') {\n    review += 1;\n  }\n\n  lines.push(`${status}: ${query}`);\n}\n\nreturn [{\n  json: {\n    ready,\n    review,\n    total: items.length,\n    checkedAt: new Date().toISOString(),\n    report: lines.slice(0, 8).join('\\n') || 'No promotion actions were executed.',\n  },\n}];"
+      },
+      "id": "summarize-promotion",
+      "name": "Summarize Promotion",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1460,
+        20
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { ready: 0, review: 0, total: 0, checkedAt: new Date().toISOString(), report: 'No queued Search Ops opportunities matched the guarded filters.' } }];"
+      },
+      "id": "empty-summary",
+      "name": "Empty Queue Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1220,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ 'https://api.telegram.org/bot' + $env.RS_TELEGRAM_BOT_TOKEN + '/sendMessage' }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ chat_id: $env.RS_TELEGRAM_CHAT_ID, text: 'Search Ops Promoter\\n\\n' + $json.report + '\\n\\nReady for apply: ' + $json.ready + '\\nReview required: ' + $json.review + '\\nTotal handled: ' + $json.total + '\\nChecked: ' + $json.checkedAt, parse_mode: 'HTML' }) }}",
+        "options": {
+          "timeout": 20000
+        }
+      },
+      "id": "telegram-promoter",
+      "name": "Telegram Promotion Report",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1700,
+        100
+      ]
+    }
+  ],
+  "connections": {
+    "Guarded Promotion Trigger": {
+      "main": [
+        [
+          {
+            "node": "Build Promotion Queues",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual Promote Trigger": {
+      "main": [
+        [
+          {
+            "node": "Build Promotion Queues",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Promotion Queues": {
+      "main": [
+        [
+          {
+            "node": "Fetch Opportunity Queue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Opportunity Queue": {
+      "main": [
+        [
+          {
+            "node": "Expand Queue Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Expand Queue Items": {
+      "main": [
+        [
+          {
+            "node": "Skip Empty Queue?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Skip Empty Queue?": {
+      "main": [
+        [
+          {
+            "node": "Empty Queue Summary",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Promote Opportunity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Promote Opportunity": {
+      "main": [
+        [
+          {
+            "node": "Summarize Promotion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize Promotion": {
+      "main": [
+        [
+          {
+            "node": "Telegram Promotion Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Empty Queue Summary": {
+      "main": [
+        [
+          {
+            "node": "Telegram Promotion Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "tags": [
+    {
+      "name": "SearchOps"
+    },
+    {
+      "name": "Promoter"
+    },
+    {
+      "name": "ProblemFirst"
+    },
+    {
+      "name": "AEO"
+    }
+  ]
+}
