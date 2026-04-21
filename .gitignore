@@ -7,6 +7,8 @@ cursor.md
 n8n.md
 # Operator API key dump (never commit JWT)
 n8n.txt
+# Cyber-Folks SSH password (optional alternative to CYBERFOLKS_SSH_PASSWORD in mcp.env)
+cs.txt
 venv/
 .DS_Store
 *.zip

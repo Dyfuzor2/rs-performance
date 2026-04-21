@@ -4,6 +4,20 @@ Format relay: jeden blok na sesję, bez kasowania cudzych wpisów. Starsze wpisy
 
 ---
 
+## [2026-04-12] Cursor — `ssh_exec`: `cs.txt` / `CYBERFOLKS_SSH_PASSWORD_FILE` + deploy AEO OpenAPI na hosting
+
+### Wykonane
+
+- **`ssh_exec.py`:** `gravity_cursor_env.load_cursor_env()` przed odczytem hasła; hasło z env albo z pliku (`cs.txt` w korzeniu lub `CYBERFOLKS_SSH_PASSWORD_FILE`).
+- **`.gitignore`:** `cs.txt`; **`.cursor/mcp.env.example`** + **`RELAY.md`:** dokumentacja SSH deploy.
+- **Hosting (Cyber-Folks):** backup + SFTP czterech plików AEO (`RsUri`, `AiCitationHeaders`, `AiDiscoveryArtifactBuilder`, `SearchArtifactFactory`); `search:artifacts-generate`; `optimize:clear`. Smoke: `openapi_yaml` w `ai-resources.json`, `Link` z `openapi.yaml` na `/`.
+
+### Repo
+
+- Branch: `feature/v9-architecture-rebuild` — commit po `git add` wyłącznie plików powyżej.
+
+---
+
 ## [2026-04-12] Cursor — RELAY: n8n JWT wrappers (fleet + Telegram suite) w mapie narzędzi
 
 ### Wykonane
