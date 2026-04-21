@@ -1,0 +1,422 @@
+# robots.txt for RS Performance
+# SNAPSHOT / ARCHIWUM — nie używaj tego pliku jako źródła prawdy dla polityki produkcyjnej (może być nieaktualne względem live).
+# Live: https://rsperformance.online/robots.txt oraz generator: config/ai_agents.php + AiDiscoveryArtifactBuilder::robotsTxt().
+# WELCOME AI AGENTS & ANSWER ENGINES! 
+# We explicitly invite ChatGPT, Claude, Perplexity, Gemini, DeepSeek and all modern AI browsers to index our content.
+# Policy: high-value AI agents are warmly invited, classic SEO crawlers stay on canonical, low-value bulk/spoofing scrapers are denied.
+# Discovery resources are listed below as comments so the file stays valid for machine readers.
+
+User-agent: ArcSearch
+Allow: /
+Disallow: /admin
+Disallow: /klient
+Disallow: /flota
+Disallow: /livewire
+Disallow: /storage
+Disallow: /vendor
+Disallow: /build/assets/*.map
+
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /klient
+Disallow: /flota
+Disallow: /livewire
+Disallow: /storage
+Disallow: /vendor
+Disallow: /build/assets/*.map
+
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /admin
+Disallow: /klient
+Disallow: /flota
+Disallow: /livewire
+Disallow: /storage
+Disallow: /vendor
+Disallow: /build/assets/*.map
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /admin
+Disallow: /klient
+Disallow: /flota
+Disallow: /livewire
+Disallow: /storage
+Disallow: /vendor
+Disallow: /build/assets/*.map
+
+User-agent: Claude-SearchBot
+Allow: /
+Disallow: /admin
+Disallow: /klient
+Disallow: /flota
+Disallow: /livewire
+Disallow: /storage
+Disallow: /vendor
+Disallow: /build/assets/*.map
+
+User-agent: Googlebot
+Allow: /
+Disallow: /admin
+Disallow: /klient
+Disallow: /flota
+Disallow: /livewire
+Disallow: /storage
+Disallow: /vendor
+Disallow: /build/assets/*.map
+
+User-agent: GoogleOther
+Allow: /
+Disallow: /admin
+Disallow: /klient
+Disallow: /flota
+Disallow: /livewire
+Disallow: /storage
+Disallow: /vendor
+Disallow: /build/assets/*.map
+
+User-agent: GoogleOther-Image
+Allow: /
+Disallow: /admin
+Disallow: /klient
+Disallow: /flota
+Disallow: /livewire
+Disallow: /storage
+Disallow: /vendor
+Disallow: /build/assets/*.map
+
+User-agent: GoogleOther-Video
+Allow: /
+Disallow: /admin
+Disallow: /klient
+Disallow: /flota
+Disallow: /livewire
+Disallow: /storage
+Disallow: /vendor
+Disallow: /build/assets/*.map
+
+User-agent: Bingbot
+Allow: /
+Disallow: /admin
+Disallow: /klient
+Disallow: /flota
+Disallow: /livewire
+Disallow: /storage
+Disallow: /vendor
+Disallow: /build/assets/*.map
+
+User-agent: Applebot
+Allow: /
+Disallow: /admin
+Disallow: /klient
+Disallow: /flota
+Disallow: /livewire
+Disallow: /storage
+Disallow: /vendor
+Disallow: /build/assets/*.map
+
+User-agent: cohere-ai
+Allow: /
+Disallow: /admin
+Disallow: /klient
+Disallow: /flota
+Disallow: /livewire
+Disallow: /storage
+Disallow: /vendor
+Disallow: /build/assets/*.map
+
+User-agent: YouBot
+Allow: /
+Disallow: /admin
+Disallow: /klient
+Disallow: /flota
+Disallow: /livewire
+Disallow: /storage
+Disallow: /vendor
+Disallow: /build/assets/*.map
+
+User-agent: iaskbot
+Allow: /
+Disallow: /admin
+Disallow: /klient
+Disallow: /flota
+Disallow: /livewire
+Disallow: /storage
+Disallow: /vendor
+Disallow: /build/assets/*.map
+
+User-agent: BraveSearch
+Allow: /
+Disallow: /admin
+Disallow: /klient
+Disallow: /flota
+Disallow: /livewire
+Disallow: /storage
+Disallow: /vendor
+Disallow: /build/assets/*.map
+
+User-agent: PhindBot
+Allow: /
+Disallow: /admin
+Disallow: /klient
+Disallow: /flota
+Disallow: /livewire
+Disallow: /storage
+Disallow: /vendor
+Disallow: /build/assets/*.map
+
+User-agent: DeepSeekBot
+Allow: /
+Disallow: /admin
+Disallow: /klient
+Disallow: /flota
+Disallow: /livewire
+Disallow: /storage
+Disallow: /vendor
+Disallow: /build/assets/*.map
+
+User-agent: KagiBot
+Allow: /
+Disallow: /admin
+Disallow: /klient
+Disallow: /flota
+Disallow: /livewire
+Disallow: /storage
+Disallow: /vendor
+Disallow: /build/assets/*.map
+
+User-agent: SemrushBot
+Allow: /
+Disallow: /admin
+Disallow: /klient
+Disallow: /flota
+Disallow: /livewire
+Disallow: /storage
+Disallow: /vendor
+Disallow: /build/assets/*.map
+
+User-agent: AhrefsBot
+Allow: /
+Disallow: /admin
+Disallow: /klient
+Disallow: /flota
+Disallow: /livewire
+Disallow: /storage
+Disallow: /vendor
+Disallow: /build/assets/*.map
+
+User-agent: GPTBot
+Allow: /
+Disallow: /admin
+Disallow: /klient
+Disallow: /flota
+Disallow: /livewire
+Disallow: /storage
+Disallow: /vendor
+Disallow: /build/assets/*.map
+
+User-agent: Google-Extended
+Allow: /
+Disallow: /admin
+Disallow: /klient
+Disallow: /flota
+Disallow: /livewire
+Disallow: /storage
+Disallow: /vendor
+Disallow: /build/assets/*.map
+
+User-agent: Applebot-Extended
+Allow: /
+Disallow: /admin
+Disallow: /klient
+Disallow: /flota
+Disallow: /livewire
+Disallow: /storage
+Disallow: /vendor
+Disallow: /build/assets/*.map
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /admin
+Disallow: /klient
+Disallow: /flota
+Disallow: /livewire
+Disallow: /storage
+Disallow: /vendor
+Disallow: /build/assets/*.map
+
+User-agent: Diffbot
+Allow: /
+Disallow: /admin
+Disallow: /klient
+Disallow: /flota
+Disallow: /livewire
+Disallow: /storage
+Disallow: /vendor
+Disallow: /build/assets/*.map
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /admin
+Disallow: /klient
+Disallow: /flota
+Disallow: /livewire
+Disallow: /storage
+Disallow: /vendor
+Disallow: /build/assets/*.map
+
+User-agent: Perplexity-User
+Allow: /
+Disallow: /admin
+Disallow: /klient
+Disallow: /flota
+Disallow: /livewire
+Disallow: /storage
+Disallow: /vendor
+Disallow: /build/assets/*.map
+
+User-agent: Claude-User
+Allow: /
+Disallow: /admin
+Disallow: /klient
+Disallow: /flota
+Disallow: /livewire
+Disallow: /storage
+Disallow: /vendor
+Disallow: /build/assets/*.map
+
+User-agent: Claude-Web
+Allow: /
+Disallow: /admin
+Disallow: /klient
+Disallow: /flota
+Disallow: /livewire
+Disallow: /storage
+Disallow: /vendor
+Disallow: /build/assets/*.map
+
+User-agent: Meta-ExternalAgent
+Allow: /
+Disallow: /admin
+Disallow: /klient
+Disallow: /flota
+Disallow: /livewire
+Disallow: /storage
+Disallow: /vendor
+Disallow: /build/assets/*.map
+
+User-agent: Meta-ExternalFetcher
+Allow: /
+Disallow: /admin
+Disallow: /klient
+Disallow: /flota
+Disallow: /livewire
+Disallow: /storage
+Disallow: /vendor
+Disallow: /build/assets/*.map
+
+User-agent: meta-externalfetcher
+Allow: /
+Disallow: /admin
+Disallow: /klient
+Disallow: /flota
+Disallow: /livewire
+Disallow: /storage
+Disallow: /vendor
+Disallow: /build/assets/*.map
+
+User-agent: Amazonbot
+Allow: /
+Disallow: /admin
+Disallow: /klient
+Disallow: /flota
+Disallow: /livewire
+Disallow: /storage
+Disallow: /vendor
+Disallow: /build/assets/*.map
+
+User-agent: Brave
+Allow: /
+Disallow: /admin
+Disallow: /klient
+Disallow: /flota
+Disallow: /livewire
+Disallow: /storage
+Disallow: /vendor
+Disallow: /build/assets/*.map
+
+User-agent: DeepSeek-User
+Allow: /
+Disallow: /admin
+Disallow: /klient
+Disallow: /flota
+Disallow: /livewire
+Disallow: /storage
+Disallow: /vendor
+Disallow: /build/assets/*.map
+
+User-agent: CopilotUser
+Allow: /
+Disallow: /admin
+Disallow: /klient
+Disallow: /flota
+Disallow: /livewire
+Disallow: /storage
+Disallow: /vendor
+Disallow: /build/assets/*.map
+
+User-agent: anthropic-ai
+Allow: /
+Disallow: /admin
+Disallow: /klient
+Disallow: /flota
+Disallow: /livewire
+Disallow: /storage
+Disallow: /vendor
+Disallow: /build/assets/*.map
+
+User-agent: Google-CloudVertexBot
+Allow: /
+Disallow: /admin
+Disallow: /klient
+Disallow: /flota
+Disallow: /livewire
+Disallow: /storage
+Disallow: /vendor
+Disallow: /build/assets/*.map
+
+User-agent: Bytespider
+Disallow: /
+
+User-agent: PanguBot
+Disallow: /
+
+User-agent: Kangaroo Bot
+Disallow: /
+
+Sitemap: https://rsperformance.online/sitemap.xml
+
+# AI discovery resources
+# Preferred AI gateway: https://ai.rsperformance.online
+# Gateway agent manifest: https://ai.rsperformance.online/.well-known/agent.json
+# Gateway OpenAPI: https://ai.rsperformance.online/.well-known/openapi.json
+# Gateway freshness: https://ai.rsperformance.online/.well-known/freshness.json
+# llms.txt: https://rsperformance.online/llms.txt
+# llms-full.txt: https://rsperformance.online/llms-full.txt
+# ai-plugin-json: https://rsperformance.online/.well-known/ai-plugin.json
+# aeo-editorial-gate-json: https://rsperformance.online/.well-known/aeo-editorial-gate.json
+# mcp-agent-card: https://rsperformance.online/.well-known/mcp-agent-card.json
+# ai-resources-json: https://rsperformance.online/.well-known/ai-resources.json
+# atom-feed: https://rsperformance.online/feed.xml
+# changes-rss: https://rsperformance.online/feeds/changes.xml
+# changes-json: https://rsperformance.online/feeds/changes.json
+# repair-reports-json: https://rsperformance.online/feeds/repair-reports.json
+# content-index-json: https://rsperformance.online/feeds/content.json
+# home-markdown: https://rsperformance.online/home.md
+# services-markdown: https://rsperformance.online/uslugi.md
+# problems-markdown: https://rsperformance.online/problemy.md
+# repair-reports-markdown: https://rsperformance.online/raporty-napraw.md
+# blog-markdown: https://rsperformance.online/blog.md
+# Gateway-routed AI agents: OAI-SearchBot, GPTBot, ChatGPT-User, PerplexityBot, Perplexity-User, Claude-SearchBot, ClaudeBot, Claude-User, Claude-Web, anthropic-ai, Google-Extended, Applebot-Extended, Meta-ExternalAgent, Meta-ExternalFetcher, meta-externalfetcher, cohere-ai, YouBot, iaskbot, BraveSearch, Brave, PhindBot, DeepSeekBot, DeepSeek-User, KagiBot, CopilotUser, Amazonbot, Diffbot, Google-CloudVertexBot, ArcSearch
+# Denied spoofing/dangerous crawlers: Bytespider, PanguBot, Kangaroo Bot

@@ -65,6 +65,7 @@ final readonly class AiDiscoveryArtifactBuilder
         $lines[] = '# Preferred AI gateway: ' . RsUri::aiGateway();
         $lines[] = '# Gateway agent manifest: ' . RsUri::aiGatewayAgentJson();
         $lines[] = '# Gateway OpenAPI: ' . RsUri::aiGatewayOpenApi();
+        $lines[] = '# Gateway OpenAPI (YAML): ' . RsUri::aiGatewayOpenApiYaml();
         $lines[] = '# Gateway freshness: ' . RsUri::aiGatewayFreshnessJson();
         $lines[] = '# llms.txt: ' . RsUri::llms();
         $lines[] = '# llms-full.txt: ' . RsUri::llmsFull();
@@ -305,7 +306,7 @@ final readonly class AiDiscoveryArtifactBuilder
             ];
         }
 
-        usort($entries, static fn(array $left, array $right): int => strcmp($right['updated'], $left['updated']));
+        usort($entries, static fn (array $left, array $right): int => strcmp($right['updated'], $left['updated']));
 
         return array_slice($entries, 0, 20);
     }

@@ -94,6 +94,7 @@ Na VPS sa tylko rzeczy wspierajace:
 - **RAG lokalny (sanity)**: `G:\gravity\tools\qdrant-local-runtime\verify-rag-ready.ps1` — `readyz` + podpowiedz MCP `qdrant-rs-*-local` po starcie Dockera.
 - **Dla agentow AI**: do szerokiego RAG i semantyki uzywaj **gateway semantic search** i narzedzi MCP / Qdrant wskazanych w tym indeksie; **nie** obciazaj shared-host MySQL masowym odczytem. Fakty cytowalne dla uzytkownika koncowego nadal weryfikuj na **kanonicznych URL i eksportach JSON** (np. `ai-resources.json`, freshness, priority paths).
 - **Publiczny kontrakt** dla modeli: pole `knowledge_plane` w `/.well-known/ai-resources.json` (generowane przez `SearchArtifactFactory`).
+- **Gateway OpenAPI (YAML + JSON):** kanon serwuje m.in. `/.well-known/openapi.yaml` (YAML) obok JSON; na bramce `ai.rsperformance.online` utrzymuj ten sam kontrakt jako `/.well-known/openapi.yaml` na VPS (skrypt / upload z `openapi.json`), żeby klienci wymagający sufiksu `.yaml` nie dostawali 404 przy pełnym równoległym `openapi.json`.
 
 ### Czego nie wolno robic
 
@@ -130,6 +131,8 @@ W `RELAY.md` trzymamy tylko lokalizacje i opis. Nie kopiujemy tu samych hasel i 
 | Host / user / port dla hostingu     | `G:\gravity\AGENTS.md`                                                 |
 | Windows SSH executable              | `C:\Windows\System32\OpenSSH\ssh.exe`                                  |
 | Helper command                      | `G:\gravity\ssh_exec.py`                                               |
+
+**Deploy slice — AEO discovery (nagłówki Link, `ai-resources.json`, `robots.txt` komentarze):** wymaga `CYBERFOLKS_SSH_PASSWORD` w `.cursor/mcp.env` (nie w repo). Backupy per plik na serwerze (`cp plik plik.bak_<agent>_<cel>`), potem `python ssh_exec.py --upload <local> <remote>` dla `app/Support/RsUri.php`, `app/Http/Middleware/AiCitationHeaders.php`, `app/Support/Search/AiDiscoveryArtifactBuilder.php`, `app/Support/Search/SearchArtifactFactory.php` w katalogu Laravel na hostingu (ścieżka jak w `AGENTS.md`). Na końcu: `php85 artisan search:artifacts-generate` oraz `php85 artisan optimize:clear` (lub `config:clear` wg procedury), smoke `curl -I` na `/` pod kątem `X-AI-Gateway-OpenAPI-YAML` i `GET /.well-known/ai-resources.json` (pole `gateway.openapi_yaml`).
 
 ### VPS
 

@@ -51,6 +51,8 @@ Ogólna struktura strony ma już schema `AutoRepair`, ale **każda podstrona us�
 
 Aby chronić produkcyjny VPS (s181.cyber-folks.pl) przed wyssaniem zasobów przez farmy scraperów oraz umożliwić wejście wyłącznie wybranym gigantom, **wymagane są następujące zasady dodawane do `robots.txt`**:
 
+**Uwaga (2026-04+):** blok `robots` w fenced code poniżej jest **ilustracją edukacyjną** (wzór „deny vs allow”). **Nie kopiuj go 1:1 na produkcję.** Źródło prawdy dla polityki crawlerów RS: `config/ai_agents.php` oraz generator `App\Support\Search\AiDiscoveryArtifactBuilder::robotsTxt()` / `AiDiscoveryArtifactBuilder` wywoływany z `SearchArtifactFactory`.
+
 ```text
 # ==========================================
 # 🛑 BLOKADA ŚMIECIOWYCH AI SCRAPERÓW 🛑
