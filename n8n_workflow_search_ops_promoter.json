@@ -1,5 +1,5 @@
 {
-  "name": "RS Search Ops Promoter",
+  "name": "RS SEO Search Ops Promoter",
   "nodes": [
     {
       "parameters": {
@@ -40,7 +40,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const baseUrl = ($env.RS_CANONICAL_BASE_URL || 'https://rsperformance.online').replace(/\\/$/, '');\nconst token = $env.N8N_API_TOKEN || $env.RS_API_TOKEN || '';\nif (!String(token).trim()) {\n  throw new Error('SearchOps promoter: set RS_API_TOKEN or N8N_API_TOKEN in n8n environment (X-API-Token for hosting API).');\n}\n\nreturn [\n  {\n    json: {\n      queueType: 'micro_expansion',\n      path: '/api/search-ops/opportunities?decision=micro_expansion&tier=tier_a&limit=4',\n      baseUrl,\n      token,\n    },\n  },\n  {\n    json: {\n      queueType: 'new_support_page',\n      path: '/api/search-ops/opportunities?decision=new_support_page&tier=tier_b&limit=4',\n      baseUrl,\n      token,\n    },\n  },\n];"
+        "jsCode": "const baseUrl = ($env.RS_CANONICAL_BASE_URL || 'https://rsperformance.online').replace(/\\/$/, '');\nconst token = $env.N8N_API_TOKEN || $env.RS_API_TOKEN || '';\nif (!String(token).trim()) {\n  throw new Error('SEO Search Ops promoter: set RS_API_TOKEN or N8N_API_TOKEN in n8n environment (X-API-Token for hosting Search Ops API).');\n}\n\nreturn [\n  {\n    json: {\n      queueType: 'micro_expansion',\n      path: '/api/search-ops/opportunities?decision=micro_expansion&tier=tier_a&limit=4',\n      baseUrl,\n      token,\n    },\n  },\n  {\n    json: {\n      queueType: 'new_support_page',\n      path: '/api/search-ops/opportunities?decision=new_support_page&tier=tier_b&limit=4',\n      baseUrl,\n      token,\n    },\n  },\n];"
       },
       "id": "build-queues",
       "name": "Build Promotion Queues",
@@ -158,7 +158,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const items = $input.all();\nlet ready = 0;\nlet review = 0;\nconst lines = [];\n\nfor (const item of items) {\n  const status = item.json.status || 'idle';\n  const query = item.json.query || item.json.body?.query || item.json.draft?.headline || 'n/a';\n\n  if (status === 'ready_for_apply') {\n    ready += 1;\n  }\n  if (status === 'review_required') {\n    review += 1;\n  }\n\n  lines.push(`${status}: ${query}`);\n}\n\nreturn [{\n  json: {\n    ready,\n    review,\n    total: items.length,\n    checkedAt: new Date().toISOString(),\n    report: lines.slice(0, 8).join('\\n') || 'No promotion actions were executed.',\n  },\n}];"
+        "jsCode": "const items = $input.all();\nlet ready = 0;\nlet review = 0;\nconst lines = [];\n\nfor (const item of items) {\n  const status = item.json.status || 'idle';\n  const query = item.json.query || item.json.body?.query || item.json.draft?.headline || 'n/a';\n\n  if (status === 'ready_for_apply') {\n    ready += 1;\n  }\n  if (status === 'review_required') {\n    review += 1;\n  }\n\n  lines.push(`${status}: ${query}`);\n}\n\nreturn [{\n  json: {\n    ready,\n    review,\n    total: items.length,\n    checkedAt: new Date().toISOString(),\n    report: lines.slice(0, 8).join('\\n') || 'No SEO promotion actions were executed.',\n  },\n}];"
       },
       "id": "summarize-promotion",
       "name": "Summarize Promotion",
@@ -171,7 +171,7 @@
     },
     {
       "parameters": {
-        "jsCode": "return [{ json: { ready: 0, review: 0, total: 0, checkedAt: new Date().toISOString(), report: 'No queued Search Ops opportunities matched the guarded filters.' } }];"
+        "jsCode": "return [{ json: { ready: 0, review: 0, total: 0, checkedAt: new Date().toISOString(), report: 'No queued SEO Search Ops opportunities matched the guarded filters.' } }];"
       },
       "id": "empty-summary",
       "name": "Empty Queue Summary",
@@ -188,7 +188,7 @@
         "url": "={{ 'https://api.telegram.org/bot' + $env.RS_TELEGRAM_BOT_TOKEN + '/sendMessage' }}",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ chat_id: $env.RS_TELEGRAM_CHAT_ID, text: 'Search Ops Promoter\\n\\n' + $json.report + '\\n\\nReady for apply: ' + $json.ready + '\\nReview required: ' + $json.review + '\\nTotal handled: ' + $json.total + '\\nChecked: ' + $json.checkedAt, parse_mode: 'HTML' }) }}",
+        "jsonBody": "={{ JSON.stringify({ chat_id: $env.RS_TELEGRAM_CHAT_ID, text: 'SEO Search Ops | Promoter\\n\\n' + $json.report + '\\n\\nReady for apply: ' + $json.ready + '\\nReview required: ' + $json.review + '\\nTotal handled: ' + $json.total + '\\nChecked: ' + $json.checkedAt, parse_mode: 'HTML' }) }}",
         "options": {
           "timeout": 20000
         }
@@ -321,13 +321,13 @@
       "name": "SearchOps"
     },
     {
+      "name": "SEO"
+    },
+    {
       "name": "Promoter"
     },
     {
       "name": "ProblemFirst"
-    },
-    {
-      "name": "AEO"
     }
   ]
 }

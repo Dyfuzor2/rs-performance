@@ -1,5 +1,5 @@
 {
-  "name": "RS Search Ops Harvester",
+  "name": "RS SEO Search Ops Harvester",
   "nodes": [
     {
       "parameters": {
@@ -40,7 +40,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const now = new Date().toISOString();\nconst baseUrl = ($env.RS_CANONICAL_BASE_URL || 'https://rsperformance.online').replace(/\\/$/, '');\nconst token = $env.N8N_API_TOKEN || $env.RS_API_TOKEN || '';\nif (!String(token).trim()) {\n  throw new Error('SearchOps harvester: set RS_API_TOKEN or N8N_API_TOKEN in n8n environment (X-API-Token for hosting API).');\n}\n\nreturn [\n  {\n    json: {\n      source: 'gsc',\n      days: 28,\n      limit: 25,\n      baseUrl,\n      token,\n      runLabel: 'weekly-harvest',\n      startedAt: now,\n    },\n  },\n  {\n    json: {\n      source: 'bing',\n      days: 28,\n      limit: 25,\n      baseUrl,\n      token,\n      runLabel: 'weekly-harvest',\n      startedAt: now,\n    },\n  },\n];"
+        "jsCode": "const now = new Date().toISOString();\nconst baseUrl = ($env.RS_CANONICAL_BASE_URL || 'https://rsperformance.online').replace(/\\/$/, '');\nconst token = $env.N8N_API_TOKEN || $env.RS_API_TOKEN || '';\nif (!String(token).trim()) {\n  throw new Error('SEO Search Ops harvester: set RS_API_TOKEN or N8N_API_TOKEN in n8n environment (X-API-Token for hosting Search Ops API).');\n}\n\nreturn [\n  {\n    json: {\n      source: 'gsc',\n      days: 28,\n      limit: 25,\n      baseUrl,\n      token,\n      runLabel: 'weekly-harvest',\n      startedAt: now,\n    },\n  },\n  {\n    json: {\n      source: 'bing',\n      days: 28,\n      limit: 25,\n      baseUrl,\n      token,\n      runLabel: 'weekly-harvest',\n      startedAt: now,\n    },\n  },\n];"
       },
       "id": "build-sources",
       "name": "Build Sources",
@@ -104,7 +104,7 @@
         "url": "={{ 'https://api.telegram.org/bot' + $env.RS_TELEGRAM_BOT_TOKEN + '/sendMessage' }}",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ chat_id: $env.RS_TELEGRAM_CHAT_ID, text: 'Search Ops Harvester\\n\\n' + $json.report + '\\n\\nStored total: ' + $json.storedTotal + '\\nOK: ' + $json.okCount + ' | Fail: ' + $json.failCount + '\\nChecked: ' + $json.checkedAt, parse_mode: 'HTML' }) }}",
+        "jsonBody": "={{ JSON.stringify({ chat_id: $env.RS_TELEGRAM_CHAT_ID, text: 'SEO Search Ops | Harvester\\n\\n' + $json.report + '\\n\\nStored total: ' + $json.storedTotal + '\\nOK: ' + $json.okCount + ' | Fail: ' + $json.failCount + '\\nChecked: ' + $json.checkedAt, parse_mode: 'HTML' }) }}",
         "options": {
           "timeout": 20000
         }
@@ -186,13 +186,13 @@
       "name": "SearchOps"
     },
     {
+      "name": "SEO"
+    },
+    {
       "name": "GSC"
     },
     {
       "name": "Bing"
-    },
-    {
-      "name": "AEO"
     }
   ]
 }
