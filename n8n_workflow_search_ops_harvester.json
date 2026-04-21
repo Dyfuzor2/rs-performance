@@ -101,10 +101,19 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "={{ 'https://api.telegram.org/bot' + $env.RS_TELEGRAM_BOT_TOKEN + '/sendMessage' }}",
+        "url": "={{ 'https://api.telegram.org/bot' + String($env.RS_TELEGRAM_BOT_TOKEN || $env.TELEGRAM_BOT_TOKEN || '') + '/sendMessage' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            }
+          ]
+        },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ chat_id: $env.RS_TELEGRAM_CHAT_ID, text: 'SEO Search Ops | Harvester\\n\\n' + $json.report + '\\n\\nStored total: ' + $json.storedTotal + '\\nOK: ' + $json.okCount + ' | Fail: ' + $json.failCount + '\\nChecked: ' + $json.checkedAt, parse_mode: 'HTML' }) }}",
+        "jsonBody": "={{ JSON.stringify({ chat_id: String($env.RS_TELEGRAM_CHAT_ID || $env.TELEGRAM_CHAT_ID || ''), parse_mode: 'HTML', disable_web_page_preview: true, text: '<b>SEO Search Ops | Harvester</b>\\n\\n' + String($json.report || '') + '\\n\\n<b>Stored total:</b> ' + String($json.storedTotal ?? 0) + '\\n<b>OK:</b> ' + String($json.okCount ?? 0) + ' | <b>Fail:</b> ' + String($json.failCount ?? 0) + '\\n<b>Checked:</b> ' + String($json.checkedAt || '') }) }}",
         "options": {
           "timeout": 20000
         }
