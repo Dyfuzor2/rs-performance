@@ -11,6 +11,9 @@ Usage:
   python scripts/n8n_fleet_wow_verify_apr2026.py --base-url https://n8n-s2.socmid.cloud --api-key-env N8N_API_KEY_SOCMID
   python scripts/n8n_fleet_wow_verify_apr2026.py --strict   # exit 1 if any active workflow last=error or active+never
   python scripts/n8n_fleet_wow_verify_apr2026.py --json      # machine-readable summary line on stderr/stdout
+  python scripts/n8n_fleet_wow_verify_apr2026.py --definition-gate --json
+      # Active workflows whose *last* run failed but current JSON passes April-2026 sanity
+      #   are downgraded to DEF-OK (not counted as issues / strict failures).
 """
 
 from __future__ import annotations
@@ -51,6 +54,48 @@ def _chat_ids_in_nodes(nodes: list) -> set[str]:
         for m in _CHAT_ID_RE.finditer(blob):
             ids.add(m.group(1))
     return ids
+
+
+def _definition_sanity_passes(nodes: list) -> tuple[bool, list[str]]:
+    """
+    Heuristic static checks on workflow JSON (April 2026+ repair targets).
+
+    When last execution is still ``error`` (stale) after a PUT fix, these gates
+    let CI/ops pass without waiting for the next cron tick.
+    """
+    reasons: list[str] = []
+
+    def _http_param_blob(params: dict) -> str:
+        return json.dumps(params, ensure_ascii=False)
+
+    for n in nodes:
+        name = n.get("name") or "?"
+        ntype = n.get("type") or ""
+        params = n.get("parameters") or {}
+
+        if ntype == "n8n-nodes-base.code":
+            js = str(params.get("jsCode") or "")
+            if "require('crypto'" in js or 'require("crypto"' in js:
+                reasons.append(f"code:{name}:disallowed_crypto")
+
+        if ntype == "n8n-nodes-base.httpRequest":
+            jb = str(params.get("jsonBody") or "").strip()
+            # Legacy OpenRouter / Vertex migration typo: ``={ JSON.stringify`` (one ``{``) instead of ``={{``.
+            if re.search(r"=\{\s+JSON\.stringify", jb) and not jb.startswith("{{"):
+                reasons.append(f"http:{name}:jsonBody_legacy_stringify")
+            blob = _http_param_blob(params)
+            if "sk-or-" in blob or "sk-proj-" in blob:
+                reasons.append(f"http:{name}:possible_literal_api_key")
+            url = str(params.get("url") or "")
+            url_st = url.strip()
+            # Broken: raw ``=https://api.telegram.org/...`` without ``={{`` (n8n expression).
+            if "{{" not in url and (
+                url_st.startswith("=https://api.telegram.org")
+                or url_st.startswith("=http://api.telegram.org")
+            ):
+                reasons.append(f"http:{name}:telegram_url_missing_expression_braces")
+
+    return (len(reasons) == 0, reasons)
 
 
 def _agent_nodes(nodes: list) -> list[tuple[str, str]]:
@@ -112,6 +157,14 @@ def main() -> int:
         default="N8N_API_KEY",
         help="Which env var holds the API key for this instance (default N8N_API_KEY).",
     )
+    ap.add_argument(
+        "--definition-gate",
+        action="store_true",
+        help=(
+            "If last execution is error but workflow JSON passes static sanity checks, "
+            "show DEF-OK and do not count as failure (--strict / JSON ok)."
+        ),
+    )
     args = ap.parse_args()
 
     try:
@@ -168,6 +221,7 @@ def main() -> int:
     print(f"(workflows listed: {len(rows)})\n")
 
     issues: list[str] = []
+    stale_recovered: list[str] = []
     all_chat_ids: set[str] = set()
 
     for m in sorted(rows, key=lambda x: (not x.get("active", False), (x.get("name") or "").lower())):
@@ -195,10 +249,19 @@ def main() -> int:
         wf_chats = _chat_ids_in_nodes(nodes)
         all_chat_ids |= wf_chats
 
+        def_ok, def_reasons = _definition_sanity_passes(nodes)
+
         flag = "OK"
         if active and st == "error":
-            flag = "FAIL"
-            issues.append(f"{wid} {name}: last execution error")
+            if args.definition_gate and def_ok:
+                flag = "DEFOK"
+                stale_recovered.append(
+                    f"{wid} {name}: last execution error (stale); definition sanity OK"
+                )
+            else:
+                flag = "FAIL"
+                extra = f" | def: {'; '.join(def_reasons[:6])}" if def_reasons else ""
+                issues.append(f"{wid} {name}: last execution error{extra}")
         elif active and st == "never":
             flag = "WARN"
             issues.append(f"{wid} {name}: active but never run")
@@ -208,11 +271,16 @@ def main() -> int:
         chat_s = ",".join(sorted(wf_chats))[:40] if wf_chats else "-"
 
         print(
-            f"[{flag:4}] act={int(bool(active))} last={st:7} {started:19} | {wid:22} | {name}"
+            f"[{flag:5}] act={int(bool(active))} last={st:7} {started:19} | {wid:22} | {name}"
         )
         print(f"       {ag_s}; {tg_s}; chat_ids: {chat_s}")
         if err_hint:
             print(f"       error: {err_hint}")
+        if flag == "DEFOK":
+            print(
+                "       note: definition-gate — JSON passes static repair checks; "
+                "next successful run clears stale error in n8n history"
+            )
         if agents and len(agents) <= 8:
             for nn, tt in agents[:8]:
                 print(f"         - {nn}: {tt[:60]}")
@@ -230,6 +298,12 @@ def main() -> int:
         print("  (skip - no TELEGRAM_CHAT_ID in env)")
 
     print("\n=== Summary ===")
+    if stale_recovered:
+        print(f"  Definition-gate (stale error, JSON OK): {len(stale_recovered)}")
+        for s in stale_recovered[:15]:
+            print(f"    ~ {s}")
+        if len(stale_recovered) > 15:
+            print(f"    ... +{len(stale_recovered) - 15} more")
     if issues:
         print(f"  Flagged: {len(issues)}")
         for i in issues[:25]:
@@ -243,8 +317,11 @@ def main() -> int:
         payload = {
             "suite": "n8n_fleet_wow_verify_apr2026",
             "n8n_base": base,
+            "definition_gate": bool(args.definition_gate),
             "flagged_count": len(issues),
             "issues": issues[:100],
+            "stale_error_recovered_count": len(stale_recovered),
+            "stale_error_recovered": stale_recovered[:50],
             "ok": len(issues) == 0,
         }
         print("\n__JSON__\n" + json.dumps(payload, ensure_ascii=False))
