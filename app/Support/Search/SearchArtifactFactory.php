@@ -649,7 +649,7 @@ class SearchArtifactFactory
                 'organization' => 'RS Performance',
                 'url' => $base,
             ],
-            'version' => '2.2.0',
+            'version' => '2.2.1',
             'supportedInterfaces' => [
                 [
                     'url' => $base . '/message:send',
@@ -663,10 +663,16 @@ class SearchArtifactFactory
                     'x_rs_transport_note' => 'Streaming task lifecycle for the same envelope as message:send; chunking compatible with A2A streaming samples.',
                 ],
                 [
+                    'url' => $base . '/tasks',
+                    'protocolBinding' => 'HTTP+JSON',
+                    'protocolVersion' => '1.0',
+                    'x_rs_transport_note' => 'REST list of tasks (Overture list-tasks via GET). JSON-RPC: ListTasks / tasks/list on POST / returns result.tasks.',
+                ],
+                [
                     'url' => $base . '/',
                     'protocolBinding' => 'JSONRPC',
                     'protocolVersion' => '2.0',
-                    'x_rs_transport_note' => 'JSON-RPC 2.0: message/send, message/stream, tasks/get, tasks/cancel, tasks/subscribe.',
+                    'x_rs_transport_note' => 'JSON-RPC 2.0: message/send, message/stream, ListTasks, tasks/list, tasks/get, tasks/cancel, tasks/subscribe.',
                 ],
             ],
             'capabilities' => [
@@ -943,12 +949,12 @@ class SearchArtifactFactory
                     'gateway_url' => RsUri::aiGatewayAnswerRoutingJson(),
                     'packet_command' => 'aeo:build-answer-routing-packet',
                 ],
-                'service_atomic_answers' => $topServices->map(fn (array $service) => [
+                'service_atomic_answers' => $topServices->map(fn(array $service) => [
                     'title' => $service['name'],
                     'url' => $service['url'],
                     'atomic_summary' => $service['atomic_summary'],
                 ])->all(),
-                'problem_atomic_answers' => $topProblems->map(fn (array $problem) => [
+                'problem_atomic_answers' => $topProblems->map(fn(array $problem) => [
                     'title' => $problem['name'],
                     'url' => $problem['url'],
                     'atomic_summary' => $problem['atomic_summary'],
@@ -1334,7 +1340,7 @@ class SearchArtifactFactory
             ->keyBy('slug');
 
         return collect($preferredOrder)
-            ->map(fn (string $slug) => $services->get($slug))
+            ->map(fn(string $slug) => $services->get($slug))
             ->filter()
             ->map(function (Service $service) {
                 $serviceSeoData = $this->serviceSeoData($service);
@@ -1388,8 +1394,8 @@ class SearchArtifactFactory
 
     private function serviceAtomicSummary(Service $service, array $serviceSeoData): string
     {
-        $symptom = collect($serviceSeoData['symptoms'] ?? [])->filter()->map(fn (mixed $value): string => trim((string) $value))->first();
-        $proofPoint = collect($serviceSeoData['proof_points'] ?? [])->filter()->map(fn (mixed $value): string => trim((string) $value))->first();
+        $symptom = collect($serviceSeoData['symptoms'] ?? [])->filter()->map(fn(mixed $value): string => trim((string) $value))->first();
+        $proofPoint = collect($serviceSeoData['proof_points'] ?? [])->filter()->map(fn(mixed $value): string => trim((string) $value))->first();
         $serviceLead = trim((string) ($service->short_description ?: $service->full_description ?: ''));
 
         $problemClause = $symptom !== null && $symptom !== ''
@@ -1444,7 +1450,7 @@ class SearchArtifactFactory
             ->orderByDesc('is_featured')
             ->orderByDesc('published_at')
             ->get()
-            ->map(fn (RepairReport $report) => [
+            ->map(fn(RepairReport $report) => [
                 'name' => $report->title,
                 'url' => RsUri::repairReport($report->slug),
             ])
@@ -1460,7 +1466,7 @@ class SearchArtifactFactory
             ->published()
             ->orderByDesc('published_at')
             ->get()
-            ->map(fn (BlogPost $post) => [
+            ->map(fn(BlogPost $post) => [
                 'name' => $post->title,
                 'url' => RsUri::blogPost($post->slug),
                 'markdown_url' => RsUri::blogPostMarkdown($post->slug),
@@ -1575,17 +1581,17 @@ class SearchArtifactFactory
                 ['name' => 'DTC hub', 'uri' => RsUri::dtcHub(), 'mimeType' => 'text/html'],
                 ['name' => 'DTC JSON feed', 'uri' => RsUri::dtcFeedJson(), 'mimeType' => 'application/json'],
                 ['name' => 'DTC strongest landings JSON', 'uri' => RsUri::dtcStrongestFeedJson(), 'mimeType' => 'application/json'],
-                ...collect(['P', 'C', 'B', 'U'])->map(fn (string $type) => [
+                ...collect(['P', 'C', 'B', 'U'])->map(fn(string $type) => [
                     'name' => 'Type ' . $type . ' DTC slice',
                     'uri' => RsUri::dtcType($type),
                     'mimeType' => 'text/html',
                 ])->all(),
-                ...collect($this->featuredDtcManufacturers())->map(fn (string $manufacturer) => [
+                ...collect($this->featuredDtcManufacturers())->map(fn(string $manufacturer) => [
                     'name' => $manufacturer . ' DTC slice',
                     'uri' => RsUri::dtcManufacturer($manufacturer),
                     'mimeType' => 'text/html',
                 ])->all(),
-                ...collect($this->strongestDtcManufacturerTypes())->map(fn (array $combo) => [
+                ...collect($this->strongestDtcManufacturerTypes())->map(fn(array $combo) => [
                     'name' => $combo['manufacturer'] . ' type ' . $combo['type'] . ' DTC slice',
                     'uri' => RsUri::dtcManufacturerType($combo['manufacturer'], $combo['type']),
                     'mimeType' => 'text/html',
@@ -1597,24 +1603,24 @@ class SearchArtifactFactory
                 ['name' => 'Short AI profile', 'uri' => RsUri::llms(), 'mimeType' => 'text/plain'],
                 ['name' => 'Full AI profile', 'uri' => RsUri::llmsFull(), 'mimeType' => 'text/plain'],
             ],
-            $topServices->map(fn (array $service) => [
+            $topServices->map(fn(array $service) => [
                 'name' => $service['name'],
                 'uri' => $service['url'],
                 'mimeType' => 'text/html',
                 'atomic_summary' => $service['atomic_summary'],
             ])->all(),
-            $this->problemEntries()->take(6)->map(fn (array $problem) => [
+            $this->problemEntries()->take(6)->map(fn(array $problem) => [
                 'name' => $problem['name'],
                 'uri' => $problem['url'],
                 'mimeType' => 'text/html',
                 'atomic_summary' => $problem['atomic_summary'],
             ])->all(),
-            $featuredReports->map(fn (array $report) => [
+            $featuredReports->map(fn(array $report) => [
                 'name' => $report['name'],
                 'uri' => $report['url'],
                 'mimeType' => 'text/html',
             ])->all(),
-            $recentBlogPosts->map(fn (array $post) => [
+            $recentBlogPosts->map(fn(array $post) => [
                 'name' => $post['name'],
                 'uri' => $post['url'],
                 'mimeType' => 'text/html',
@@ -1899,7 +1905,7 @@ class SearchArtifactFactory
 
         usort(
             $items,
-            static fn (array $left, array $right): int => ($right['priority'] <=> $left['priority'])
+            static fn(array $left, array $right): int => ($right['priority'] <=> $left['priority'])
                 ?: strcmp((string) $right['updated_at'], (string) $left['updated_at'])
         );
 
@@ -1921,7 +1927,7 @@ class SearchArtifactFactory
             ->whereIn('code', $codes->all())
             ->orderBy('code')
             ->get()
-            ->unique(fn (DtcCode $row) => $row->code)
+            ->unique(fn(DtcCode $row) => $row->code)
             ->values();
     }
 
@@ -1953,12 +1959,12 @@ class SearchArtifactFactory
             })
             ->flatMap(function (mixed $code): array {
                 if (is_array($code)) {
-                    return collect($code)->flatten()->map(fn (mixed $nested): string => strtoupper(trim((string) $nested)))->all();
+                    return collect($code)->flatten()->map(fn(mixed $nested): string => strtoupper(trim((string) $nested)))->all();
                 }
 
                 return [strtoupper(trim((string) $code))];
             })
-            ->filter(fn (string $code): bool => preg_match('/^[PCBU][0-9A-Z]{3,6}$/', $code) === 1)
+            ->filter(fn(string $code): bool => preg_match('/^[PCBU][0-9A-Z]{3,6}$/', $code) === 1)
             ->countBy()
             ->sortDesc()
             ->keys()
@@ -1974,10 +1980,10 @@ class SearchArtifactFactory
             ->select('manufacturer')
             ->groupBy('manufacturer')
             ->get()
-            ->keyBy(fn (object $row): string => Str::slug((string) $row->manufacturer));
+            ->keyBy(fn(object $row): string => Str::slug((string) $row->manufacturer));
 
         $curated = collect(self::CURATED_DTC_MANUFACTURERS)
-            ->map(fn (string $manufacturer): ?string => $availableManufacturers->get(Str::slug($manufacturer))?->manufacturer)
+            ->map(fn(string $manufacturer): ?string => $availableManufacturers->get(Str::slug($manufacturer))?->manufacturer)
             ->filter()
             ->values();
 
@@ -2019,7 +2025,7 @@ class SearchArtifactFactory
             ->orderByDesc('aggregate')
             ->limit(8)
             ->get()
-            ->map(fn (object $row): array => [
+            ->map(fn(object $row): array => [
                 'manufacturer' => (string) $row->manufacturer,
                 'type' => (string) $row->type,
                 'aggregate' => (int) $row->aggregate,
@@ -2049,7 +2055,7 @@ class SearchArtifactFactory
     private function exactDtcLookup(): array
     {
         return $this->featuredDtcCodes()
-            ->mapWithKeys(fn (DtcCode $code): array => [
+            ->mapWithKeys(fn(DtcCode $code): array => [
                 strtoupper($code->code) => [
                     'url' => RsUri::dtcCode($code->code),
                     'json_url' => RsUri::dtcCodeJson($code->code),
@@ -2069,8 +2075,8 @@ class SearchArtifactFactory
     private function exactSlugLookup(): array
     {
         return $this->priorityAnswerPathCollection()
-            ->filter(fn (array $path): bool => filled($path['slug'] ?? null))
-            ->mapWithKeys(fn (array $path): array => [
+            ->filter(fn(array $path): bool => filled($path['slug'] ?? null))
+            ->mapWithKeys(fn(array $path): array => [
                 strtolower((string) $path['slug']) => [
                     'url' => (string) $path['url'],
                     'type' => (string) ($path['type'] ?? ''),
@@ -2079,7 +2085,7 @@ class SearchArtifactFactory
                     'intent' => (string) ($path['intent'] ?? ''),
                     'priority' => (int) ($path['priority'] ?? $path['priority_score'] ?? 0),
                     'entities' => array_values(array_filter(array_map(
-                        static fn (mixed $entity): string => trim((string) $entity),
+                        static fn(mixed $entity): string => trim((string) $entity),
                         (array) ($path['entities'] ?? [])
                     ))),
                 ],
@@ -2272,7 +2278,7 @@ class SearchArtifactFactory
     private function priorityAnswerClusters(int $perCategory = 4): array
     {
         return $this->priorityAnswerPathCollection()
-            ->groupBy(fn (array $path) => $path['category'])
+            ->groupBy(fn(array $path) => $path['category'])
             ->map(function (Collection $paths, string $category) use ($perCategory): array {
                 $label = match ($category) {
                     'service' => 'Service money paths',

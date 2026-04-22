@@ -7,7 +7,7 @@ description: >
     debugging task routing, certifying agent cards, or wiring MCP bridge flows.
 license: Proprietary — RS Performance internal
 metadata:
-    version: 1.2.9
+    version: 1.2.10
     updated: 2026-04-22
     stack: Laravel 13 + PHP 8.5 (hosting canonical, VPS support-plane)
 ---
@@ -151,6 +151,7 @@ Interpret failures: **agent card**, **CORS** (gateway), **zły `url` w karcie**,
 
 ## Version history
 
+- **1.2.10** (2026-04-22) — Karta agenta: `supportedInterfaces` deklaruje **GET /tasks** oraz w `x_rs_transport_note` dla JSON-RPC jawne **ListTasks** / **tasks/list** (parity z `A2aTaskController` + Overture `list-tasks`); wersja karty **2.2.1**.
 - **1.2.9** (2026-04-22) — Sekcja **A2A vs Qdrant (VPS)**; Cursor MCP `qdrant-vps-wow` vs kontrakt Overture.
 - **1.2.7** (2026-04-22) — **`RELAY.md`** §6 + §11: skrót A2A / Overture / VPS; onboarding z odsyłaczem do RELAY.
 - **1.2.6** (2026-04-22) — Odsyłacz z **`AGENTS.md`** (onboarding); sekcja _Onboarding_ w skille.
