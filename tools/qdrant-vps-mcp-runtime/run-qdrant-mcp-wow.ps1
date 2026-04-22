@@ -57,7 +57,7 @@ if (-not (Test-Path -LiteralPath (Join-Path $Official 'pyproject.toml'))) {
 
 $uv = Get-Command uv -ErrorAction SilentlyContinue
 if (-not $uv) {
-    [Console]::Error.WriteLine('qdrant-vps-wow: wymagany jest `uv` (Astral) na PATH — winget: Astral.uv, potem: uv sync w mcp-servers\qdrant-mcp-official (patrz install-cursor-mcp-deps.ps1).')
+    [Console]::Error.WriteLine('qdrant-vps-wow: wymagany jest `uv` (astral-sh) na PATH — winget: `winget install -e --id astral-sh.uv`, potem: uv sync w mcp-servers\qdrant-mcp-official (patrz install-cursor-mcp-deps.ps1).')
     exit 1
 }
 

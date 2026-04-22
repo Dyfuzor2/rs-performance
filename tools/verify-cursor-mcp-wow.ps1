@@ -66,7 +66,7 @@ $qdOfficial = Join-Path $RepoRoot 'mcp-servers\qdrant-mcp-official\pyproject.tom
 if (-not (Test-Path -LiteralPath $qdPs1)) { Add-Issue "Brak: $qdPs1" }
 if (-not (Test-Path -LiteralPath $qdOfficial)) { Add-Issue "Brak: $qdOfficial" }
 $uv = Get-Command uv -ErrorAction SilentlyContinue
-if (-not $uv) { Add-Warn 'uv (Astral) nie na PATH — qdrant-vps-wow: winget install Astral.uv, potem uv sync w mcp-servers\qdrant-mcp-official' }
+if (-not $uv) { Add-Warn 'uv (astral-sh) nie na PATH — qdrant-vps-wow: winget install -e --id astral-sh.uv, potem uv sync w mcp-servers\qdrant-mcp-official' }
 
 # GitHub MCP (oficjalny binary)
 $ghExe = Join-Path $RepoRoot 'tools\github-mcp-runtime\bin\github-mcp-server.exe'
@@ -104,9 +104,11 @@ if (-not (Test-Path -LiteralPath $pgMjs)) {
 }
 
 $ok = ($issues.Count -eq 0)
+$tier = if ($ok -and $warns.Count -eq 0) { 'S' } elseif ($ok) { 'A' } else { 'F' }
 if ($Json) {
     $o = [ordered]@{
         ok     = $ok
+        tier   = $tier
         issues = @($issues)
         warns  = @($warns)
     }
@@ -120,8 +122,9 @@ if ($Json) {
     foreach ($i in $issues) { Write-Host "  [FAIL] $i" -ForegroundColor Red }
     if ($ok -and $warns.Count -eq 0) {
         Write-Host "  [OK]   MCP WOW stack: config + runtimes" -ForegroundColor Green
+        Write-Host '  [WOW]  Tier S / Apr 2026+ - uv + Qdrant .venv, Laravel Boost, n8n+telegram+gcloud runtimes, GitHub MCP binary' -ForegroundColor Magenta
     } elseif ($ok) {
-        Write-Host "  [OK]   krytyczne pliki (ostrzeżenia powyżej)" -ForegroundColor Green
+        Write-Host '  [OK]   krytyczne pliki (ostrzezenia powyzej)' -ForegroundColor Green
     } else {
         Write-Host "  [FAIL] popraw i uruchom ponownie" -ForegroundColor Red
     }

@@ -49,7 +49,7 @@ try {
 
 $uv = Get-Command uv -ErrorAction SilentlyContinue
 if ($uv) {
-    Write-Host "== mcp-servers\qdrant-mcp-official (uv lock — qdrant-vps-wow MCP) ==" -ForegroundColor Cyan
+    Write-Host '== mcp-servers\qdrant-mcp-official (uv lock - qdrant-vps-wow MCP) ==' -ForegroundColor Cyan
     Push-Location (Join-Path $root "mcp-servers\qdrant-mcp-official")
     try {
         & $uv.Path sync
@@ -57,7 +57,7 @@ if ($uv) {
         Pop-Location
     }
 } else {
-    Write-Host "WARN: `uv` nie na PATH — pominieto `uv sync` dla qdrant-mcp-official (qdrant-vps-wow). winget: Astral.uv" -ForegroundColor Yellow
+    Write-Host 'WARN: uv nie na PATH - pominieto uv sync dla qdrant-mcp-official (qdrant-vps-wow). winget install -e --id astral-sh.uv' -ForegroundColor Yellow
 }
 
-Write-Host "Done. Katalog glowny: mcp-postgres + Playwright MCP (piny w package.json). N8N: N8N_API_URL + N8N_API_KEY (patrz .cursor\mcp.env.example). Telegram: TELEGRAM_*; gcloud: PATH. Qdrant MCP: `uv` + QDRANT_* w mcp.env." -ForegroundColor Green
+Write-Host 'Done. Katalog glowny: mcp-postgres + Playwright MCP (piny w package.json). N8N: N8N_API_URL + N8N_API_KEY (patrz .cursor\mcp.env.example). Telegram: TELEGRAM_*; gcloud: PATH. Qdrant MCP: uv + QDRANT_* w mcp.env.' -ForegroundColor Green
