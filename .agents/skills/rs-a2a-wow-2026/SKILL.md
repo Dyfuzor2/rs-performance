@@ -7,7 +7,7 @@ description: >
     debugging task routing, certifying agent cards, or wiring MCP bridge flows.
 license: Proprietary — RS Performance internal
 metadata:
-    version: 1.2.11
+    version: 1.2.12
     updated: 2026-04-22
     stack: Laravel 13 + PHP 8.5 (hosting canonical, VPS support-plane)
 ---
@@ -152,6 +152,7 @@ Interpret failures: **agent card**, **CORS** (gateway), **zły `url` w karcie**,
 
 ## Version history
 
+- **1.2.12** (2026-04-22) — Karta **2.2.3**: opis April 2026, `authentication.description` (fair use), blok **`x_rs_a2a_operator_2026_04`** (certify, języki, polityka błędów). JSON-RPC: te same kody, **czytelniejsze `message`** (`-32600`…`-32004`). Test: `x_rs_a2a_operator_2026_04` w `A2aAgentCardTest`.
 - **1.2.11** (2026-04-22) — Publiczna karta: nowy skill **`ev-hybrid-knowledge`** w `a2aAgentSkills()` (parity z `A2aTaskController` + `generalInfo.card_skill_ids`); wersja karty **2.2.2**; opis, tagi i przykłady PL+EN pod lane EV/PHEV/BMS.
 - **1.2.10** (2026-04-22) — Karta agenta: `supportedInterfaces` deklaruje **GET /tasks** oraz w `x_rs_transport_note` dla JSON-RPC jawne **ListTasks** / **tasks/list** (parity z `A2aTaskController` + Overture `list-tasks`); wersja karty **2.2.1**.
 - **1.2.9** (2026-04-22) — Sekcja **A2A vs Qdrant (VPS)**; Cursor MCP `qdrant-vps-wow` vs kontrakt Overture.

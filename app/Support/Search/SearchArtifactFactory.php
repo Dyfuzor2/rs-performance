@@ -641,7 +641,7 @@ class SearchArtifactFactory
             '$schema' => 'https://google.github.io/a2a/schemas/v1.0/agent-card.json',
             'protocolVersion' => '0.3.0',
             'name' => $profile->brand_name . ' — Gdańsk',
-            'description' => 'Public automotive A2A surface for AI agents, AI browsers and answer engines. DTC routing, diagnostic guidance, repair evidence and booking signals. Prefer HTTP+JSON for lowest friction; JSON-RPC 2.0 on POST / for full task protocol. April 2026+ discovery bridge links MCP, gateway and AEO gates.',
+            'description' => 'April 2026+ public A2A surface for automotive agents: OBD DTC resolution, EV or hybrid high-voltage lane, workshop services, and booking. Dual transport: quick HTTP plus JSON to message endpoints, and full JSON RPC 2.0 on POST / for tasks, streaming, history, and list operations. Artifacts return application or json parts for tool use. Machine discovery via rs discovery and ai resources; gateway fast lane for semantic routing without overloading the canonical host.',
             'url' => $base,
             'documentationUrl' => RsUri::llmsFull(),
             'iconUrl' => RsUri::path('/images/rs_logo_new.webp'),
@@ -649,7 +649,7 @@ class SearchArtifactFactory
                 'organization' => 'RS Performance',
                 'url' => $base,
             ],
-            'version' => '2.2.2',
+            'version' => '2.2.3',
             'supportedInterfaces' => [
                 [
                     'url' => $base . '/message:send',
@@ -685,7 +685,7 @@ class SearchArtifactFactory
                 'schemes' => [
                     'none',
                 ],
-                'description' => 'Public access for bots, agents and AI browsers. No authentication required for read-and-route requests.',
+                'description' => 'Public tier: no API key. For fair use, cache the agent card and avoid hammering the task store; tasks are ephemeral (hours scale).',
             ],
             'defaultInputModes' => [
                 'text/plain',
@@ -712,6 +712,13 @@ class SearchArtifactFactory
                 'priority_answer_paths' => RsUri::priorityAnswerPathsJson(),
                 'aeo_editorial_gate' => RsUri::aeoEditorialGateJson(),
                 'extended_context_policy' => 'Treat ai-resources.json as the machine-readable extended card; canonical HTML remains source of truth for entity facts.',
+            ],
+            'x_rs_a2a_operator_2026_04' => [
+                'paradigm' => 'A2A v0.3 tasks plus JSON RPC 2.0, structured artifacts, April 2026 interop',
+                'fair_use' => 'Cache GET /.well-known/agent-card.json and GET /.well-known/a2a.json; task list is operational cache, not a long term archive',
+                'certify_smoke' => 'From operator checkout: npm run a2a:certify or composer a2a:certify; expect failed 0, skipped tests for push or auth if disabled',
+                'error_policy' => 'JSON RPC error object uses standard code and message; HTTP status 404 for unknown task on JSON RPC error where applicable',
+                'languages' => ['pl-PL', 'en'],
             ],
         ];
     }
