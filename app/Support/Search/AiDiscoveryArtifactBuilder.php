@@ -27,6 +27,7 @@ final readonly class AiDiscoveryArtifactBuilder
             '# robots.txt for RS Performance',
             '# Standards-compliant crawling rules for search engines, AI search, training bots, and user-triggered fetchers.',
             '# Policy: invite documented AI/search/training/user-fetch UAs; Googlebot and Bingbot stay on canonical for classic SEO; other listed AI families may be routed to the VPS gateway via hosting rules.',
+            '# Wszyscy agenci z katalogu (search_bots, training_bots, user_fetchers) otrzymują User-agent: … + Allow: /; wyjątki tylko w denied_agents (Disallow: /) — bez blokowania reszty ekosystemu.',
             '# denied_agents: explicit Disallow / for operator-chosen scrapers (see config/ai_agents.php); other abuse still at WAF.',
             '# Discovery resources are listed below as comments so the file stays valid for Google, Bing, OpenAI, Anthropic, Perplexity, Applebot and other machine readers.',
             '',
@@ -306,7 +307,7 @@ final readonly class AiDiscoveryArtifactBuilder
             ];
         }
 
-        usort($entries, static fn (array $left, array $right): int => strcmp($right['updated'], $left['updated']));
+        usort($entries, static fn(array $left, array $right): int => strcmp($right['updated'], $left['updated']));
 
         return array_slice($entries, 0, 20);
     }

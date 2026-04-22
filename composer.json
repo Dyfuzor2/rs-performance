@@ -83,6 +83,13 @@
             "@stan",
             "@test"
         ],
+        "a2a:certify": "npx --prefix tools/a2a-overture-runtime overture certify https://rsperformance.online --json",
+        "a2a:sync-gateway": "python scripts/vps_ai_gateway_sync_apr2026.py",
+        "a2a:test": [
+            "@php vendor/bin/pest tests/Feature/A2aStructuredArtifactsTest.php tests/Feature/A2aAgentCardTest.php"
+        ],
+        "mcp-verify": "powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File tools/verify-cursor-mcp-wow.ps1",
+        "mcp-install": "powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File tools/install-cursor-mcp-deps.ps1",
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi",

@@ -1,8 +1,8 @@
 ---
 name: rs-discovery-wow-2026
 description: Ultra-modern April 2026+ discovery skill for RS Performance. Orchestrates AI discovery, technical SEO, response headers, llms surfaces, A2A + MCP cards, IndexNow, markdown mirrors, schema graph quality, and bot invitation verification under one production-safe workflow.
-version: 1.0.0
-updated: 2026-04-02
+version: 1.0.3
+updated: 2026-04-22
 author: codex
 tags:
     [
@@ -24,6 +24,8 @@ tags:
 **Mapa GEO vs AEO i wybór modułów `geo-*`:** `G:\gravity\GEO.md` (reguła: preferuj `geo-*`, nie utrzymuj treści równolegle w `geo-geo-*`).
 
 This is the top-level operational skill for the RS public discovery layer.
+
+**MCP (Cursor, kwiecien 2026+):** `playwright-wow` — Microsoft **[@playwright/mcp](https://github.com/microsoft/playwright-mcp)**; `postgres-vps-wow` — **[mcp-postgres](https://github.com/kristofer84/mcp-postgres)** (preferuj `node_modules` po `npm install` w korzeniu; pelny stos: `tools/install-cursor-mcp-deps.ps1`). Tunel SSH + `POSTGRES_MCP_ENABLED=1`. Szczegoly: `RELAY.md` §6, `vps.md` (Postgres Docker).
 
 Use it when auditing, hardening, or extending:
 

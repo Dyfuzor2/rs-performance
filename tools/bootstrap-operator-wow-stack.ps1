@@ -5,7 +5,7 @@
 
 .DESCRIPTION
   Kolejnosc:
-  1) Opcjonalnie: install-cursor-mcp-deps.ps1 (n8n + telegram + gcloud WOW npm)
+  1) Opcjonalnie: install-cursor-mcp-deps.ps1 — npm w **korzeniu** (mcp-postgres, @playwright/mcp) + n8n-mcp + runtimy (telegram, gcloud-wow) + **uv sync** w `mcp-servers\qdrant-mcp-official` (gdy `uv` na PATH, dla `qdrant-vps-wow`)
   2) install-gcloud-wow.ps1 (winget lub no-op juz zainstalowany)
   3) Hydrate .cursor/mcp.env gdy istnieje cursor.md, zawsze --check
   4) Szybka weryfikacja folderow node_modules MCP
@@ -84,6 +84,9 @@ foreach ($r in $runtimes) {
         Write-Host "      -> run: pwsh -File $($PSScriptRoot)\install-cursor-mcp-deps.ps1" -ForegroundColor DarkYellow
     }
 }
+
+& (Join-Path $PSScriptRoot 'verify-cursor-mcp-wow.ps1')
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 Write-WowBanner "done"
 Write-Host '  Next: Cursor - Command Palette - MCP: Restart Servers (lub reload okna).' -ForegroundColor White

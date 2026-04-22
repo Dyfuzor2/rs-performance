@@ -62,6 +62,41 @@
         "G:\\gravity\\tools\\github-mcp-runtime\\run-github-mcp.ps1"
       ],
       "description": "Official GitHub MCP (read-only). Install: tools/github-mcp-runtime/install-github-mcp.ps1"
+    },
+    "playwright-wow": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@playwright/mcp@0.0.70",
+        "--headless",
+        "--browser",
+        "chromium"
+      ],
+      "description": "Microsoft @playwright/mcp (pinned) — a11y snapshots / browser tools. Complements Cursor IDE browser; use for deterministic automation + AEO smoke."
+    },
+    "postgres-vps-wow": {
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-NonInteractive",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "G:\\gravity\\tools\\postgres-vps-mcp-runtime\\run-postgres-mcp-wow.ps1"
+      ],
+      "description": "VPS Postgres via mcp-postgres@1.2.1. POSTGRES_MCP_ENABLED=1 + DATABASE_URL in .cursor/mcp.env. Use SSH tunnel; never commit secrets."
+    },
+    "qdrant-vps-wow": {
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-NonInteractive",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "G:\\gravity\\tools\\qdrant-vps-mcp-runtime\\run-qdrant-mcp-wow.ps1"
+      ],
+      "description": "Official mcp-server-qdrant@0.8.1 -> Qdrant on VPS. QDRANT_MCP_ENABLED=1 + QDRANT_URL in .cursor/mcp.env; requires `uv` + `uv sync` in mcp-servers/qdrant-mcp-official. SSH tunnel to 6333; not a substitute for A2A (see RELAY)."
     }
   }
 }

@@ -1,0 +1,33 @@
+{
+    "$schema": "https://www.schemastore.org/package.json",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "build": "vite build",
+        "dev": "vite",
+        "a2a:certify": "npx --prefix tools/a2a-overture-runtime overture certify https://rsperformance.online --json",
+        "a2a:certify:agent": "npx --prefix tools/a2a-overture-runtime overture certify",
+        "a2a:test": "php vendor/bin/pest tests/Feature/A2aStructuredArtifactsTest.php tests/Feature/A2aAgentCardTest.php",
+        "a2a:sync-gateway": "python scripts/vps_ai_gateway_sync_apr2026.py",
+        "mcp-verify": "powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File tools/verify-cursor-mcp-wow.ps1",
+        "mcp:install": "powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File tools/install-cursor-mcp-deps.ps1"
+    },
+    "devDependencies": {
+        "mcp-postgres": "1.2.1",
+        "@playwright/mcp": "0.0.70",
+        "@tailwindcss/vite": "^4.0.0",
+        "axios": "^1.11.0",
+        "concurrently": "^9.0.1",
+        "laravel-vite-plugin": "^2.0.0",
+        "playwright": "^1.58.2",
+        "tailwindcss": "^4.0.0",
+        "vite": "^7.0.7"
+    },
+    "dependencies": {
+        "@fontsource/inter": "^5.2.8",
+        "@fontsource/orbitron": "^5.2.8",
+        "@modelcontextprotocol/server-filesystem": "^2026.1.14",
+        "gsap": "^3.14.2",
+        "lenis": "^1.1.0"
+    }
+}

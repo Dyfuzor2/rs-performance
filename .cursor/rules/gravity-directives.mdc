@@ -1,0 +1,79 @@
+---
+description: Nadrzędne dyrektywy RS Performance / gravity — produkcja, VPS, backup, Vertex, styl kodu
+alwaysApply: true
+---
+
+# Dyrektywy projektu gravity (RS Performance)
+
+## Źródła prawdy (czytaj na starcie)
+
+- `start.md` — credentials, stan produkcji, SSH (hosting). Przed pracą: weryfikacja serwera.
+- `plan.md` — focus, blocker, next step, pełny plan. Aktualizuj po każdym tasku.
+- `handoff-log.md` — append po każdej zmianie na produkcji.
+- `AGENTS.md` / `CLAUDE.md` — protokoły, backup rule, dyrektywy nadrzędne.
+- `vps.md` — VPS (185.180.207.211, rsops, klucz cyberfolks_rsa). `vertex.md` — Vertex API; klucz JSON w `diagnosta-489719-96def3352c52.json`.
+
+## Nadrzędne zasady
+
+0. **Priorytet: hosting + VPS (kwiecień 2026+).** O ile user nie ogranicza zadania, agent **najpierw** myśli i działa w osi **Cyber-Folks (canonical)** + **VPS (support plane)** — deploy, SSH/`ssh_exec`/`vps_exec`, sync bramki, n8n, Qdrant/Postgres wg `RELAY`/`vps.md`. Praca tylko w `G:\gravity` bez powiązania z prod jest **drugorzędna**. Skills, pluginy, MCP: używaj i instaluj zgodnie z `AGENTS.md` i pinami w `.cursor/mcp.json`; nowe pakiety z GitHub tylko po **audycie** (oficjalne / wysoko oceniane + zgodność z RS), nie losowe „top starred”.
+1. **Produkcja musi działać.** Żadna zmiana nie może łamać strony.
+2. **Produkcja zawsze bezpieczna: backup i rollback w gotowości.** Przed deployem — backup (Spatie, .bak\_\*, lub snapshot). Po deployze — weryfikacja (HTTP 200, logi). Rollback gotowy: skrypt lub procedura przywracania; przy błędzie — najpierw przywróć, potem analizuj.
+3. **Backup przed każdą zmianą na VPS.** Zawsze. Użyj `python vps_exec.py --backup <ścieżka> [suffix]` lub `cp plik plik.bak_<agent>_<cel>` na VPS. Na hostingu: `cp plik plik.bak_<agent>_<cel>` przed edycją.
+4. **Tylko rozwiązania 2026+, nic wcześniej.** Zawsze sprawdzaj na **GitHub** i **forach tematycznych** wyłącznie podejścia z 2026+. Produkcja ma być **top of the world**: najwyżej oceniane, hiper nowoczesne, best-in-class. Żadnych starszych wzorców przy nowych decyzjach. Istniejącego działającego kodu nie ruszaj, jeśli zmiana byłaby gorsza.
+5. **AEO przed SEO.** Priorytet: **AEO (AI Engine Optimization)** — optymalizacja pod agenty AI i przeglądarki AI; dopiero potem klasyczne SEO. Projekt stawia na fanatyków agentów AI i AI browsers.
+6. **Kod: gładki i piękny.** Spójny styl, `.editorconfig` + Laravel Pint (`pint.json`). Planowanie: kreatywne.
+7. **Przygotowanie do Laravel 13.** Unikaj deprecated, trzymaj się oficjalnych praktyk Laravel.
+8. **Architektura:** Hosting = strona (canonical). VPS = wsparcie (async, DTC, AI). Nie podważać.
+9. **Limit sesji:** Gdy ~10% kontekstu zostaje — daj znać userowi (zapisać stan, nowa sesja).
+10. **Narzędzia:** Używaj wszystkich dostępnych (plugins, skills, MCP, SSH, web search). Brakujące instaluj w `G:\gravity`.
+11. **Vertex:** Konfiguracja i klucz w workspace; na VPS klucz JSON + gcloud. Nie podważać.
+
+## Dysk D: (workspace agenta)
+
+- **D:\gravity-agent** — należy do agenta. Można używać: `tmp/`, `scripts/`, `cache/`, dowolne pliki. Źródło prawdy projektu = G:\gravity; D: tylko wsparcie (bez commitu do repo).
+
+## Narzędzia SSH (workspace)
+
+- **Hosting:** `python ssh_exec.py "komenda"` — s181.cyber-folks.pl, Laravel w ~/domains/rsperformance.online/laravel, PHP `php85`.
+- **VPS:** `python vps_exec.py "komenda"` — 185.180.207.211, user rsops, klucz `C:\Users\oli22\.ssh\cyberfolks_rsa`. Backup: `python vps_exec.py --backup /remote/path [suffix]`.
+
+## Po każdym ukończonym tasku na produkcji
+
+1. Zaktualizuj "AKTUALNY STAN PRODUKCJI" w `start.md`.
+2. Przenieś OSTATNIA SESJA → PRZEDOSTATNIA w `start.md`, wpisz nową.
+3. Dopisz wpis na koniec `handoff-log.md`.
+4. Zaktualizuj `plan.md` (focus/blocker/next step jeśli się zmieniły).
+
+## Relay Protocol (multi-agent)
+
+> 4 agenty (Antigravity, Opus 4.6, Codex, Cursor) pracują na jednym katalogu `G:\gravity`.
+
+### PRZED PRACĄ (PRE-FLIGHT - ZANIM ZACZNIESZ KODOWAĆ):
+
+1. **[DEAD AGENT RECOVERY]** Odpal `git status` i `git diff`. Jeśli są niezacommitowane śmieci poprzednika, napraw je albo zrób `git restore .`. Nie zaczynaj pracy na brudnym drzewie!
+2. Przeczytaj `RELAY.md` — mapa projektu, credentials, skills, narzędzia
+3. Przeczytaj `HANDOFF.md` — bieżący stan, ostatni agent, next steps
+4. Zaktualizuj `plan.md` — znajdź swój obecny cel i zmień jego status na `[-W TRAKCIE-]` (lub podobny)
+5. Zaktualizuj `HANDOFF.md` — w sekcji AKTUALNA OPERACJA wpisz kto pracuje, nad czym i **O KTÓREJ GODZINIE (Timestamp - np. 14:30)**.
+
+### PO PRACY (POST-FLIGHT - OBOWIĄZKOWE):
+
+1. Zaktualizuj `plan.md` — oznacz zadanie jako `[ZAKOŃCZONE]` (lub zaktualizuj postęp)
+2. Zaktualizuj `HANDOFF.md`:
+    - Wyczyść "AKTUALNA OPERACJA" (przywróć "Obecnie brak")
+    - Jeśli się nie udało: skryptuj błąd w ZAMROŻONE BLOCKERY
+    - Nadpisz OSTATNI AGENT (Twoje dane)
+    - Nadpisz NASTĘPNE KROKI (max 5)
+3. **[VPS DESYNC GUARD]** Jeśli wysyłałeś kod na VPS, zostaw w logu informacje aby uniknąć nadpisania ręcznych poprawek usera!
+4. Dopisz blok do `SESSION_LOG.md` (format opisany w `RELAY.md`)
+5. **[LOG ROTATION]** Jeśli `SESSION_LOG.md` ma więcej niż 50 wpisów, przenieś starsze do archiwum.
+6. Jeśli zmieniałeś produkcję → dopisz też do `handoff-log.md`
+7. Zrób lokalny commit i wyślij zmiany: `git add . && git commit -m "[Agent] Post-flight handoff" && git push origin main`
+
+### Zasady relay:
+
+- **[SYSTEM SNAPSHOT OVERRIDE]**: Pliki na dysku (HANDOFF.md/RELAY.md) ZAWSZE wygrywają z pamięcią LLM. Jeśli kontekst rozmowy mówi coś innego niż HANDOFF.md, wierz plikowi dyskowemu. ZAWSZE odczytuj plik.
+- NIGDY nie usuwaj cudzych wpisów z `SESSION_LOG.md`
+- NIGDY nie kasuj reguł/blockerów z `HANDOFF.md` bez zgody usera
+- Jeśli plan jest za długi → dokładaj etapy, nie nadpisuj cudzych
+- W razie konfliktu → zapytaj usera
