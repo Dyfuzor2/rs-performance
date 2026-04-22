@@ -1,3 +1,6 @@
+> LIVE A2A 2.2.3 + JSON-RPC (2026-04-22 CET)
+> Hosting `domains/rsperformance.online/laravel/`: backup `*.bak_cursor_a2a_223_20260422` na `SearchArtifactFactory.php` + `A2aTaskController.php`; SFTP z `G:\gravity`; `php85 artisan search:artifacts-generate` + `optimize:clear`. VPS: `python scripts/vps_ai_gateway_sync_apr2026.py` OK. Public: `GET /.well-known/agent-card.json` → **version 2.2.3**, `x_rs_a2a_operator_2026_04`. Git: `5d738ba` na `feature/v9-architecture-rebuild`. Dyrektywa: **deploy bez pytania** (`gravity-directives.mdc` §0a).
+
 > LIVE N8N WEBHOOK PATH + OPS HUB PATCH (2026-04-12 ~21:50 CET)
 > Hosting `domains/rsperformance.online/laravel/`: wgrano **N8nWorkflowWebhookPathResolver** (ścieżki z `:param`, `workflow.nodes`, osobny hint gdy Webhook jest ale ścieżka dynamiczna), **N8nPublicApiHealthService**, **N8nWorkflowDocumentResource** + **ListN8nWorkflowDocuments** + **N8nWorkflowHubOverview** (WOW hub), **config/blog.php** (`BLOG_PHP_CLI` / `php_cli_binary`). Backupy: `*.bak_cursor_20260412` przy każdym pliku. Komendy: `composer dump-autoload -o`, `php85 artisan config:clear`, `optimize:clear`. Smoke z serwera: `/` i `/admin/login` → **200**. Rollback: przywróć `.bak_cursor_20260412` na wskazanych ścieżkach.
 > LIVE N8N WOW TRIGGER AUTO-WEBHOOK (2026-04-12 ~late CET)
