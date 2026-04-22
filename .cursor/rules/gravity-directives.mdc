@@ -16,6 +16,7 @@ alwaysApply: true
 ## Nadrzędne zasady
 
 0. **Priorytet: hosting + VPS (kwiecień 2026+).** O ile user nie ogranicza zadania, agent **najpierw** myśli i działa w osi **Cyber-Folks (canonical)** + **VPS (support plane)** — deploy, SSH/`ssh_exec`/`vps_exec`, sync bramki, n8n, Qdrant/Postgres wg `RELAY`/`vps.md`. Praca tylko w `G:\gravity` bez powiązania z prod jest **drugorzędna**. Skills, pluginy, MCP: używaj i instaluj zgodnie z `AGENTS.md` i pinami w `.cursor/mcp.json`; nowe pakiety z GitHub tylko po **audycie** (oficjalne / wysoko oceniane + zgodność z RS), nie losowe „top starred”.
+0a. **Produkcja przed GitHubem (kolejność, nie odwrotnie).** Zmiany, które mają wejść na **live**, wykonuj **najpierw** na **produkcji** (backup → SFTP/SSH → `artisan` / smoke), potem **zsynchronizuj repozytorium** (commit + push) jako zapis i mirror. **Nie** stosuj wzorca „najpierw push/PR, potem deploy”, gdy celem jest działający serwis — `AGENTS.md` uznaje **Cyber-Folks** za kanał wykonawczy; GitHub służy śledzeniu kodu i współpracy, ale **źródłem faktu o stanie strony** jest serwer.
 1. **Produkcja musi działać.** Żadna zmiana nie może łamać strony.
 2. **Produkcja zawsze bezpieczna: backup i rollback w gotowości.** Przed deployem — backup (Spatie, .bak\_\*, lub snapshot). Po deployze — weryfikacja (HTTP 200, logi). Rollback gotowy: skrypt lub procedura przywracania; przy błędzie — najpierw przywróć, potem analizuj.
 3. **Backup przed każdą zmianą na VPS.** Zawsze. Użyj `python vps_exec.py --backup <ścieżka> [suffix]` lub `cp plik plik.bak_<agent>_<cel>` na VPS. Na hostingu: `cp plik plik.bak_<agent>_<cel>` przed edycją.
@@ -68,7 +69,7 @@ alwaysApply: true
 4. Dopisz blok do `SESSION_LOG.md` (format opisany w `RELAY.md`)
 5. **[LOG ROTATION]** Jeśli `SESSION_LOG.md` ma więcej niż 50 wpisów, przenieś starsze do archiwum.
 6. Jeśli zmieniałeś produkcję → dopisz też do `handoff-log.md`
-7. Zrób lokalny commit i wyślij zmiany: `git add . && git commit -m "[Agent] Post-flight handoff" && git push origin main`
+7. Zrób lokalny commit i wyślij zmiany: `git add . && git commit -m "[Agent] Post-flight handoff" && git push origin main` — **po** zmianach na produkcji (jeśli task dotyczył live); kolejność: **produkcja → potem git**, zgodnie z §0a.
 
 ### Zasady relay:
 

@@ -14,6 +14,7 @@
 - **Narzędzia:** aktywnie używaj **skills** (`.agents/skills/`, `.claude/skills/`), **pluginów Cursor/Claude** gdy pasują, **serwerów MCP** z pinowanego stosu (`.cursor/mcp.json`, `npm run mcp:install` / `composer mcp-install`, `npm run mcp-verify`). Brakujące zależności dozwolone do instalacji w `G:\gravity` zgodnie z `RELAY` §6 — **nie** dokładaj losowych serwerów MCP z netu bez audytu i wpisu w indeks.
 - **Standard:** **kwiecień 2026+**, efekt **wow**, źródła **top-tier** (oficjalne repozytoria, wysoko oceniane gdy są **zgodne z architekturą RS** i po weryfikacji). Cena: **stabilność produkcji** nienegocjowalna (backup, rollback).
 - Lokalne repo / Cursor bez deploy to **wsparcie** ścieżki hosting+VPS, nie zamiast niej.
+- **Kolejność operacji:** **produkcja (SSH / SFTP / VPS) przed GitHubem** — wdrożenie i smoke na **live** pierwsze; commit + push dopiero po ustalonym stanie serwera (repozytorium = mirror i dokumentacja, nie „najpierw PR, potem ręczny deploy”). Szczegół: `gravity-directives.mdc` §0a.
 
 ### A2A / Overture / bramka VPS (kwiecień 2026+)
 
