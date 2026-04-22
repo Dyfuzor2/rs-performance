@@ -1,6 +1,8 @@
 > LIVE VPS NOTE (2026-03-29)
 > Current verified VPS support-plane runtime is Laravel 13.1.1 / PHP 8.5.3.
 > Older Laravel 12 references in this file are historical.
+>
+> **Audyt hosting + VPS (sondy SSH/HTTP, bez sekretów):** `docs/ops/HOSTING-VPS-AUDIT-2026-04-22.md` — 2026-04-22.
 
 # VPS Cyber_Folks — stan roboczy
 

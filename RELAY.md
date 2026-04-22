@@ -29,6 +29,7 @@ To jest dyrektywa nadrzedna:
 To jest skrot najwazniejszych zasad. Pelne brzmienie siedzi w plikach dyrektyw wskazanych nizej.
 
 - **Priorytet pracy (2026+):** domyślnie **hosting + VPS** (zmiany produkcyjne, bramka `ai.*`, n8n, bazy, tunele, sync); repo lokalne i tooling MCP to **środek** do tego celu, chyba że zadanie wyraźnie jest „tylko lokalnie”. Pełna dyrektywa: **`AGENTS.md` — _Dyrektywa priorytetu pracy_**.
+- **Audyt operacyjny hosting + VPS (snapshot, kwiecień 2026):** `docs/ops/HOSTING-VPS-AUDIT-2026-04-22.md` — sciezki SSH, wersje PHP/Laravel, kontenery, sondy HTTP, zasady pracy.
 - Produkcja musi dzialac.
 - Shared hosting `rsperformance.online` jest zawsze canonical production runtime.
 - VPS jest realnym wsparciem produkcji:
