@@ -68,6 +68,17 @@ Wszystkie poniższe zwróciły **200** (HEAD/GET w zależności od sondy):
 3. Zmiany tylko w **docs / Cursor / skryptach lokalnych** — bez SSH, chyba że skrypt to orchestruje.
 4. Zawsze: `RELAY` → `vps` → `AGENTS` przed głębokim refaktorem.
 
+## 8. Sonda bieżąca (hosting + VPS, operator SSH + HTTP)
+
+| Warstwa | Wynik (sesja) |
+| ------- | ------------- |
+| **Hosting** | `php85` / Laravel **8.5.3** / **13.1.1** (CLI w `~/domains/rsperformance.online/laravel`); root FS `~1007G` (zajęte **~77%** — normalny wolumen współdzielony). |
+| **VPS** | `/` **98G**, **~62%** zajęte; `docker ps`: m.in. `n8n` Up, `n8n-mcp` healthy, `compose-postgres-1` / `compose-qdrant-1` Up, `rs-support-plane-app` + horizon Up, nightwatch agenty Up. |
+| **Bramka** | `composer a2a:sync-gateway` (skrypt `vps_ai_gateway_sync_apr2026.py` → `sudo /srv/ai-gateway/sync.sh`) — **OK** po sondach. |
+| **HTTP** | `rsperformance.online` `/`, `health`, `/.well-known/a2a.json`, `ai-resources.json` → **200**; `ai.rsperformance.online` `/.well-known/answer-routing.json`, `openapi.json` (nagłówki z VPS) → **200**; `auto.rs3d.pl/healthz` (JSON) → **200**. |
+
+**Priorytet pracy:** operacje wykonawcze **na hostingu (Cyber-Folks) i VPS** (`ssh_exec.py`, `vps_exec.py`, regeneracja artefaktów, sync bramki) — repozytorium lokalne jako źródło zmian, nie jedyne środowisko (por. `RELAY.md`).
+
 ---
 
 _Artefakt generowany w sesji audytu; można go aktualizować przy większych migracjach infrastruktury._
