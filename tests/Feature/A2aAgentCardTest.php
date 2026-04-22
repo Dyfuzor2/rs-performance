@@ -7,7 +7,7 @@ use App\Support\Search\SearchArtifactFactory;
 it('exposes a2a agent card with streaming and discovery bridge', function (): void {
     $card = app(SearchArtifactFactory::class)->a2aAgentCard();
 
-    expect($card['version'] ?? null)->toBe('2.2.1');
+    expect($card['version'] ?? null)->toBe('2.2.2');
     expect($card['capabilities']['streaming'] ?? null)->toBeTrue();
     expect($card['capabilities']['extendedAgentCard'] ?? null)->toBeTrue();
     expect($card)->toHaveKey('rs_discovery_wow_2026_04');
@@ -16,6 +16,10 @@ it('exposes a2a agent card with streaming and discovery bridge', function (): vo
     $urls = array_column($card['supportedInterfaces'] ?? [], 'url');
     expect(implode(' ', array_map('strval', $urls)))->toContain('/message:stream');
     expect(implode(' ', array_map('strval', $urls)))->toContain('/tasks');
+
+    $skillIds = array_column($card['skills'] ?? [], 'id');
+    expect($skillIds)->toContain('ev-hybrid-knowledge')
+        ->and($skillIds)->toContain('gateway-semantic-routing');
 });
 
 it('serves a2a.json over HTTP with matching agent-card alias', function (): void {

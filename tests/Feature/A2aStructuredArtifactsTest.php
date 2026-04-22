@@ -113,5 +113,6 @@ it('includes structured JSON artifact for general capabilities', function (): vo
     expect($data)->toBeArray();
     expect($data['intent'] ?? null)->toBe('general_capabilities');
     expect($data['card_skill_ids'] ?? null)->toContain('dtc-lookup');
+    expect($data['card_skill_ids'] ?? null)->toContain('ev-hybrid-knowledge');
     expect($data['support_plane']['rs_skill'] ?? null)->toBe('gateway-semantic-routing');
 });

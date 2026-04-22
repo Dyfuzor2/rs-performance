@@ -7,7 +7,7 @@ description: >
     debugging task routing, certifying agent cards, or wiring MCP bridge flows.
 license: Proprietary — RS Performance internal
 metadata:
-    version: 1.2.10
+    version: 1.2.11
     updated: 2026-04-22
     stack: Laravel 13 + PHP 8.5 (hosting canonical, VPS support-plane)
 ---
@@ -97,11 +97,12 @@ Declared in `routes/web.php` (verify live with `php artisan route:list --path=me
 
 ## Agent card — skill IDs vs routing
 
-`SearchArtifactFactory::a2aAgentSkills()` exposes skill entries (e.g. `dtc-lookup`, `vehicle-diagnostics`, `repair-services`, `booking`, `gateway-semantic-routing`).`A2aTaskController::routeToSkill()` maps **user text** (regex/heuristics) to behaviors — not necessarily 1:1 with card IDs. **WOW hygiene:** when adding a card skill, add or document the routing path and prefer **structured artifacts** (see below) for machine-readable handoff.
+`SearchArtifactFactory::a2aAgentSkills()` exposes skill entries (`dtc-lookup`, `vehicle-diagnostics`, **`ev-hybrid-knowledge`**, `repair-services`, `booking`, `gateway-semantic-routing`). `A2aTaskController::routeToSkill()` maps **user text** (regex/heuristics) to behaviors — **card IDs must include** every `rs_skill` emitted in JSON artifacts (including `ev-hybrid-knowledge`). **WOW hygiene:** when adding a card skill, add or document the routing path and prefer **structured artifacts** (see below) for machine-readable handoff.
 
 ## Structured artifacts (WOW)
 
 - **DTC** — JSON artifact for: DB missing, code not found, row without Trinity enrichment, and enriched Trinity payload (all include `discovery` + canonical DTC URLs where applicable).
+- **EV / hybrid** — JSON part with `rs_skill: ev-hybrid-knowledge`, hub + lane/topic URLs (`RsUri::evKnowledge*`), markdown mirrors where applicable; **also listed** on the public agent card (parity with `general_capabilities.card_skill_ids`).
 - **Diagnostics / booking / repair** — each response includes one `application/json` part with `rs_skill` matching the agent card (`vehicle-diagnostics`, `booking`, `repair-services`), `summary`, `canonical_paths` via `RsUri`, and `discovery` (a2a + agent-card + ai-resources).
 - **General fallback** — artifact `intent: general_capabilities`, `card_skill_ids`, and `support_plane` (gateway semantic search + routing URLs).
 
@@ -151,6 +152,7 @@ Interpret failures: **agent card**, **CORS** (gateway), **zły `url` w karcie**,
 
 ## Version history
 
+- **1.2.11** (2026-04-22) — Publiczna karta: nowy skill **`ev-hybrid-knowledge`** w `a2aAgentSkills()` (parity z `A2aTaskController` + `generalInfo.card_skill_ids`); wersja karty **2.2.2**; opis, tagi i przykłady PL+EN pod lane EV/PHEV/BMS.
 - **1.2.10** (2026-04-22) — Karta agenta: `supportedInterfaces` deklaruje **GET /tasks** oraz w `x_rs_transport_note` dla JSON-RPC jawne **ListTasks** / **tasks/list** (parity z `A2aTaskController` + Overture `list-tasks`); wersja karty **2.2.1**.
 - **1.2.9** (2026-04-22) — Sekcja **A2A vs Qdrant (VPS)**; Cursor MCP `qdrant-vps-wow` vs kontrakt Overture.
 - **1.2.7** (2026-04-22) — **`RELAY.md`** §6 + §11: skrót A2A / Overture / VPS; onboarding z odsyłaczem do RELAY.

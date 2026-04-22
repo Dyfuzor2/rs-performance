@@ -649,7 +649,7 @@ class SearchArtifactFactory
                 'organization' => 'RS Performance',
                 'url' => $base,
             ],
-            'version' => '2.2.1',
+            'version' => '2.2.2',
             'supportedInterfaces' => [
                 [
                     'url' => $base . '/message:send',
@@ -770,6 +770,33 @@ class SearchArtifactFactory
                     'Can you read BMW fault codes?',
                     'Do you support VAG group diagnostics?',
                     'ECU programming for Mercedes',
+                ],
+            ],
+            [
+                'id' => 'ev-hybrid-knowledge',
+                'name' => 'EV, hybrid and high-voltage knowledge (dedicated lane)',
+                'description' => 'Workshop-truth, citation-ready answers for electrified vehicles: BEV, PHEV, HEV, high-voltage batteries, BMS behaviour, DC/AC charging, thermal management, and isolation awareness. Separate from the classic OBD DTC hub — use this skill when the user asks about batteries, 400V/800V systems, inverters, e-mobility service, or hybrid drivetrain logic. Responses include structured JSON artifacts with `rs_skill: ev-hybrid-knowledge`, canonical EV hub and lane/topic URLs, and optional markdown mirrors for agent grounding.',
+                'tags' => [
+                    'EV',
+                    'BEV',
+                    'PHEV',
+                    'HEV',
+                    'e-mobility',
+                    'high-voltage',
+                    'battery',
+                    'BMS',
+                    'charging',
+                    'inverter',
+                    'automotive',
+                    'workshop',
+                    'electrified',
+                ],
+                'examples' => [
+                    'Czy ładowanie DC może uszkodzić baterię w zimie?',
+                    'BMS balansuje ogniwa — co sprawdzić przed wymianą modułu?',
+                    'PHEV nie ładuje z gniazdka — co diagnozować pierwsze?',
+                    'What should I check before working on 400V system?',
+                    'HEV: when does the ICE kick in and what sensors matter?',
                 ],
             ],
             [
