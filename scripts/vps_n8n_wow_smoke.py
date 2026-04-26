@@ -66,18 +66,21 @@ def telegram_from_monitor_workflow() -> tuple[str, str] | None:
     if not row:
         return None
     nodes = json.loads(row[0])
+    chat = ""
     for n in nodes:
+        params_blob = json.dumps(n.get("parameters") or {}, ensure_ascii=False)
+        m_chat = re.search(r"chat_id:\s*['\"]([0-9-]+)['\"]", params_blob)
+        if not m_chat:
+            m_chat = re.search(r'"chat_id"\s*:\s*"?([0-9-]+)"?', params_blob)
+        if m_chat:
+            chat = m_chat.group(1)
+
         if n.get("type") != "n8n-nodes-base.httpRequest":
             continue
         p = n.get("parameters") or {}
         url = (p.get("url") or "").strip()
-        if "api.telegram.org" not in url or url.startswith("="):
+        if "api.telegram.org" not in url:
             continue
-        body = p.get("jsonBody") or ""
-        m_chat = re.search(r"chat_id:\s*['\"]([0-9-]+)['\"]", body)
-        if not m_chat:
-            m_chat = re.search(r"chat_id:\s*([0-9-]+)", body)
-        chat = m_chat.group(1) if m_chat else ""
         if chat:
             return url, chat
     return None
@@ -122,7 +125,7 @@ def main() -> None:
             send_url,
             data=payload,
             method="POST",
-            headers={"Content-Type": "application/json"},
+            headers={"Content-Type": "application/json; charset=utf-8"},
         )
         try:
             with urllib.request.urlopen(req, timeout=30) as r:

@@ -690,3 +690,45 @@ Pomiar `redirects` / `final_url`: `curl -L` (follow), `-w '%{num_redirects} %{ur
 ### Commity
 
 - `ci(n8n): add workflow_dispatch fleet verify with definition gate` — branch `feature/v9-architecture-rebuild`.
+
+---
+
+## [2026-04-26 10:49 CET] Cursor — VPS n8n + Telegram WOW final audit/fix
+
+### Zakres
+
+- Produkcja: `https://auto.rs3d.pl` / VPS `/srv/ops-stack`.
+- Cel: potwierdzić, czy workflowy n8n i Telegram działają z efektem WOW, z obsługą polskich znaków.
+
+### Wykonane
+
+- Fleet audit: `python scripts/run_n8n_fleet_verify_vps_auto.py --json` + `--definition-gate --json`.
+- Telegram UTF-8 smoke: realny `sendMessage` do operatora z tekstem `Zażółć gęślą jaźń...`; wynik Bot API `HTTP 200`, `ok=true`, `echo_matches=true`.
+- Naprawiono i zsynchronizowano helpery VPS:
+    - `/srv/ops-stack/scripts/vps_n8n_telegram_wow_digest.py`
+    - `/srv/ops-stack/scripts/vps_n8n_wow_smoke.py`
+- Root cause digestu: po modernizacji workflow `RS AI Agent Monitor` Telegram node wysyła `jsonBody={{ JSON.stringify($json) }}`, a `chat_id` jest budowany w poprzednim Code node; stary parser szukał `chat_id` tylko w Telegram node.
+- Runtime fixes workflowów przez n8n Public API:
+    - `F6uosr6xSCJZM4fO` / `RS AI Bot Invitation Hub`: Telegram URL i chat id na `RS_TELEGRAM_BOT_TOKEN` / `RS_TELEGRAM_CHAT_ID`, UTF-8 JSON header.
+    - `yE7tLieYNJa4FDW3` / `RS AI Agent SEO-AEO`: usunięto martwe URL-e `https://rsperformance.online/diagnostyka` i `https://rsperformance.online/kontakt`; Telegram SEO Report na env fallback + UTF-8 JSON header.
+
+### Backupy / rollback
+
+- VPS: `/srv/ops-stack/scripts/vps_n8n_telegram_wow_digest.py.bak_cursor_digest_parser_20260426`.
+- VPS n8n DB: `/srv/ops-stack/n8n/storage/database.sqlite.bak_cursor_n8n_runtime_fix_20260426`.
+- VPS n8n DB: `/srv/ops-stack/n8n/storage/database.sqlite.bak_cursor_n8n_seo_aeo_kontakt_fix_20260426`.
+- Lokalny backup definicji workflowów:
+    - `scripts/.tmp_n8n_runtime_fix_backup_20260426_104519`
+    - `scripts/.tmp_n8n_runtime_fix_backup_20260426_104738`
+
+### Weryfikacja
+
+- `vps_n8n_wow_smoke.py`: 10/10 health URL **OK**, webhook `bot-invitation-test` **HTTP 200**, Telegram operator ping **HTTP 200**.
+- `vps_n8n_telegram_wow_digest.py`: **Telegram HTTP 200**, `health fails: 0`, `webhook: 200`.
+- `RS AI Bot Invitation Hub`: latest execution **success** (`2026-04-26T08:48:10Z`).
+- SEO-AEO URL targets: **11/11 HTTP 200** po usunięciu martwych slugów.
+- Final fleet gate: `ok: true`, `flagged_count: 0`; jeden residual `DEFOK` dla SEO-AEO to stara historia execution, która wyczyści się po kolejnym naturalnym schedule.
+
+### Residual
+
+- Nie wymuszono ręcznego runu schedule-only `RS AI Agent SEO-AEO`: n8n Public API `/execute` zwrócił **405**, a `docker exec n8n n8n execute --id ...` koliduje z aktywnym task brokerem `5679`. Definicja i URL-e są naprawione; najbliższy cron powinien zmienić last execution na success.

@@ -1,5 +1,7 @@
 ## 2026-04-12 — RELAY: n8n JWT wrappers (fleet + Telegram WOW) w §6 i Operator WOW
 
+> **2026-04-26 10:49 CET — current production note:** VPS n8n/Telegram final WOW audit completed. `auto.rs3d.pl` fleet gate -> `ok: true`, `flagged_count=0`; Telegram Bot API + UTF-8 Polish smoke -> HTTP 200 / `echo_matches=true`; VPS digest/smoke helper fixed and synced; `RS AI Bot Invitation Hub` latest run success; `RS AI Agent SEO-AEO` definition fixed (dead `/diagnostyka` + `/kontakt` removed, 11/11 target URLs HTTP 200). Residual only: n8n execution history still has stale SEO-AEO error until next natural schedule; manual API execute returned 405 and CLI execute conflicts with broker 5679, so no risky forced run.
+
 ### Agent: Cursor
 
 ### STATUS: REPO (`feature/v9-architecture-rebuild`)
