@@ -1,3 +1,8 @@
+> LIVE GSC STATUS SYNC API (2026-04-26 ~18:00 CET)
+> Hosting `domains/rsperformance.online/laravel/`: **POST `api/ops/gsc-status/sync`** live — tożsame z `search-ops:gsc-fetch` (N8nInternalAuth `X-API-Token`, throttle 30/min). Backupy: `SearchOpsController.php.bak_cursor_gscsync_20260426`, `routes/api.php.bak_cursor_gscsync_20260426`, `SearchConsoleService.php.bak_cursor_gscsync_20260426`. Verify prod: `GscStatusSyncEndpointTest` **3 passed**; `search-ops:gsc-fetch` **OK**; `route:list` zawiera `api/ops/gsc-status/sync`. Git: `507d047` na `feature/v9-architecture-rebuild`.
+> LIVE N8N EDITORIAL IMAGE GATE (2026-04-26 15:10 CET)
+> Hosting `rsperformance.online` + VPS n8n `https://auto.rs3d.pl`: blog pipeline now enforces a central hero-image contract. Deployed with backups (`BlogVertexPipelineService.php.bak_20260426_n8n_image_gate`, `BlogPipelineController.php.bak_20260426_n8n_image_gate`, `config/blog.php.bak_20260426_n8n_image_gate`) and `php85 artisan optimize:clear`. `config('blog.require_hero_image_for_pipeline')` is **true** on production. VPS backup before n8n changes: `/srv/ops-stack/n8n/storage/database.sqlite.bak_n8n_image_gate_20260426`. Patched n8n workflows: `RS Daily Automotive News Drafts` now sends `require_hero_image: true`; `RS Blog on Demand` and `RS AI Agent Content` verified with `require_hero_image: true`; `RS Editorial Board` now passes source URLs, slot/date, research brief and `featured_image_alt` into `/api/blog/pipeline/persist`, so Laravel adds SEO/AEO/GEO pass and hero image before save. Verification: n8n fleet `--definition-gate --json` -> **ok true**, `flagged_count=0`; local tests **10 passed / 14 assertions**; production `BlogPipelineImageGateTest` **1 passed**; route list shows all `/api/blog/pipeline/*` routes.
+
 > LIVE N8N + TELEGRAM WOW FINAL AUDIT/FIX (2026-04-26 10:49 CET)
 > VPS n8n `https://auto.rs3d.pl`: final fleet gate `python scripts/run_n8n_fleet_verify_vps_auto.py --definition-gate --json` -> **ok true**, `flagged_count=0`, **24** workflowy (**20** aktywnych). Telegram Bot API `getMe` -> **200** (`@rsperformance_bot`), chat `6534705697` spójny; realny UTF-8 smoke z `Zażółć gęślą jaźń` -> **HTTP 200**, `echo_matches=true`. Naprawiono VPS digest/smoke helpery (backup `vps_n8n_telegram_wow_digest.py.bak_cursor_digest_parser_20260426`) oraz workflow runtime: `RS AI Bot Invitation Hub` env `RS_TELEGRAM_*` -> latest run **success**; `RS AI Agent SEO-AEO` usunięte martwe URL-e `/diagnostyka`, `/kontakt`, wszystkie **11** targetów -> HTTP **200**. Residual: w historii n8n SEO-AEO zostaje stary `DEFOK` do następnego crona; API `/execute` = **405**, CLI `n8n execute` koliduje z brokerem `5679`, więc nie wymuszano ryzykownego runu.
 
@@ -2205,3 +2210,33 @@ _Informacje o dostÄ™pie SSH, VPS i Google Cloud zostaĹ‚y przeniesione i zo
 - **Smoke wszystkich `tracked_user_agents`**: `python scripts/live_ai_invited_smoke.py` z katalogu `G:\gravity` — cel `https://rsperformance.online/kody-usterek/p0299`, nagłówek `X-RS-Synthetic-Probe: 1`. Jeśli brzeg zwraca 403 dla fałszywego Googlebot: opcjonalnie **`SMOKE_ALLOW_GOOGLEBOT_403=1`** (patrz log smoke; realny Googlebot weryfikuj GSC).
 - **OpenRouter (`OPENROUTER_API_KEY`, format `sk-or-v1-…`)**: wyłącznie w **`.cursor/mcp.env`** (jest w `.gitignore`), ewentualnie hosting **`laravel/.env`** lub **n8n → Credentials** — nigdy w artifactach ani w repozytorium. Scala lokalnie: `python scripts/hydrate_mcp_env_from_workspace.py`. Po wycieku klucza: rotacja w panelu OpenRouter i aktualizacja n8n + `mcp.env`.
 - **AEO / discovery**: po zmianach w `SearchArtifactFactory` na produkcji: backup → `php85 artisan search:artifacts-generate` → w JSON **`/.well-known/ai-resources.json`** jest blok **`openrouter_operator_surface`** (jak laczyc fetch discovery z routerem modeli bez publikowania sekretow). **`llms.txt`** zawiera skrocona wersje tej polityki.
+
+## Knowledge SEO Index Layer - 2026-04-26 13:19 CET
+
+- Produkcja: `/wiedza-ai` i `/wiedza-ai/{slug}` dzia?aj? jako indeksowalny HTML nad Qdrant/VPS.
+- GSC/SEO: nowe URL-e s? w `sitemap.xml`; strony maj? canonical, `index, follow`, schema `TechArticle`/`FAQPage`/`Dataset`.
+- AEO/GEO: `llms-full.txt` i `/.well-known/ai-resources.json` wskazuj? nowe strony oraz API `/api/knowledge/search`.
+- Smoke: live 200, produkcyjny `KnowledgeSeoPagesTest` passed, IndexNow success.
+
+## Local Gdańsk District Layer - 2026-04-26 13:39 CET
+
+- Produkcja: `/gdansk` + 10 stron dzielnicowych `/gdansk/{slug}` są live: Wrzeszcz, Oliwa, Przymorze, Zaspa, Morena, Chełm, Osowa, Siedlce, Brzeźno, Jasień.
+- SEO/AEO/GEO: strony mają unikalny kontekst lokalny, canonical, schema `AutoRepair`/`Service`/`FAQPage`, linki do usług/problemów, Qdrant evidence block oraz publiczny `/api/knowledge/search`.
+- Discovery: `sitemap.xml`, `llms-full.txt`, `.well-known/ai-resources.json`, `feeds/content.json` zostały zregenerowane na produkcji.
+- Smoke: produkcyjny `LocalSeoPagesTest` passed; public full district smoke **10/10 HTTP 200**; IndexNow **success** dla 11 nowych URL-i.
+
+## Service SEO/AEO/GEO WOW Graph - 2026-04-26 13:56 CET
+
+- Produkcja: `/uslugi` ma teraz mocniejszy answer-first service graph: pełna mapa kategorii, linki do `/problemy`, `/gdansk`, `/wiedza-ai`, metryki katalogu i lokalny blok dzielnic.
+- Produkcja: `/uslugi/{slug}` ma `AI-readable service hook`, publiczny link `/api/knowledge/search?q=...` i linki do dzielnic Gdańska.
+- Discovery: `SearchArtifactFactory::orderedServices()` obejmuje wszystkie aktywne usługi; `/.well-known/ai-resources.json` wystawia `service_atomic_answers` dla 19 usług.
+- Backup: `storage/app/backups/service-seo-wow-20260426_1345`.
+- Smoke: lokalny i produkcyjny `ServiceSeoGraphTest` **3 passed / 12 assertions**; public smoke `/uslugi`, przykładowej usługi, `sitemap.xml`, `llms-full.txt`, `ai-resources.json` -> **200**; IndexNow **success** (`url_count=24`).
+- Uwaga jakościowa: tymczasowy testowy slug `kalibracja-adas` został usunięty z DB i artefaktów; test jest już niemutujący.
+
+## Search Ops GSC Harvester/Promoter - 2026-04-26 15:47 CET
+
+- Produkcja hosting: Search Ops router ma pełną mapę 19 usług (`config/search_ops.php`), DTC-like queries wzmacniają `/uslugi/diagnostyka-komputerowa`, a snapshoty GSC+Bing są scalane per source zamiast nadpisywania kolejki.
+- Produkcja n8n `https://auto.rs3d.pl`: `RS Search Ops Harvester` i `RS Search Ops Promoter` zpatchowane przez `scripts/n8n_apply_search_ops_wow_apr2026.py`; `Promoter` aktywny.
+- Backup: hosting `storage/app/backups/search_ops_20260426_1339`; n8n workflow backups `scripts/.tmp_n8n_wf_backup_search_ops_*`.
+- Smoke: produkcyjne Search Ops testy **27 passed / 69 assertions**; webhook Harvester **200** (`OK gsc`, `OK bing`), webhook Promoter **200** (`Ready: 12`, `Review: 12`); fleet definition gate **ok true**, `flagged_count=0`.
