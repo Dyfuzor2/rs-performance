@@ -4,6 +4,72 @@ Format relay: jeden blok na sesję, bez kasowania cudzych wpisów. Starsze wpisy
 
 ---
 
+## [2026-04-26] Cursor — VPS production update: OS, Docker images, n8n 2.17.7 + external runners
+
+### Wykonane
+
+- **Backup / rollback:** utworzono `/srv/backups/vps/update_20260426_100049_cursor` z manifestami APT/Docker, kopią `/srv/ops-stack/compose`, n8n SQLite (`database.sqlite`), snapshotami Qdrant (`rs_static_knowledge`, `rs_dynamic_knowledge`, `rs_answer_routing`, itd.) oraz kopiami configów Caddy/systemd/ai-gateway.
+- **APT:** zaktualizowano Ubuntu 24.04.4 LTS pakietami systemowymi i narzędziami: Docker **29.4.1**, Docker Compose **5.1.3**, containerd **2.2.3**, Google Cloud SDK **565.0.0**, CrowdSec **1.7.7**, systemd **255.4-1ubuntu8.15**. Po aktualizacji wymagany był reboot.
+- **Docker:** pobrano i uruchomiono nowe obrazy publiczne: `n8nio/n8n`, `ghcr.io/czlonkowski/n8n-mcp`, `qdrant/qdrant`, `postgres:17`, `postgres:15-alpine`, `ghcr.io/umami-software/umami:postgresql-latest`, `searxng/searxng`. Lokalny `rs-support-plane-app` **nie** był pullowany z registry (własny lokalny build).
+- **n8n:** po aktualizacji do **2.17.7** naprawiono warning `Python task runner in internal mode` przez produkcyjny external mode: `n8nio/runners:2.17.7`, broker lokalny `127.0.0.1:5679`, image n8n przypięty do `n8nio/n8n:2.17.7`.
+- **Reboot:** wykonano kontrolowany reboot; VPS wrócił na kernelu **`6.8.0-110-generic`**, `/var/run/reboot-required` usunięty.
+- **Cleanup:** `apt-get clean` + `docker image prune -f` tylko dla obrazów nieużywanych/dangling; odzyskano ok. **1.346 GB**, finalnie `/` ma **72% used / 26G free**.
+
+### Weryfikacja
+
+- Lokalnie na VPS: n8n `/healthz` **200**, broker `:5679/healthz` **200**, n8n-mcp `/health` **200**, Qdrant `/collections` **200**, Umami **200**, Diagnosta API **200**.
+- Publicznie: `https://auto.rs3d.pl/healthz` **200**, `https://ai.rsperformance.online/for-agents` **200**, gateway OpenAPI JSON **200**, `https://analytics.rs3d.pl` **200**, `https://status.rs3d.pl` **302** (oczekiwane redirect/login).
+- n8n fleet/Telegram: `python scripts/run_n8n_fleet_verify_vps_auto.py --definition-gate --json` → **`ok: true`**, `flagged_count: 0`; dwa stare `last=error` pozostają jako **stale DEFOK** (SEO-AEO, Invitation Hub).
+- Final quick smoke: kernel **`6.8.0-110-generic`**, `apt_upgradable=0`, `auto.rs3d.pl`, AI gateway, analytics, n8n, n8n broker, n8n-mcp i Qdrant all green.
+
+### Repo
+
+- Zaktualizowano `infrastructure/vps/docker/docker-compose.yml` jako bezsekretowy blueprint dla external task runners i pinu n8n `2.17.7`.
+- Zaktualizowano `start.md` oraz `handoff-log.md`.
+
+---
+
+## [2026-04-26] Cursor — VPS n8n + Telegram: `n8n_fleet_wow_verify` (produkcja `https://auto.rs3d.pl`)
+
+### Wykonane (odczyt prod — nakaz zapisu)
+
+- **`python scripts/run_n8n_fleet_verify_vps_auto.py --json`** — JWT z SQLite VPS, lista **24** workflowów, Telegram **getMe** `HTTP 200`, bot `@rsperformance_bot`, `TELEGRAM_CHAT_ID` spójny z węzłami (**6534705697: OK**).
+- **Ostatni run (bez definition-gate):** `flagged_count: 2` — `yE7tLieYNJa4FDW3` (RS AI Agent SEO-AEO), `F6uosr6xSCJZM4fO` (RS AI Bot Invitation Hub), komunikat błędu: _The resource you are requesting could not be found_ (typowo **HTTP 404** do zasobu, nie do Telegram API).
+- **`--definition-gate --json`:** `ok: true`, `flagged_count: 0` — te dwa błędne ostatnie runy uznane za **stale** (definicja JSON przechodzi bramkę statyczną z kwiecień-2026; kolejny udany run w historii n8n czyści czerwony `last`).
+
+### Telegram WOW (deploy wcześniej)
+
+- Weryfikacja obejmuje m.in. `xcwu34W87JpmV75S` (Research Harvester), `9oAbPosvf0h860Xg` (DTC), `v2p1MYtzCVmxUxyU` (IndexNow) — wszystkie **last=success** w tym teście.
+
+---
+
+## [2026-04-26] Cursor — VPS n8n: audyt duplikatów nazw workflowów (tylko odczyt API, produkcja)
+
+### Wykonane (nakaz: każde sprawdzenie prod ma być w repo)
+
+- **Źródło prawdy:** publiczne API n8n na VPS `https://auto.rs3d.pl` (JWT z SQLite na VPS, jak w `run_n8n_telegram_wow_suite_vps_auto.py`).
+- **Metoda:** lista wszystkich workflowów → grupowanie po `name` → raport duplikatów.
+- **Wynik:** **24** workflowy, **22** unikalne nazwy; **2** pary tej samej nazwy (świeża aktywna + stara nieaktywna): `RS AI Bot Invitation Hub` (`F6uosr6xSCJZM4fO` active / `FM1BxBIDKRmhr57i` inactive), `RS Blog on Demand (Telegram)` (`BiCeE7CqPPfVsad0` active / `VPTe4OfoyBuGgddS` inactive). **Brak** masowego duplikowania.
+
+### Uwaga procesowa (sesja 2026-04-26)
+
+- Pierwsza odpowiedź w czacie zawierała wynik audytu, ale **bez** dopisania do `handoff-log` / `SESSION_LOG` — błąd. Od teraz: **produkcja + zapis w repo = nakaz właściciela**, także dla samych odczytów.
+
+---
+
+## [2026-04-26] Cursor — VPS n8n: deploy Telegram WOW suite (prod `auto.rs3d.pl`)
+
+### Wykonane
+
+- **`python scripts/run_n8n_telegram_wow_suite_vps_auto.py --json`** — jeden odczyt JWT z SQLite na VPS, `N8N_API_URL=https://auto.rs3d.pl`, sekwencja: Research Harvester → DTC Enrichment → IndexNow Drip (PUT **OK**).
+- **Workflow IDs (prod):** `xcwu34W87JpmV75S`, `9oAbPosvf0h860Xg`, `v2p1MYtzCVmxUxyU`; lokalne backupy pod `scripts/.tmp_n8n_wf_backup_20260426_*`.
+
+### Uwagi operatora
+
+- Następne kroki (opcjonalnie): w n8n UI sprawdź **aktywne** + ostatni **execution**; digest Telegram: `scripts/vps_n8n_telegram_wow_digest.py` na VPS (cron 08:00) — już opisane w `rs-n8n-wow-2026`.
+
+---
+
 ## [2026-04-12] Cursor — `ssh_exec`: `cs.txt` / `CYBERFOLKS_SSH_PASSWORD_FILE` + deploy AEO OpenAPI na hosting
 
 ### Wykonane

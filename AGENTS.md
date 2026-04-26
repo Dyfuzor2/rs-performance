@@ -65,6 +65,8 @@ Od tej chwili obowiązują sztywne zasady operacyjne:
 3. Dopisz wpis na koniec `G:\gravity\handoff-log.md`
 4. **NIE CZEKAJ na koniec sesji — rób to po KAŻDEJ zmianie na produkcji**
 
+**Weryfikacje / audyty tylko-odczyt na produkcji (VPS, hosting, n8n API, curl do live):** to nadal praca „na produkcji”. Po każdym takim sprawdzeniu dopisz **krótki fakt** do `G:\gravity\handoff-log.md` (co sprawdzono, wynik); przy szerszym audycie — także blok w `G:\gravity\SESSION_LOG.md`. **To jest nakaz właściciela, nie opcjonalna prośba.**
+
 ### Gdy user pisze "start.md" lub "przeczytaj start.md":
 
 - Przeczytaj `G:\gravity\start.md` i wykonaj procedurę startową (weryfikacja serwera)
